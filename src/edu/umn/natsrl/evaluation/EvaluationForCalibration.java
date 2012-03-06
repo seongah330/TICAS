@@ -76,12 +76,6 @@ public class EvaluationForCalibration extends TimerTask {
     SimulationResult selectedSimulationResult;
     private ArrayList<SimulationResult> simResultList;
     
-    private String SimulationName;
-    
-    //for File Create
-    private boolean IsRunSheet = false;
-    private String RunFname;
-    
     public EvaluationForCalibration(TICASOption selectedOption, OptionType[] opt, RunningDialog rd, SimulationResult sr){
         rd.showLog();
         this.selectedOption = selectedOption;
@@ -96,9 +90,6 @@ public class EvaluationForCalibration extends TimerTask {
         StationStateSims = new ArrayList<ArrayList>();
         CumSimStations = new ArrayList<CStation>();
         this.selectedSimulationResult = sr;
-        this.IsRunSheet = false;
-        this.RunFname = null;
-        this.SimulationName = selectedSimulationResult.getName();
     }
     
     @Override
@@ -117,7 +108,6 @@ public class EvaluationForCalibration extends TimerTask {
         }
         
         try {
-            
             if (selectedOption.getEvaluationOption().hasOption(OptionType.OUT_EXCEL)) {
                 CumSimStations = new ArrayList<CStation>();
                 Evaluation();
@@ -308,8 +298,8 @@ public class EvaluationForCalibration extends TimerTask {
         System.out.println("Making File.."+FileName);
         
         WritableWorkbook workbook = Workbook.createWorkbook(new File(FileName));
-        String[] temparr = FileName.split("\\.")[0].split("\\\\");
-        WritableSheet sheet = workbook.createSheet(temparr[temparr.length-1], 1);
+        String[] temparr = FileName.split("\\.")[0].split("_");
+        WritableSheet sheet = workbook.createSheet("Calibration_"+option.getSection().getName()+"_"+temparr[temparr.length-1], 1);
         int Col = 0;
         
         //Add Time Info
@@ -650,14 +640,7 @@ public class EvaluationForCalibration extends TimerTask {
      */
     private void saveContour(Evaluation ev, TICASOption selectedOption, EvaluationOption opts, ContourType cType) {
         ContourPlotter cp = new ContourPlotter(opts.getSection(), opts.getContourSetting(cType), ev, selectedOption.getOutputPath());
-        String Cname = cType.name();
-        
-        if(cType.isTotalFlowContour())
-            Cname = "Station Speed";
-        if(cType.isSpeedContour())
-            Cname = "Station Total Flow";
-        
-        cp.saveImage(opts.hasOption(OptionType.OPEN_CONTOUR),this.getFileName(Cname,"jpg"));        
+        cp.saveImage(opts.hasOption(OptionType.OPEN_CONTOUR),this.getFileName(cType.name(),"jpg"));        
     }
     
     /*
@@ -712,25 +695,12 @@ public class EvaluationForCalibration extends TimerTask {
         return getFileName(null,ext);
     }
     private String getFileName(String name, String ext){
-//        String Fname = "Calibration_" + option.getSection().getName();
-        String Fname = this.SimulationName;
-        
-        //if Contour with CSV or EXEL
-        if(ext.equals("jpg") && IsRunSheet){
-            Fname = RunFname;
-        }
-        
+        String Fname = "Calibration_" + option.getSection().getName();
         if(name != null)
             Fname += "_"+name;
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMddyyyHHmmss");
         String FileName = FileHelper.getNumberedFileName(this.selectedOption.getOutputPath() + "\\" + Fname  + "."+ext);
-        
-        if(ext.equals("csv") || ext.equals("xls")){
-            this.IsRunSheet = true;
-            String[] temparr = FileName.split("\\.")[0].split("\\\\");
-            this.RunFname = temparr[temparr.length-1];
-        }
         return FileName;
     }
     
