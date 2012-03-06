@@ -615,11 +615,11 @@ public class SFIMPanel extends javax.swing.JPanel {
             }
         });
 
-        tabMain.setFont(new java.awt.Font("Verdana", 0, 12));
+        tabMain.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
 
-        panSimulation.setFont(new java.awt.Font("Verdana", 0, 12));
+        panSimulation.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
 
-        btnStartStop.setFont(new java.awt.Font("Verdana", 0, 12));
+        btnStartStop.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnStartStop.setText("Start Simulation");
         btnStartStop.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -629,10 +629,10 @@ public class SFIMPanel extends javax.swing.JPanel {
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Simulation", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 12))); // NOI18N
 
-        jLabel1.setFont(new java.awt.Font("Verdana", 1, 11));
+        jLabel1.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
         jLabel1.setText("VISSIM Case File");
 
-        btnCaseFile.setFont(new java.awt.Font("Verdana", 0, 12));
+        btnCaseFile.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnCaseFile.setText("Browse");
         btnCaseFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -640,19 +640,19 @@ public class SFIMPanel extends javax.swing.JPanel {
             }
         });
 
-        tbxCaseFile.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxCaseFile.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
 
-        jLabel8.setFont(new java.awt.Font("Verdana", 1, 11));
+        jLabel8.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
         jLabel8.setText("Random Number");
 
-        tbxRandom.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxRandom.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxRandom.setText("13");
         tbxRandom.setPreferredSize(new java.awt.Dimension(59, 25));
 
-        jLabel3.setFont(new java.awt.Font("Verdana", 1, 11));
+        jLabel3.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
         jLabel3.setText("Section");
 
-        cbxSections.setFont(new java.awt.Font("Verdana", 0, 10));
+        cbxSections.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         cbxSections.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbxSectionsActionPerformed(evt);
@@ -721,25 +721,25 @@ public class SFIMPanel extends javax.swing.JPanel {
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "IRIS", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 12))); // NOI18N
 
-        jLabel4.setFont(new java.awt.Font("Verdana", 1, 11));
+        jLabel4.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
         jLabel4.setText("Traffic Policy");
 
-        chkMetering.setFont(new java.awt.Font("Verdana", 0, 12));
+        chkMetering.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         chkMetering.setSelected(true);
         chkMetering.setText("Metering");
 
-        chkVSA.setFont(new java.awt.Font("Verdana", 0, 12));
+        chkVSA.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         chkVSA.setText("VSL");
 
-        jLabel2.setFont(new java.awt.Font("Verdana", 1, 11));
+        jLabel2.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
         jLabel2.setText("Metering Algorithm");
 
-        cbxMeteringAlgorithm.setFont(new java.awt.Font("Verdana", 0, 12));
+        cbxMeteringAlgorithm.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
 
-        jLabel9.setFont(new java.awt.Font("Verdana", 1, 11));
+        jLabel9.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
         jLabel9.setText("Time");
 
-        jLabel13.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel13.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel13.setText("From");
 
         tbxSimStartHour.setText("6");
@@ -748,22 +748,22 @@ public class SFIMPanel extends javax.swing.JPanel {
 
         tbxSimStartMin.setText("0");
 
-        jLabel11.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel11.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel11.setText("for");
 
         tbxSimDuration.setText("3");
 
-        jLabel12.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel12.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel12.setText("hour");
 
-        jLabel14.setFont(new java.awt.Font("Verdana", 1, 11));
+        jLabel14.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
         jLabel14.setText("Options");
 
-        chkPrintStation.setFont(new java.awt.Font("Verdana", 0, 11));
+        chkPrintStation.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         chkPrintStation.setSelected(true);
         chkPrintStation.setText("debug station info from IRIS");
 
-        chkPrintMeter.setFont(new java.awt.Font("Verdana", 0, 11));
+        chkPrintMeter.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         chkPrintMeter.setSelected(true);
         chkPrintMeter.setText("debug ramp meter info from IRIS");
 
@@ -870,7 +870,7 @@ public class SFIMPanel extends javax.swing.JPanel {
 
         tabMain.addTab("Simulation", panSimulation);
 
-        chkShowVehicles.setFont(new java.awt.Font("Verdana", 0, 12));
+        chkShowVehicles.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         chkShowVehicles.setText("show vehicles");
         chkShowVehicles.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -884,7 +884,7 @@ public class SFIMPanel extends javax.swing.JPanel {
         splitConsoleOutputPane.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         splitConsoleOutputPane.setDividerLocation(300);
 
-        jLabel6.setFont(new java.awt.Font("Verdana", 0, 11));
+        jLabel6.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jLabel6.setText("SFIM");
 
         tbxLog.setColumns(20);
@@ -893,7 +893,7 @@ public class SFIMPanel extends javax.swing.JPanel {
         tbxLog.setRows(5);
         jScrollPane1.setViewportView(tbxLog);
 
-        btnSaveLog.setFont(new java.awt.Font("Verdana", 0, 12));
+        btnSaveLog.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnSaveLog.setText("Save");
         btnSaveLog.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -901,7 +901,7 @@ public class SFIMPanel extends javax.swing.JPanel {
             }
         });
 
-        btnClear.setFont(new java.awt.Font("Verdana", 0, 12));
+        btnClear.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnClear.setText("Clear");
         btnClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -941,16 +941,16 @@ public class SFIMPanel extends javax.swing.JPanel {
 
         splitConsoleOutputPane.setLeftComponent(panOutputSfim);
 
-        jLabel7.setFont(new java.awt.Font("Verdana", 0, 11));
+        jLabel7.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jLabel7.setText("IRIS");
 
         tbxRemoteLog.setColumns(20);
-        tbxRemoteLog.setFont(new java.awt.Font("Verdana", 0, 11));
+        tbxRemoteLog.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         tbxRemoteLog.setLineWrap(true);
         tbxRemoteLog.setRows(5);
         jScrollPane2.setViewportView(tbxRemoteLog);
 
-        btnSaveRemoteLog.setFont(new java.awt.Font("Verdana", 0, 12));
+        btnSaveRemoteLog.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnSaveRemoteLog.setText("Save");
         btnSaveRemoteLog.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -958,7 +958,7 @@ public class SFIMPanel extends javax.swing.JPanel {
             }
         });
 
-        btnRemoteClear.setFont(new java.awt.Font("Verdana", 0, 12));
+        btnRemoteClear.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnRemoteClear.setText("Clear");
         btnRemoteClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1000,7 +1000,7 @@ public class SFIMPanel extends javax.swing.JPanel {
         splitConsoleMainPane.setTopComponent(splitConsoleOutputPane);
 
         tbxErrors.setColumns(20);
-        tbxErrors.setFont(new java.awt.Font("Verdana", 0, 11));
+        tbxErrors.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         tbxErrors.setLineWrap(true);
         tbxErrors.setRows(5);
         jScrollPane3.setViewportView(tbxErrors);
@@ -1015,7 +1015,7 @@ public class SFIMPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(panLogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(chkShowVehicles)
-                    .addComponent(splitConsoleMainPane, javax.swing.GroupLayout.DEFAULT_SIZE, 829, Short.MAX_VALUE))
+                    .addComponent(splitConsoleMainPane))
                 .addContainerGap())
         );
         panLogLayout.setVerticalGroup(
@@ -1036,14 +1036,14 @@ public class SFIMPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tabMain, javax.swing.GroupLayout.DEFAULT_SIZE, 854, Short.MAX_VALUE)
+                .addComponent(tabMain)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tabMain, javax.swing.GroupLayout.DEFAULT_SIZE, 592, Short.MAX_VALUE)
+                .addComponent(tabMain)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
