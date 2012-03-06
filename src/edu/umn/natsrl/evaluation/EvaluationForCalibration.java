@@ -653,9 +653,9 @@ public class EvaluationForCalibration extends TimerTask {
         String Cname = cType.name();
         
         if(cType.isTotalFlowContour())
-            Cname = "Station Total Flow";
-        if(cType.isSpeedContour())
             Cname = "Station Speed";
+        if(cType.isSpeedContour())
+            Cname = "Station Total Flow";
         
         cp.saveImage(opts.hasOption(OptionType.OPEN_CONTOUR),this.getFileName(Cname,"jpg"));        
     }
