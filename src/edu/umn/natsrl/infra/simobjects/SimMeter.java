@@ -27,7 +27,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class SimMeter extends SimObject {
 

@@ -46,7 +46,7 @@ import javax.swing.SwingUtilities;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEndSignal {
     private TMO tmo = TMO.getInstance();

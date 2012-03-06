@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park (chongmyung.park@gmail.com) (chongmyung.park@gmail.com)
  * @author Subok Kim (derekkim29@gmail.com)
  */
 public class SRTEProcess {

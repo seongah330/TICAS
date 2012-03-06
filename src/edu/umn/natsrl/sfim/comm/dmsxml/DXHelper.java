@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 
 /**
  * DMS XML Helper Class
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class DXHelper {
        

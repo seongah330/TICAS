@@ -25,7 +25,7 @@ import java.util.Arrays;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public abstract class AStationData extends Evaluation {
 

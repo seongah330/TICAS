@@ -34,7 +34,7 @@ import java.util.Properties;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class SFIMSyncServer extends Thread {
 

@@ -22,7 +22,7 @@ import java.awt.BorderLayout;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class SectionEditor extends javax.swing.JFrame {
     

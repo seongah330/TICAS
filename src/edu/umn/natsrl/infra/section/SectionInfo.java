@@ -22,7 +22,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class SectionInfo implements Serializable
 {

@@ -29,7 +29,7 @@ import java.nio.ByteBuffer;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class ReadRedTime  extends MnDotResponser {
 

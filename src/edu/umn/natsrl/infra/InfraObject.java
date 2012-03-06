@@ -28,7 +28,7 @@ import org.w3c.dom.NamedNodeMap;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public abstract class InfraObject implements Serializable {
     

@@ -20,7 +20,7 @@ package edu.umn.natsrl.util;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class ExcelHelper {
     

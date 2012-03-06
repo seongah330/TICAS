@@ -25,7 +25,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public abstract class MnDotResponser  extends Responser {
     

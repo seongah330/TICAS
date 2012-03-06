@@ -51,7 +51,7 @@ import jxl.write.Number;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class TravelTimeIndexer {
     

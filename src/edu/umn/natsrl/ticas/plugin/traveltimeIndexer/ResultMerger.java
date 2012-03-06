@@ -38,7 +38,7 @@ import jxl.write.WritableWorkbook;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class ResultMerger extends javax.swing.JDialog {
 

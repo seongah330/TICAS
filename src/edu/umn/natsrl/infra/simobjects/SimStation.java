@@ -22,7 +22,7 @@ import edu.umn.natsrl.infra.infraobjects.Station;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class SimStation extends SimRNode {
 

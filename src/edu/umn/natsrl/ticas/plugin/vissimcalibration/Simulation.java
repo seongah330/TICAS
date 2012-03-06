@@ -32,7 +32,7 @@ import jxl.write.WritableWorkbook;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class Simulation extends Thread implements ITravelTimeListener {
     private String casefile;

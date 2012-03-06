@@ -25,7 +25,7 @@ import java.io.IOException;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class Logger {
     public static String SAVE_DIR = InfraConstants.CACHE_DIR + File.separator + "log";

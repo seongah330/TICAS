@@ -29,7 +29,7 @@ import java.util.Arrays;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 /**
  * Class to store result

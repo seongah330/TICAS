@@ -23,7 +23,7 @@ import java.util.Vector;
 
 /**
  * Data structure for saving controller information
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class InfoController {
     public InfoCommLink commlink;

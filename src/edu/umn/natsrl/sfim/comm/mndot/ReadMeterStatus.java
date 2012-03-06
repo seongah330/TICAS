@@ -30,7 +30,7 @@ import java.io.IOException;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class ReadMeterStatus  extends MnDotResponser {
     

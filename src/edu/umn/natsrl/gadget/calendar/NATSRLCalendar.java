@@ -35,7 +35,7 @@ import javax.swing.JToggleButton;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public final class NATSRLCalendar extends javax.swing.JPanel {
     

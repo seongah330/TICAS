@@ -54,7 +54,7 @@ import org.jawin.constants.VarTypes;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class VISSIMController {
 

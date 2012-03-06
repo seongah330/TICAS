@@ -25,7 +25,7 @@ import edu.umn.natsrl.infra.types.InfraType;
 /**
  * This class is not used now.
  * because 'tms_config.xml' does not include dms information
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class DMS extends InfraObject {
     

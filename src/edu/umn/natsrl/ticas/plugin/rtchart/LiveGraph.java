@@ -34,7 +34,7 @@ import org.krm.tg.live.JGraphPanel;
 import org.krm.tg.Graph;
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public abstract class LiveGraph {
     

@@ -41,7 +41,7 @@ import org.jdesktop.swingx.mapviewer.GeoPosition;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class SectionCreatorPanel extends javax.swing.JPanel {
 

@@ -20,7 +20,7 @@ package edu.umn.natsrl.sfim.comm;
 
 /**
  * Data structure for saving timing plan (metering algorithm) information
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class InfoTimingPlan {
     public int id;

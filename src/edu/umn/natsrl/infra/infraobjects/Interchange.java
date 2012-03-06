@@ -22,7 +22,7 @@ import org.w3c.dom.Element;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class Interchange extends RNode {
 

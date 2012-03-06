@@ -24,7 +24,7 @@ import edu.umn.natsrl.infra.TMO;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class SectionInfoDialog extends javax.swing.JDialog {
 

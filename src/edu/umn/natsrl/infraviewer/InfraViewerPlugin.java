@@ -30,7 +30,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 @PluginImplementation
 public class InfraViewerPlugin implements ITicasPlugin {
