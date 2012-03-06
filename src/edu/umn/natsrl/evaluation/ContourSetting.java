@@ -23,7 +23,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class ContourSetting implements Serializable {
 

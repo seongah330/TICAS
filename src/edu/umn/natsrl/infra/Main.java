@@ -22,7 +22,7 @@ import edu.umn.natsrl.infra.infraobjects.Station;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class Main {
     public static void main(String[] args)

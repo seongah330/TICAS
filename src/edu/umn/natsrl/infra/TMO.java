@@ -36,7 +36,7 @@ import javax.swing.JFrame;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class TMO implements Serializable {
 

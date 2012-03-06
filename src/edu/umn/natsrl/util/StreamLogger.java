@@ -26,7 +26,7 @@ import java.io.OutputStream;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class StreamLogger extends OutputStream {
     

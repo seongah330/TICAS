@@ -35,7 +35,7 @@ import java.util.logging.Logger;
 /**
  * Class for storing option of TICAS GUI
  * It stores section, period, interval, output path and all check boxes in TICAS GUI
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class TICASOption implements Serializable {
 

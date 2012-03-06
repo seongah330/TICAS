@@ -20,7 +20,7 @@ package edu.umn.natsrl.vissimcom;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public interface ITravelTimeListener {
     public void readTravelTime(String[] travelTimeIds, double[] travelTimes);

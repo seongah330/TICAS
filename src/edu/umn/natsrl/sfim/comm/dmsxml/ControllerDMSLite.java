@@ -28,7 +28,7 @@ import edu.umn.natsrl.sfim.comm.Responser;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class ControllerDMSLite extends Controller  {
 

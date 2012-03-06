@@ -23,7 +23,7 @@ import java.awt.Toolkit;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class SFIMFrame extends javax.swing.JFrame {
     

@@ -43,7 +43,7 @@ import jxl.write.WritableWorkbook;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class DataReaderGUI extends javax.swing.JPanel {
 

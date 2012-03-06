@@ -20,7 +20,7 @@ package edu.umn.natsrl.infra.interfaces;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public interface IInfraProgressListener {
     public void addProgress(int progress);

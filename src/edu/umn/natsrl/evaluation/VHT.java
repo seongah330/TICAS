@@ -24,7 +24,7 @@ import java.util.Vector;
 
 /**
  * Vehicle Hour Traveled
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class VHT extends Evaluation {
 

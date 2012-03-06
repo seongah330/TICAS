@@ -20,7 +20,7 @@ package edu.umn.natsrl.sfim.comm;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public enum ResponserType {
     DMS_GET_CONFIG,

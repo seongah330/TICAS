@@ -33,7 +33,7 @@ import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class TMCProvider {
 

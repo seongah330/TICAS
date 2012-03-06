@@ -28,7 +28,7 @@ import java.util.Vector;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public abstract class Controller {
     protected int drop;

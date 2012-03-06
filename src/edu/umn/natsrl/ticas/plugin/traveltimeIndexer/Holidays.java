@@ -20,7 +20,7 @@ package edu.umn.natsrl.ticas.plugin.traveltimeIndexer;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 import java.util.*;
 import java.text.*;

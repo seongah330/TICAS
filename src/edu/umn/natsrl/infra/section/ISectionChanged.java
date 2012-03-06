@@ -19,7 +19,7 @@ package edu.umn.natsrl.infra.section;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public interface ISectionChanged {
     public void sectionChanged(SectionChangedStatus status);

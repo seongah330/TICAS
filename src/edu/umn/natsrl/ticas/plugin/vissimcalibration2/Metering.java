@@ -37,7 +37,7 @@ import java.util.List;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  * 
  */
 public class Metering {

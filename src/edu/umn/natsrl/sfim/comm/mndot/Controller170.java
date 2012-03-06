@@ -37,7 +37,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class Controller170 extends Controller implements IStepListener {
     

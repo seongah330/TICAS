@@ -27,7 +27,7 @@ import java.net.Socket;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class RemoteDebug extends Thread {
 

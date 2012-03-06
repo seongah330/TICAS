@@ -23,7 +23,7 @@ import java.util.Date;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public interface IDateChecker {
     public boolean isAvailable(Calendar c);

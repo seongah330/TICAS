@@ -21,7 +21,7 @@ import edu.umn.natsrl.infra.infraobjects.Detector;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class DetectorWithLaneConfigSpeed extends ADetectorWithLaneConfig {
 

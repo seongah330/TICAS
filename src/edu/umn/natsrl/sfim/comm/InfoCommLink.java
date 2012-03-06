@@ -20,7 +20,7 @@ package edu.umn.natsrl.sfim.comm;
 
 /**
  * Data structure for saving comm_link information
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class InfoCommLink {
     public String name;

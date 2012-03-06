@@ -23,7 +23,7 @@ import java.util.Vector;
 
 /**
  * Speed Variation
- * @author Chongmyung Park
+ * @author Chongmyung Park (chongmyung.park@gmail.com)
  */
 public class SV extends Evaluation {
 
