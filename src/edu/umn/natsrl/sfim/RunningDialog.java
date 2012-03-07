@@ -28,7 +28,7 @@ import java.util.TimerTask;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class RunningDialog extends javax.swing.JDialog {
     

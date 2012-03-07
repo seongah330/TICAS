@@ -31,7 +31,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 @PluginImplementation
 public class TTIndexterPlugin implements ITicasPlugin {

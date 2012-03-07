@@ -37,7 +37,7 @@ import org.xml.sax.SAXException;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class DataLoader {
 

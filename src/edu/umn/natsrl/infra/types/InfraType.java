@@ -32,7 +32,7 @@ import edu.umn.natsrl.infra.infraobjects.Station;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public enum InfraType {
     CORRIDOR(Corridor.class, "corridor"),

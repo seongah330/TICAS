@@ -28,7 +28,7 @@ import java.util.HashMap;
 
 /**
  * Communication protocol class for metering and sending detector data
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class CommMnDot extends Communicator {
 

@@ -54,7 +54,7 @@ import org.jdesktop.swingx.mapviewer.GeoPosition;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class InfraViewerPanel extends javax.swing.JPanel {
 

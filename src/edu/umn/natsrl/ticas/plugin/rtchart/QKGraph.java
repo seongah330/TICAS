@@ -22,7 +22,7 @@ import edu.umn.natsrl.ticas.plugin.rtchart.reader.StationNode;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class QKGraph extends LiveXYGraph {
 

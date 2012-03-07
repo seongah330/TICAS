@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class SimObjects {
 

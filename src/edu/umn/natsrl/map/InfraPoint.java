@@ -30,7 +30,7 @@ import org.jdesktop.swingx.mapviewer.Waypoint;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class InfraPoint extends Waypoint {
 

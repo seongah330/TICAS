@@ -27,7 +27,7 @@ import java.net.Socket;
 
 /**
  * Communication protocol class for DMS control
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class CommDMSXml extends Communicator {
 

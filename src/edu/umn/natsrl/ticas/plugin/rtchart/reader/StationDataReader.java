@@ -26,7 +26,7 @@ import org.w3c.dom.Document;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class StationDataReader {
     

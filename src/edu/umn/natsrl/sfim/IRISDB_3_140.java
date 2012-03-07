@@ -39,7 +39,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class IRISDB_3_140 {
 
@@ -52,7 +52,13 @@ public class IRISDB_3_140 {
     public IRISDB_3_140() {
         try {
             dbconnect();
+//            String[][] plans = FileHelper.readCSV("timingplan.csv", 0);
+//            for(int i=0; i<plans.length; i++) {
+//                statement.addBatch("UPDATE iris.timing_plan SET start_min = "+plans[i][1]+", stop_min = "+plans[i][2]+" WHERE name = '" + plans[i][0] + "'");
+//            }
             statement.executeBatch();
+//        } catch (IOException ex) {
+//            ex.printStackTrace();
         } catch (SQLException ex) {            
             SFIMExceptionHandler.handle(ex);
         }

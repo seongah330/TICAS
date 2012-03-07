@@ -21,7 +21,7 @@ import java.util.Date;
 
 /**
  * Set of station, timestamp and traffic data for just one xml file
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class StationNode {
 

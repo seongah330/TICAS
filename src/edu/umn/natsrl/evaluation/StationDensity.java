@@ -22,7 +22,7 @@ import edu.umn.natsrl.infra.interfaces.IDetectorChecker;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class StationDensity extends AStationData {
     

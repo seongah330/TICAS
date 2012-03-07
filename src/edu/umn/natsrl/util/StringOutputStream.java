@@ -25,7 +25,7 @@ import javax.swing.SwingUtilities;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 /**
  * String Output Stream class for output redirection

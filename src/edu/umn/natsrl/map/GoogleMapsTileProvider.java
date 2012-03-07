@@ -24,7 +24,7 @@ import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class GoogleMapsTileProvider {
 

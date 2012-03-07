@@ -23,7 +23,7 @@ import edu.umn.natsrl.vissimctrl.VSA;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class SimDMS extends SimObject {
     

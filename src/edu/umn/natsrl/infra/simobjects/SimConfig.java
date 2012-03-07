@@ -20,7 +20,7 @@ package edu.umn.natsrl.infra.simobjects;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class SimConfig {
     

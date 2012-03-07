@@ -27,7 +27,7 @@ import org.w3c.dom.NodeList;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class Corridor extends InfraObject implements Comparable {
     

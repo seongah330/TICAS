@@ -19,7 +19,7 @@ package edu.umn.natsrl.ticas.plugin.vissimcalibration;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public interface ISimEndSignal {
     public void signalEnd(int code);

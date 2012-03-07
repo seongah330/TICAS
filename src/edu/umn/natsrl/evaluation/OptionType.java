@@ -19,7 +19,7 @@ package edu.umn.natsrl.evaluation;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public enum OptionType {
     

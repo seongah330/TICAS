@@ -20,7 +20,7 @@ package edu.umn.natsrl.ticas.plugin;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public interface ITicasAfterSimulation {
     void afterSimulation(PluginFrame sf);

@@ -20,7 +20,7 @@ package edu.umn.natsrl.vissimcom;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public interface ITrafficListener {
     public void addTraffic(int[] detectorIds, int[] volumes, int[] flows, float[] speeds, float[] density);

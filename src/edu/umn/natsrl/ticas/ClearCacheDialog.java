@@ -22,7 +22,7 @@ import edu.umn.natsrl.infra.TMO;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class ClearCacheDialog extends javax.swing.JDialog {
     

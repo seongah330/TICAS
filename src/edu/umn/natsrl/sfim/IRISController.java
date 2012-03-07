@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class IRISController {
     

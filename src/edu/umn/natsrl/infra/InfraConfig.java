@@ -44,7 +44,7 @@ import org.w3c.dom.NodeList;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class InfraConfig implements Serializable {
     

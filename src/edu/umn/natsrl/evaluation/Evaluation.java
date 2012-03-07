@@ -37,7 +37,7 @@ import jxl.write.WritableWorkbook;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public abstract class Evaluation {
 

@@ -29,7 +29,7 @@ import java.util.TimerTask;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class SplashDialog extends javax.swing.JDialog {
 

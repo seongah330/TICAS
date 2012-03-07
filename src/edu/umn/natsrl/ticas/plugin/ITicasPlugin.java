@@ -22,7 +22,7 @@ import net.xeoh.plugins.base.Plugin;
 
 /**
  * Interface for tool and simulation plugin in TICAS
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 
 public interface ITicasPlugin extends Plugin {

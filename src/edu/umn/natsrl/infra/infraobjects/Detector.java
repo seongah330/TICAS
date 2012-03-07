@@ -42,7 +42,7 @@ import org.w3c.dom.Element;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class Detector extends InfraObject implements Comparable {
 

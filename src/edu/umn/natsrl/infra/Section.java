@@ -45,7 +45,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class Section implements Serializable {
 

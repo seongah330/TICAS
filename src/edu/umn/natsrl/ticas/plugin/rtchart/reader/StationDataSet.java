@@ -23,7 +23,7 @@ import java.util.Vector;
 /**
  * Traffic data set for a station that includes StationNode
  * @see StationNode
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class StationDataSet {
 

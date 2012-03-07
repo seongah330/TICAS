@@ -79,7 +79,7 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class TICAS2FrameOldVersion extends javax.swing.JFrame implements ITicasAfterSimulation {
 

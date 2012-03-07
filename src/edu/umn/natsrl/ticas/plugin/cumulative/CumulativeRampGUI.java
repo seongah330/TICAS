@@ -61,7 +61,7 @@ import jxl.write.WritableWorkbook;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class CumulativeRampGUI extends javax.swing.JPanel {
 

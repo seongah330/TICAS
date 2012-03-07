@@ -39,7 +39,7 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class SectionEditorPanel extends javax.swing.JPanel {
 

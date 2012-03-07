@@ -31,7 +31,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class EvalHelper {
     

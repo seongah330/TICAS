@@ -53,7 +53,7 @@ import org.jawin.COMException;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class Simulation extends Thread implements IStepListener, ITravelTimeListener {
     

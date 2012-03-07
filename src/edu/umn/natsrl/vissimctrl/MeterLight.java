@@ -20,7 +20,7 @@ package edu.umn.natsrl.vissimctrl;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public enum MeterLight {
     

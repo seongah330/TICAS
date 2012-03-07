@@ -20,7 +20,7 @@ package edu.umn.natsrl.util;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class NumUtil {
     

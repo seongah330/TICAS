@@ -49,7 +49,7 @@ import jcw.VISSIM_COMSERVERLib.Vissim;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class VISSIMController {
 

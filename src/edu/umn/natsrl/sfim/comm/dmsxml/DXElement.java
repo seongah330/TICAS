@@ -20,7 +20,7 @@ package edu.umn.natsrl.sfim.comm.dmsxml;
 
 /**
  * DMS XML Element Enumeration
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public enum DXElement {
     // root tag

@@ -20,7 +20,7 @@ package edu.umn.natsrl.sfim.comm;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 
 public enum CommProtocol {

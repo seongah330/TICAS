@@ -37,7 +37,7 @@ import org.jfree.data.contour.NonGridContourDataset;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public final class ContourPlotter {
 

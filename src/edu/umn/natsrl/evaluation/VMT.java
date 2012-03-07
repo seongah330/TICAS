@@ -23,7 +23,7 @@ import java.util.Vector;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class VMT extends Evaluation {
 

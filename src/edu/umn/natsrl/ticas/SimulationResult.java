@@ -39,7 +39,7 @@ import javax.swing.JOptionPane;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class SimulationResult implements Comparable {
     final String K_NAME = "name";

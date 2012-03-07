@@ -22,7 +22,7 @@ import edu.umn.natsrl.infra.Infra;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public interface IOrganizer {
 

@@ -32,7 +32,7 @@ import net.xeoh.plugins.base.impl.PluginManagerFactory;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class PluginFrame extends javax.swing.JFrame {
 

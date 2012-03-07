@@ -28,7 +28,7 @@ import java.util.Arrays;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class DetectorWithoutLaneConfig extends Evaluation {
         

@@ -20,7 +20,7 @@ package edu.umn.natsrl.sfim;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class SFIMConfigDialog extends javax.swing.JDialog {
 

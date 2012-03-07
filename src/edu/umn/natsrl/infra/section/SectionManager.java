@@ -29,7 +29,7 @@ import java.util.Vector;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public final class SectionManager {
     private Vector<Section> sections = new Vector<Section>();

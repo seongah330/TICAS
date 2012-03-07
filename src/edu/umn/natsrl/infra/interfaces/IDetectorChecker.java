@@ -22,7 +22,7 @@ import edu.umn.natsrl.infra.infraobjects.Detector;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public interface IDetectorChecker {
     public boolean check(Detector d);

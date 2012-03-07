@@ -22,7 +22,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public enum VSA {
     V15("VSL-15", 15),

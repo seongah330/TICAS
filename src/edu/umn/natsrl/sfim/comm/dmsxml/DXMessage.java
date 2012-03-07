@@ -20,7 +20,7 @@ package edu.umn.natsrl.sfim.comm.dmsxml;
 
 /**
  * DMS XML Message Class
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class DXMessage {
     StringBuilder message;

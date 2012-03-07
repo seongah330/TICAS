@@ -24,7 +24,7 @@ import org.krm.tg.XYDataSeries;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public abstract class LiveTimelineGraph extends LiveGraph {
 

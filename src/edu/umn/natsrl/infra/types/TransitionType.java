@@ -20,7 +20,7 @@ package edu.umn.natsrl.infra.types;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public enum TransitionType {
     None,

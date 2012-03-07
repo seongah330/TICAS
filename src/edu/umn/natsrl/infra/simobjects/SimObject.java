@@ -22,7 +22,7 @@ import edu.umn.natsrl.infra.InfraObject;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 abstract public class SimObject extends InfraObject {
     SimDeviceType type;

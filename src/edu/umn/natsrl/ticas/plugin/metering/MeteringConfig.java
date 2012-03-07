@@ -22,7 +22,7 @@ import edu.umn.natsrl.util.PropertiesWrapper;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class MeteringConfig {
     

@@ -29,7 +29,7 @@ import java.nio.ByteBuffer;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class Read30sData  extends MnDotResponser {
 

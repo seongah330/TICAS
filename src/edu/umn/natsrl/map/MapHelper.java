@@ -58,7 +58,7 @@ import org.jdesktop.swingx.mapviewer.WaypointRenderer;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public class MapHelper {
 

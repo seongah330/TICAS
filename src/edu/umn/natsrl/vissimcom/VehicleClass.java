@@ -22,7 +22,7 @@ import java.util.HashMap;
 
 /**
  *
- * @author Chongmyung Park (chongmyung.park@gmail.com)
+ * @author Chongmyung Park
  */
 public enum VehicleClass {
     CAR("Car", 10),
