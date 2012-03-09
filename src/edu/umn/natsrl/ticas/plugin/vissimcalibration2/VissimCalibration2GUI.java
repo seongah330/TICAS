@@ -113,6 +113,8 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             
             this.cbxTimeInterval.setEnabled(false);
             this.btnRun.setEnabled(false);
+            this.cbxRandomSeedList.setEnabled(false);
+            this.chxRunwithsingleRandom.setEnabled(false);
             startTime = new Date();
             
             MeteringConfig.CASE_FILE = this.tbxCaseFile.getText();
