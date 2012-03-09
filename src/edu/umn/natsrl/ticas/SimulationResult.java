@@ -52,10 +52,10 @@ public class SimulationResult implements Comparable {
     final String K_SECTION_DESC = "section.desc";
     final String K_SECTION_RNODES = "section.rnodes" ;
     final String K_SECTION_DETECTORS = "section.detectors";
-    public final static String SAVE_PROP_DIR = "simulation results";    
-    public final static String SAVE_DATA_DIR = "simulation results"+File.separator+"data";
-    public final static String SAVE_PROP_DIR_SUB = "simulation results"+ File.separator + "subdata";    
-    public final static String SAVE_DATA_DIR_SUB = "simulation results" + File.separator + "subdata" +File.separator+"data";
+    public final static String SAVE_PROP_DIR = "simulationresults";    
+    public final static String SAVE_DATA_DIR = "simulationresults"+File.separator+"data";
+    public final static String SAVE_PROP_DIR_SUB = "simulationresults"+ File.separator + "subdata";    
+    public final static String SAVE_DATA_DIR_SUB = "simulationresults" + File.separator + "subdata" +File.separator+"data";
     private String name;
     private String desc;
     private Date created;
