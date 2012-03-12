@@ -63,9 +63,7 @@ public class TICAS2AboutBox extends javax.swing.JDialog {
         javax.swing.JLabel homepageLabel = new javax.swing.JLabel();
         javax.swing.JLabel linkNatsrl = new javax.swing.JLabel();
         closeButton = new javax.swing.JButton();
-        lbByfun = new javax.swing.JLabel();
         appVersion = new javax.swing.JLabel();
-        linkSnslab = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("About : TICAS");
@@ -79,7 +77,7 @@ public class TICAS2AboutBox extends javax.swing.JDialog {
         vendorLabel.setFont(vendorLabel.getFont().deriveFont(vendorLabel.getFont().getStyle() | java.awt.Font.BOLD));
         vendorLabel.setText("Vendor:");
 
-        appVendorLabel.setText("NATSRL (UMD) and Software System Lab (KNU, Korea)");
+        appVendorLabel.setText("NATSRL (UMD)");
 
         homepageLabel.setFont(homepageLabel.getFont().deriveFont(homepageLabel.getFont().getStyle() | java.awt.Font.BOLD));
         homepageLabel.setText("Homepage:");
@@ -100,23 +98,7 @@ public class TICAS2AboutBox extends javax.swing.JDialog {
             }
         });
 
-        lbByfun.setIcon(new javax.swing.ImageIcon(getClass().getResource("/edu/umn/natsrl/ticas/resources/byfun.png"))); // NOI18N
-        lbByfun.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lbByfunMouseClicked(evt);
-            }
-        });
-
-        appVersion.setText("2.8");
-
-        linkSnslab.setForeground(java.awt.Color.blue);
-        linkSnslab.setText("http://snslab.kangwon.ac.kr");
-        linkSnslab.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        linkSnslab.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                linkSnslabMouseClicked(evt);
-            }
-        });
+        appVersion.setText("3.0");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -126,32 +108,27 @@ public class TICAS2AboutBox extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(imageLabel)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(lbByfun)
+                        .addGap(155, 155, 155)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(versionLabel)
-                                    .addComponent(vendorLabel)
-                                    .addComponent(homepageLabel))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(appVersion)
-                                    .addComponent(appVendorLabel)
-                                    .addComponent(linkNatsrl)
-                                    .addComponent(linkSnslab)))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(10, 10, 10)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(closeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(appTitleLabel))))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(versionLabel)
+                            .addComponent(vendorLabel)
+                            .addComponent(homepageLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(appVersion)
+                            .addComponent(appVendorLabel)
+                            .addComponent(linkNatsrl)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(147, 147, 147)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(closeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(appTitleLabel))))
+                .addContainerGap(19, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(appTitleLabel)
@@ -167,14 +144,9 @@ public class TICAS2AboutBox extends javax.swing.JDialog {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(linkNatsrl)
                             .addComponent(homepageLabel))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(linkSnslab)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(61, 61, 61)
                         .addComponent(closeButton, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addComponent(imageLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lbByfun)))
+                    .addComponent(imageLabel, javax.swing.GroupLayout.Alignment.LEADING))
                 .addContainerGap())
         );
 
@@ -185,14 +157,6 @@ public class TICAS2AboutBox extends javax.swing.JDialog {
         dispose();
     }//GEN-LAST:event_closeButtonActionPerformed
 
-    private void linkSnslabMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_linkSnslabMouseClicked
-        try {
-            Desktop desk = Desktop.getDesktop();
-            desk.browse(new URI("http://snslab.kangwon.ac.kr"));
-        } catch (Exception ex) {
-        }
-    }//GEN-LAST:event_linkSnslabMouseClicked
-
     private void linkNatsrlMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_linkNatsrlMouseClicked
         try {
             Desktop desk = Desktop.getDesktop();
@@ -201,22 +165,10 @@ public class TICAS2AboutBox extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_linkNatsrlMouseClicked
 
-    private void lbByfunMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbByfunMouseClicked
-        if(evt.getClickCount() > 1) {
-            try {
-                Desktop desk = Desktop.getDesktop();
-                desk.browse(new URI("http://ticas.byfun.com"));
-            } catch (Exception ex) {
-            }            
-        }
-    }//GEN-LAST:event_lbByfunMouseClicked
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel appVersion;
     private javax.swing.JButton closeButton;
-    private javax.swing.JLabel lbByfun;
-    private javax.swing.JLabel linkSnslab;
     // End of variables declaration//GEN-END:variables
 
 }

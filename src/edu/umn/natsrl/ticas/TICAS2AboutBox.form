@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <Properties>
@@ -27,42 +27,35 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="imageLabel" min="-2" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="lbByfun" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="155" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace type="separate" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="versionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="vendorLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="homepageLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace min="-2" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="appVersion" min="-2" max="-2" attributes="0"/>
-                                  <Component id="appVendorLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="linkNatsrl" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="linkSnslab" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Component id="closeButton" alignment="1" min="-2" pref="88" max="-2" attributes="0"/>
-                                  <Component id="appTitleLabel" alignment="1" min="-2" max="-2" attributes="1"/>
-                              </Group>
-                          </Group>
+                          <Component id="versionLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="vendorLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="homepageLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="appVersion" min="-2" max="-2" attributes="0"/>
+                          <Component id="appVendorLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="linkNatsrl" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="147" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="closeButton" alignment="1" min="-2" pref="88" max="-2" attributes="0"/>
+                          <Component id="appTitleLabel" alignment="1" min="-2" max="-2" attributes="1"/>
                       </Group>
                   </Group>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace pref="19" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
-              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+              <Group type="103" groupAlignment="1" attributes="0">
                   <Group type="102" alignment="0" attributes="1">
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="appTitleLabel" min="-2" max="-2" attributes="0"/>
@@ -79,18 +72,12 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="linkNatsrl" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="homepageLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="homepageLabel" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="linkSnslab" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="61" max="-2" attributes="0"/>
                       <Component id="closeButton" min="-2" pref="30" max="-2" attributes="0"/>
                   </Group>
-                  <Group type="102" alignment="0" attributes="0">
-                      <Component id="imageLabel" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="lbByfun" min="-2" max="-2" attributes="0"/>
-                  </Group>
+                  <Component id="imageLabel" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -148,7 +135,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="appVendorLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="NATSRL (UMD) and Software System Lab (KNU, Korea)"/>
+        <Property name="text" type="java.lang.String" value="NATSRL (UMD)"/>
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_VariableLocal" type="java.lang.Boolean" value="true"/>
@@ -195,34 +182,10 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="closeButtonActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JLabel" name="lbByfun">
-      <Properties>
-        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/edu/umn/natsrl/ticas/resources/byfun.png"/>
-        </Property>
-      </Properties>
-      <Events>
-        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lbByfunMouseClicked"/>
-      </Events>
-    </Component>
     <Component class="javax.swing.JLabel" name="appVersion">
       <Properties>
-        <Property name="text" type="java.lang.String" value="2.8"/>
+        <Property name="text" type="java.lang.String" value="3.0"/>
       </Properties>
-    </Component>
-    <Component class="javax.swing.JLabel" name="linkSnslab">
-      <Properties>
-        <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-          <Color blue="ff" green="0" id="blue" palette="1" red="0" type="palette"/>
-        </Property>
-        <Property name="text" type="java.lang.String" value="http://snslab.kangwon.ac.kr"/>
-        <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-          <Color id="Hand Cursor"/>
-        </Property>
-      </Properties>
-      <Events>
-        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="linkSnslabMouseClicked"/>
-      </Events>
     </Component>
   </SubComponents>
 </Form>

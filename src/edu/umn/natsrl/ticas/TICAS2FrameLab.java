@@ -427,7 +427,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         // load builtin simulation plugins                
         
         if(addSimEvaluatorPlugin) {
-            PluginInfo simEvaluator = new PluginInfo("Simulation Evaluator", PluginType.SIMULATION, VissimCalibration2.class);
+            PluginInfo simEvaluator = new PluginInfo("Basic Simulation", PluginType.SIMULATION, VissimCalibration2.class);
             addSimulationPlugins(simEvaluator);            
         }
         
@@ -437,7 +437,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         }        
         
         if(addSFIMPlugin) {
-            PluginInfo sfimPlugin = new PluginInfo("SFIM", PluginType.SIMULATION, SfimTicasPlugin.class);
+            PluginInfo sfimPlugin = new PluginInfo("IRIS_in_Loop Simulation", PluginType.SIMULATION, SfimTicasPlugin.class);
             addSimulationPlugins(sfimPlugin);            
         }
         if(addInfraViewerPlugin) {
@@ -1457,7 +1457,6 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         jPanel2 = new javax.swing.JPanel();
         chkConfigUseMRFInput = new javax.swing.JCheckBox();
         jLabel8 = new javax.swing.JLabel();
-        jLabel28 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem6 = new javax.swing.JMenuItem();
@@ -1477,7 +1476,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        mainTab.setFont(new java.awt.Font("Verdana", 0, 12));
+        mainTab.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         mainTab.setMinimumSize(size());
         mainTab.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -1488,14 +1487,14 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         panRouteCreation.setLayout(new java.awt.BorderLayout());
         mainTab.addTab("Route Creation", panRouteCreation);
 
-        cbxSections.setFont(new java.awt.Font("Verdana", 0, 11));
+        cbxSections.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         cbxSections.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbxSectionsActionPerformed(evt);
             }
         });
 
-        jLabel22.setFont(new java.awt.Font("Verdana", 1, 10));
+        jLabel22.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel22.setText("Route");
 
         jmKit.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -1510,10 +1509,9 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                     .addComponent(jLabel22)
                     .addGroup(jPanel10Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(cbxSections, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel10Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jmKit, javax.swing.GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)))
+                        .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cbxSections, javax.swing.GroupLayout.PREFERRED_SIZE, 161, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jmKit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         jPanel10Layout.setVerticalGroup(
@@ -1527,10 +1525,10 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 .addContainerGap())
         );
 
-        chkVMT.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkVMT.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkVMT.setText("Vehicle Miles Traveled (VMT)");
 
-        chkLVMT.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkLVMT.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkLVMT.setText("Lost VMT for congestion (LVMT)");
         chkLVMT.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1538,19 +1536,19 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        chkVHT.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkVHT.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkVHT.setText("Vehicle Hour Traveled (VHT)");
 
-        chkDVH.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkDVH.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkDVH.setText("Delayed Vehicle Hours (DVH)");
 
-        chkMRF.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkMRF.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkMRF.setText("Mainlane and Ramp Flow Rates");
 
-        chkTT.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkTT.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkTT.setText("Travel Time (TT)");
 
-        chkCM.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkCM.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkCM.setText("Congested Miles (CM)");
         chkCM.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1558,7 +1556,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        chkCMH.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkCMH.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkCMH.setText("Congested Miles * Hours (CMH)");
         chkCMH.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1566,46 +1564,46 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        chkSV.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkSV.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkSV.setText("Speed Variations (SV)");
 
-        jLabel4.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel4.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel4.setText("Congestion Threshold Speed (mph)");
 
-        tbxCongestionThresholdSpeed.setFont(new java.awt.Font("Verdana", 0, 10));
+        tbxCongestionThresholdSpeed.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         tbxCongestionThresholdSpeed.setText("45");
 
-        jLabel7.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel7.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel7.setText("Default Lane Capacity (veh/hr)");
 
-        tbxLaneCapacity.setFont(new java.awt.Font("Verdana", 0, 10));
+        tbxLaneCapacity.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         tbxLaneCapacity.setText("2200");
 
-        jLabel9.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel9.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel9.setText("Critical Density (veh/mile)");
 
-        tbxCriticalDensity.setFont(new java.awt.Font("Verdana", 0, 10));
+        tbxCriticalDensity.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         tbxCriticalDensity.setText("40");
 
-        jCheckBox11.setFont(new java.awt.Font("Verdana", 0, 10));
+        jCheckBox11.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jCheckBox11.setText("Acceleration");
 
-        jCheckBox5.setFont(new java.awt.Font("Verdana", 0, 10));
+        jCheckBox5.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jCheckBox5.setText("Occupancy");
 
-        jCheckBox3.setFont(new java.awt.Font("Verdana", 0, 10));
+        jCheckBox3.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jCheckBox3.setText("Avg. Lane Flow");
 
-        jCheckBox1.setFont(new java.awt.Font("Verdana", 0, 10));
+        jCheckBox1.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jCheckBox1.setText("Speed");
 
-        jCheckBox4.setFont(new java.awt.Font("Verdana", 0, 10));
+        jCheckBox4.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jCheckBox4.setText("Density");
 
-        jCheckBox2.setFont(new java.awt.Font("Verdana", 0, 10));
+        jCheckBox2.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jCheckBox2.setText("Total Flow");
 
-        chkWithLaneConfig.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkWithLaneConfig.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkWithLaneConfig.setText("With Lane Config");
         chkWithLaneConfig.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1613,7 +1611,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        chkWithoutLaneConfig.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkWithoutLaneConfig.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkWithoutLaneConfig.setText("Without Lane Config");
         chkWithoutLaneConfig.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1621,44 +1619,44 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        chkDetectorOccupancy.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkDetectorOccupancy.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkDetectorOccupancy.setText("Occupancy");
         chkDetectorOccupancy.setEnabled(false);
 
-        chkDetectorFlow.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkDetectorFlow.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkDetectorFlow.setText("Flow");
         chkDetectorFlow.setEnabled(false);
 
-        chkDetectorDensity.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkDetectorDensity.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkDetectorDensity.setText("Density");
         chkDetectorDensity.setEnabled(false);
 
-        chkDetectorSpeed.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkDetectorSpeed.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkDetectorSpeed.setText("Speed");
         chkDetectorSpeed.setEnabled(false);
 
-        jLabel11.setFont(new java.awt.Font("Verdana", 1, 10));
+        jLabel11.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel11.setText("Station Data");
 
-        jLabel12.setFont(new java.awt.Font("Verdana", 1, 10));
+        jLabel12.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel12.setText("Detector Data");
 
-        jLabel13.setFont(new java.awt.Font("Verdana", 1, 10));
+        jLabel13.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel13.setText("Measurments");
 
-        jLabel23.setFont(new java.awt.Font("Verdana", 1, 10));
+        jLabel23.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel23.setText("Detector Filter");
 
-        jCheckBox8.setFont(new java.awt.Font("Verdana", 0, 10));
+        jCheckBox8.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jCheckBox8.setText("w/o HOV");
 
-        jCheckBox10.setFont(new java.awt.Font("Verdana", 0, 10));
+        jCheckBox10.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jCheckBox10.setText("w/o wavetronics");
 
-        jCheckBox9.setFont(new java.awt.Font("Verdana", 0, 10));
+        jCheckBox9.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jCheckBox9.setText("only HOV");
 
-        jCheckBox12.setFont(new java.awt.Font("Verdana", 0, 10));
+        jCheckBox12.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jCheckBox12.setText("w/o Aux");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
@@ -1697,20 +1695,6 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                         .addGap(2, 2, 2)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel13)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(chkDVH)
-                                    .addComponent(chkLVMT)
-                                    .addComponent(chkVMT)
-                                    .addComponent(chkVHT))
-                                .addGap(18, 18, 18)
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(chkCMH)
-                                    .addComponent(chkCM)
-                                    .addComponent(chkSV)
-                                    .addComponent(chkTT)))
-                            .addComponent(chkMRF)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(jLabel23, javax.swing.GroupLayout.Alignment.LEADING)
@@ -1725,15 +1709,31 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                                 .addGap(95, 95, 95))
                             .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel7)
-                                    .addComponent(jLabel9))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(tbxLaneCapacity, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(tbxCongestionThresholdSpeed, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE)
-                                    .addComponent(tbxCriticalDensity))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 150, Short.MAX_VALUE)))))
+                                    .addComponent(jLabel13)
+                                    .addGroup(jPanel4Layout.createSequentialGroup()
+                                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(chkDVH)
+                                            .addComponent(chkLVMT)
+                                            .addComponent(chkVMT)
+                                            .addComponent(chkVHT))
+                                        .addGap(18, 18, 18)
+                                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(chkCMH)
+                                            .addComponent(chkCM)
+                                            .addComponent(chkSV)
+                                            .addComponent(chkTT)))
+                                    .addComponent(chkMRF)
+                                    .addGroup(jPanel4Layout.createSequentialGroup()
+                                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel4)
+                                            .addComponent(jLabel7)
+                                            .addComponent(jLabel9))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                            .addComponent(tbxLaneCapacity, javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(tbxCongestionThresholdSpeed, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE)
+                                            .addComponent(tbxCriticalDensity))))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
@@ -1806,15 +1806,15 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 .addContainerGap(11, Short.MAX_VALUE))
         );
 
-        jPanel11.setFont(new java.awt.Font("Verdana", 0, 10));
+        jPanel11.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
 
-        chkExcel.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkExcel.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkExcel.setText("Excel");
 
-        chkCSV.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkCSV.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkCSV.setText("CSV");
 
-        chkContour.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkContour.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkContour.setText("Contour");
         chkContour.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1822,17 +1822,17 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        jLabel16.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel16.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel16.setText("Time Range");
 
-        jLabel21.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel21.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel21.setText("in");
 
-        cbxOutputDirection.setFont(new java.awt.Font("Verdana", 0, 10));
+        cbxOutputDirection.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
 
-        tbxOutputFolder.setFont(new java.awt.Font("Verdana", 0, 10));
+        tbxOutputFolder.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
 
-        jButton5.setFont(new java.awt.Font("Verdana", 0, 10));
+        jButton5.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jButton5.setText("Browse");
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1840,7 +1840,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        btnEvaluate.setFont(new java.awt.Font("Verdana", 1, 14));
+        btnEvaluate.setFont(new java.awt.Font("Verdana", 1, 14)); // NOI18N
         btnEvaluate.setForeground(new java.awt.Color(255, 0, 0));
         btnEvaluate.setText("Extract");
         btnEvaluate.addActionListener(new java.awt.event.ActionListener() {
@@ -1849,17 +1849,17 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        jLabel1.setFont(new java.awt.Font("Verdana", 1, 10));
+        jLabel1.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel1.setText("Output Folder");
 
-        jCheckBox6.setFont(new java.awt.Font("Verdana", 0, 10));
+        jCheckBox6.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jCheckBox6.setSelected(true);
         jCheckBox6.setText("Open contour after extraction");
 
-        chkWithoutVirtualStations.setFont(new java.awt.Font("Verdana", 0, 10));
+        chkWithoutVirtualStations.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkWithoutVirtualStations.setText("Without virtual stations");
 
-        CbxFixmissingstationdata.setFont(new java.awt.Font("Verdana", 0, 10));
+        CbxFixmissingstationdata.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         CbxFixmissingstationdata.setSelected(true);
         CbxFixmissingstationdata.setText("Interpolate missing station data");
         CbxFixmissingstationdata.addActionListener(new java.awt.event.ActionListener() {
@@ -1868,10 +1868,10 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        jLabel2.setFont(new java.awt.Font("Verdana", 1, 10));
+        jLabel2.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel2.setText("Output Format");
 
-        CbxmissingstationdataZero.setFont(new java.awt.Font("Verdana", 0, 10));
+        CbxmissingstationdataZero.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         CbxmissingstationdataZero.setText("Interpolate '0' missing station data");
         CbxmissingstationdataZero.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1889,26 +1889,27 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                         .addComponent(jLabel1)
                         .addGroup(jPanel11Layout.createSequentialGroup()
                             .addContainerGap()
-                            .addComponent(chkExcel)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(chkCSV)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(chkContour)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(jLabel16)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jLabel21)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(cbxOutputDirection, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel11Layout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(tbxOutputFolder)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel11Layout.createSequentialGroup()
+                                    .addComponent(chkExcel)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(chkCSV)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(chkContour)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(jLabel16)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jLabel21)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(cbxOutputDirection, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel11Layout.createSequentialGroup()
+                                    .addComponent(tbxOutputFolder)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                     .addComponent(jLabel2))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnEvaluate, javax.swing.GroupLayout.DEFAULT_SIZE, 223, Short.MAX_VALUE)
+                    .addComponent(btnEvaluate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                         .addComponent(chkWithoutVirtualStations)
                         .addComponent(jCheckBox6)
@@ -1950,18 +1951,18 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jLabel10.setFont(new java.awt.Font("Verdana", 1, 10));
+        jLabel10.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel10.setText("Date and Time");
 
-        jLabel17.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel17.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel17.setText("Time Interval");
 
-        cbxInterval.setFont(new java.awt.Font("Verdana", 0, 10));
+        cbxInterval.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
 
-        jLabel18.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel18.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel18.setText("Start Time");
 
-        cbxStartHour.setFont(new java.awt.Font("Verdana", 0, 10));
+        cbxStartHour.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         cbxStartHour.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" }));
         cbxStartHour.setSelectedIndex(7);
         cbxStartHour.addActionListener(new java.awt.event.ActionListener() {
@@ -1970,16 +1971,16 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        jLabel14.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel14.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel14.setText(":");
 
-        cbxStartMin.setFont(new java.awt.Font("Verdana", 0, 10));
+        cbxStartMin.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         cbxStartMin.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59" }));
 
-        jLabel20.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel20.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel20.setText("End Time");
 
-        cbxEndHour.setFont(new java.awt.Font("Verdana", 0, 10));
+        cbxEndHour.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         cbxEndHour.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" }));
         cbxEndHour.setSelectedIndex(8);
         cbxEndHour.addActionListener(new java.awt.event.ActionListener() {
@@ -1988,26 +1989,26 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        jLabel15.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel15.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel15.setText(":");
 
-        cbxEndMin.setFont(new java.awt.Font("Verdana", 0, 10));
+        cbxEndMin.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         cbxEndMin.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59" }));
 
-        jLabel3.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel3.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel3.setText("or");
 
-        jLabel5.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel5.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel5.setText("for");
 
-        cbxDuration.setFont(new java.awt.Font("Verdana", 0, 10));
+        cbxDuration.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         cbxDuration.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbxDurationActionPerformed(evt);
             }
         });
 
-        jLabel6.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel6.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel6.setText("hour");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -2044,7 +2045,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(jLabel15)
                                         .addGap(1, 1, 1)
-                                        .addComponent(cbxEndMin, 0, 0, Short.MAX_VALUE))
+                                        .addComponent(cbxEndMin, 0, 1, Short.MAX_VALUE))
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addGap(2, 2, 2)
                                         .addComponent(jLabel14)
@@ -2124,14 +2125,14 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         mainTab.addTab("Real Data Extraction", tbDataPerformance);
 
         tbSimulation.setFocusable(false);
-        tbSimulation.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbSimulation.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbSimulation.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 tbSimulationStateChanged(evt);
             }
         });
 
-        btnRunSimulationPlugin.setFont(new java.awt.Font("Verdana", 0, 12));
+        btnRunSimulationPlugin.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnRunSimulationPlugin.setText("Run Simulation");
         btnRunSimulationPlugin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2139,12 +2140,12 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        cbxPlugins.setFont(new java.awt.Font("Verdana", 0, 12));
+        cbxPlugins.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
 
-        jLabel24.setFont(new java.awt.Font("Verdana", 1, 12));
+        jLabel24.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel24.setText("Simulation Plugins");
 
-        btnSaveSimResult.setFont(new java.awt.Font("Verdana", 0, 12));
+        btnSaveSimResult.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnSaveSimResult.setText("Save Simulation Result");
         btnSaveSimResult.setEnabled(false);
         btnSaveSimResult.addActionListener(new java.awt.event.ActionListener() {
@@ -2153,10 +2154,10 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        jLabel27.setFont(new java.awt.Font("Verdana", 0, 12));
+        jLabel27.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel27.setText("Extracting data with simulation results uses the metrics of 'Real Data Extraction' tab.");
 
-        jLabel19.setFont(new java.awt.Font("Verdana", 0, 12));
+        jLabel19.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel19.setText("After saving simulation result, you can extract data from simulation results on 'Simulation Results' tab.");
 
         javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
@@ -2215,7 +2216,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
 
         tbSimulation.addTab("New Simulation", jPanel12);
 
-        tblSimResults.setFont(new java.awt.Font("Verdana", 0, 12));
+        tblSimResults.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tblSimResults.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -2243,20 +2244,20 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         tblSimResults.getColumnModel().getColumn(0).setPreferredWidth(100);
 
         tbxSimResultDesc.setColumns(20);
-        tbxSimResultDesc.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxSimResultDesc.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxSimResultDesc.setLineWrap(true);
         tbxSimResultDesc.setRows(5);
         jScrollPane2.setViewportView(tbxSimResultDesc);
 
-        jLabel26.setFont(new java.awt.Font("Verdana", 1, 12));
+        jLabel26.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel26.setText("Description");
 
-        tbxSimResultName.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxSimResultName.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
 
-        jLabel25.setFont(new java.awt.Font("Verdana", 1, 12));
+        jLabel25.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel25.setText("Case Name");
 
-        lbReloadSimulationResult.setFont(new java.awt.Font("Verdana", 0, 12));
+        lbReloadSimulationResult.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         lbReloadSimulationResult.setText("Reload");
         lbReloadSimulationResult.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -2264,7 +2265,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        btnEvaulateWithSimResult.setFont(new java.awt.Font("Verdana", 1, 12));
+        btnEvaulateWithSimResult.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         btnEvaulateWithSimResult.setForeground(java.awt.Color.red);
         btnEvaulateWithSimResult.setText("Run TICAS with Simulation Results");
         btnEvaulateWithSimResult.addActionListener(new java.awt.event.ActionListener() {
@@ -2273,10 +2274,10 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        jLabel29.setFont(new java.awt.Font("Verdana", 1, 12));
+        jLabel29.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel29.setText("Edit");
 
-        lbDeleteSimResult.setFont(new java.awt.Font("Verdana", 0, 11));
+        lbDeleteSimResult.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         lbDeleteSimResult.setText("Delete selected result");
         lbDeleteSimResult.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         lbDeleteSimResult.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -2285,7 +2286,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        lbUpdateSimResult.setFont(new java.awt.Font("Verdana", 0, 11));
+        lbUpdateSimResult.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         lbUpdateSimResult.setText("Update selected result");
         lbUpdateSimResult.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         lbUpdateSimResult.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -2296,7 +2297,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("note"));
 
-        jLabel30.setFont(new java.awt.Font("Tahoma", 0, 10));
+        jLabel30.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
         jLabel30.setText("Simulation result is influenced of Real Data Tab's Options. ");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -2349,7 +2350,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
 
         pnOutputOptionForCalibration.setBorder(javax.swing.BorderFactory.createTitledBorder("Output Option"));
 
-        cbxSimOutExcel.setFont(new java.awt.Font("Verdana", 0, 11));
+        cbxSimOutExcel.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         cbxSimOutExcel.setSelected(true);
         cbxSimOutExcel.setText("Excel");
         cbxSimOutExcel.addActionListener(new java.awt.event.ActionListener() {
@@ -2358,10 +2359,10 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        cbxSimOutCSV.setFont(new java.awt.Font("Verdana", 0, 11));
+        cbxSimOutCSV.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         cbxSimOutCSV.setText("CSV");
 
-        cbxSimOutContour.setFont(new java.awt.Font("Verdana", 0, 11));
+        cbxSimOutContour.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         cbxSimOutContour.setText("Contour");
 
         javax.swing.GroupLayout pnOutputOptionForCalibrationLayout = new javax.swing.GroupLayout(pnOutputOptionForCalibration);
@@ -2404,18 +2405,17 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                         .addComponent(jLabel26))
                     .addGroup(jPanel15Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE))
+                        .addComponent(jScrollPane2))
                     .addGroup(jPanel15Layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cbxcalibration, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(jPanel15Layout.createSequentialGroup()
-                                .addComponent(btnEvaulateWithSimResult, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(26, 26, 26))
-                            .addComponent(cbxcalibration, javax.swing.GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
-                            .addComponent(pnOutputOptionForCalibration, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(jPanel15Layout.createSequentialGroup()
-                                .addComponent(jPanel16, javax.swing.GroupLayout.PREFERRED_SIZE, 299, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(27, 27, 27)))))
+                                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(btnEvaulateWithSimResult, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(pnOutputOptionForCalibration, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jPanel16, javax.swing.GroupLayout.PREFERRED_SIZE, 299, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(23, 23, 23)))))
                 .addContainerGap())
         );
         jPanel15Layout.setVerticalGroup(
@@ -2475,20 +2475,20 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tbSimulation, javax.swing.GroupLayout.DEFAULT_SIZE, 883, Short.MAX_VALUE)
+                .addComponent(tbSimulation)
                 .addContainerGap())
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tbSimulation, javax.swing.GroupLayout.DEFAULT_SIZE, 530, Short.MAX_VALUE)
+                .addComponent(tbSimulation)
                 .addContainerGap())
         );
 
-        mainTab.addTab("Simulation Data Extraction", jPanel7);
+        mainTab.addTab("Simulation Output Extraction", jPanel7);
 
-        jTabbedPane2.setFont(new java.awt.Font("Verdana", 0, 12));
+        jTabbedPane2.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
 
         panContourSettingSpeed.setLayout(new java.awt.BorderLayout());
         jTabbedPane2.addTab("Speed", panContourSettingSpeed);
@@ -2502,7 +2502,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         panContourSettingAverageFlow.setLayout(new java.awt.BorderLayout());
         jTabbedPane2.addTab("Occupancy", panContourSettingAverageFlow);
 
-        btnSaveConfig.setFont(new java.awt.Font("Verdana", 0, 12));
+        btnSaveConfig.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnSaveConfig.setText("Save Configurations");
         btnSaveConfig.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2512,7 +2512,9 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Extraction Configuration", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 0, 12))); // NOI18N
 
+        chkConfigUseMRFInput.setForeground(new java.awt.Color(255, 255, 255));
         chkConfigUseMRFInput.setText("Use Input Flow of Ramp on using Mainlane and Ramp Flow Rates");
+        chkConfigUseMRFInput.setEnabled(false);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -2557,22 +2559,18 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 .addContainerGap())
         );
 
-        mainTab.addTab("Configuration", jPanel5);
+        mainTab.addTab("Contour Configuration", jPanel5);
 
-        jLabel8.setFont(new java.awt.Font("Verdana", 1, 12));
+        jLabel8.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel8.setText("Nothern Advanced Transportation Research Lab. @ University of Minnesota Duluth");
+        jLabel8.setText("Northland Advanced Transportation Systems Research Lab. @ University of Minnesota Duluth");
 
-        jLabel28.setFont(new java.awt.Font("Verdana", 1, 12));
-        jLabel28.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel28.setText("Software & System Lab. @ KNU, Korea");
-
-        jMenuBar1.setFont(new java.awt.Font("Verdana", 0, 12));
+        jMenuBar1.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
 
         jMenu1.setText("File");
-        jMenu1.setFont(new java.awt.Font("Verdana", 0, 12));
+        jMenu1.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
 
-        jMenuItem6.setFont(new java.awt.Font("Verdana", 0, 12));
+        jMenuItem6.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jMenuItem6.setText("Geo Update");
         jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2581,7 +2579,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         });
         jMenu1.add(jMenuItem6);
 
-        jMenuItem2.setFont(new java.awt.Font("Verdana", 0, 12));
+        jMenuItem2.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jMenuItem2.setText("Save Current Setting");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2590,7 +2588,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         });
         jMenu1.add(jMenuItem2);
 
-        jMenuItem5.setFont(new java.awt.Font("Verdana", 0, 12));
+        jMenuItem5.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jMenuItem5.setText("Clear Cache");
         jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2599,7 +2597,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         });
         jMenu1.add(jMenuItem5);
 
-        jMenuItem3.setFont(new java.awt.Font("Verdana", 0, 12));
+        jMenuItem3.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jMenuItem3.setText("Exit");
         jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2611,13 +2609,13 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         jMenuBar1.add(jMenu1);
 
         menuTools.setText("Tool");
-        menuTools.setFont(new java.awt.Font("Verdana", 0, 12));
+        menuTools.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jMenuBar1.add(menuTools);
 
         jMenu3.setText("Help");
-        jMenu3.setFont(new java.awt.Font("Verdana", 0, 12));
+        jMenu3.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
 
-        menuItemRouteEditorManual.setFont(new java.awt.Font("Verdana", 0, 12));
+        menuItemRouteEditorManual.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         menuItemRouteEditorManual.setText("Route Editor Manual");
         menuItemRouteEditorManual.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2626,7 +2624,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         });
         jMenu3.add(menuItemRouteEditorManual);
 
-        jMenuItem1.setFont(new java.awt.Font("Verdana", 0, 12));
+        jMenuItem1.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jMenuItem1.setText("About TICAS");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2647,8 +2645,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jLabel28)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 110, Short.MAX_VALUE)
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jLabel8))
                     .addComponent(mainTab, javax.swing.GroupLayout.PREFERRED_SIZE, 908, Short.MAX_VALUE))
                 .addContainerGap())
@@ -2659,9 +2656,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 .addContainerGap()
                 .addComponent(mainTab, javax.swing.GroupLayout.PREFERRED_SIZE, 582, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
-                    .addComponent(jLabel28))
+                .addComponent(jLabel8)
                 .addContainerGap())
         );
 
@@ -2926,7 +2921,6 @@ private void cbxSimOutExcelActionPerformed(java.awt.event.ActionEvent evt) {//GE
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
-    private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
