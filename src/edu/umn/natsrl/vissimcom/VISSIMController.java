@@ -215,7 +215,6 @@ public class VISSIMController {
                  * read travel data every travel time interval
                  ************************************************/
                 if (useTravelTimeMeasuring && !this.readTravelTimeListeners.isEmpty() && step % (travelTimeInterval * simResolution) == 0) {
-
                     // for all travel times                       
                     for (int i = 0; i < this.travelTimeList.length; i++) {
                         travelTimeNames[i] = this.travelTimeList[i].getName();
@@ -224,9 +223,11 @@ public class VISSIMController {
                     }
 
                     // notify traffic data to listener
+                    int cccount = 0;
                     for (ITravelTimeListener l : readTravelTimeListeners) {
                         if (l != null) {
                             l.readTravelTime(travelTimeNames, travelTimeValues);
+                            cccount ++;
                         }
                     }
                 }

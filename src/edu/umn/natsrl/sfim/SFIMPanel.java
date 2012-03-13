@@ -233,7 +233,7 @@ public class SFIMPanel extends javax.swing.JPanel {
                 ArrayList<String> detectors = VISSIMHelper.loadDetectorsFromCasefile(caseFile);
                 ArrayList<String> dsds = VISSIMHelper.loadDesiredSpeedDecisionsFromCasefile(caseFile);
                 ArrayList<String> sgs = VISSIMHelper.loadSignalGroupsFromCasefile(caseFile);
-
+                
                if (detectors == null) {
                     JOptionPane.showMessageDialog(thisPanel, "Select correct case file");
                     return;
@@ -328,7 +328,7 @@ public class SFIMPanel extends javax.swing.JPanel {
                 System.out.println("Starting commlinks ...");
                 //3.140 updating..
                 manager.makeCommLinks(activeLinks, idb);
-                idb.updateCommLinks(activeLinks, manager,detectors);
+                idb.updateCommLinks(activeLinks, manager,detectors,dsds,sgs);
                 System.out.println("Commlinks are started");
                 
                 IRISController.startIRIS();

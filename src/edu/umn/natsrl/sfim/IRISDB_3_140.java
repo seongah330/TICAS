@@ -97,7 +97,7 @@ public class IRISDB_3_140 {
      *   - active_commlink = comm_link for detectors and meters in simulation
      * @param activeCommLinkInfo 
      */
-    public void updateCommLinks(Vector<InfoCommLink> activeCommLinkInfo, SFIMManager manager, ArrayList<String> detectors) {
+    public void updateCommLinks(Vector<InfoCommLink> activeCommLinkInfo, SFIMManager manager, ArrayList<String> detectors, ArrayList<String> dsds, ArrayList<String> sgs) {
         try {
             InetAddress thisIp = InetAddress.getLocalHost();
             String ip = thisIp.getHostAddress();
@@ -110,12 +110,21 @@ public class IRISDB_3_140 {
                 CommLink cl = manager.getCommLink(ci.name);
                 Vector<InfoController> ctrls = loadControllers(ci.name);
                 for (Controller c : cl.getControllers()) {
+                    boolean isInCase = false;
+//                    System.out.println("ctrl : "+c.getName());
                     for(String io : c.getIO()){
                         if(detectors.contains(io)){
-//                            System.out.println("ctrl : "+c.getName());
-//                            statement.execute("update iris.controller set active = true where comm_link = '" + cl.getLinkName() + "'");
-                            statement.execute("update iris.controller set active = true where name = '" + c.getName() + "'");
+                            isInCase = true;
+                        }else if (dsds.contains(io)) {
+                            isInCase = true;
+                        } else if (sgs.contains(io) || sgs.contains(io + "_L")) {
+                            isInCase = true;
                         }
+                    }
+                    if(isInCase){
+//                        System.out.println("ctrl : "+c.getName() + "ok!");
+//                            statement.execute("update iris.controller set active = true where comm_link = '" + cl.getLinkName() + "'");
+                        statement.execute("update iris.controller set active = true where name = '" + c.getName() + "'");
                     }
                 }
             }

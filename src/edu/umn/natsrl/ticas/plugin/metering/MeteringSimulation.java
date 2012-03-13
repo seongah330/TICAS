@@ -33,7 +33,7 @@ public class MeteringSimulation implements ITicasPlugin {
     @Override
     public void init(PluginFrame frame) {
      
-        frame.setSize(990, 780);
+        frame.setSize(990, 790);
         Container container = frame.getContentPane();
         container.setLayout(new BorderLayout());        
         container.add(new MeteringSimulationGUI(frame));
