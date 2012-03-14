@@ -296,16 +296,38 @@ public class IRISDB_3_140 {
         int simStartMin = simTime.get(Calendar.MINUTE);
         int start_min = simStartHour * 60 + simStartMin;
         int stop_min = start_min + simDuration * 60;
+        int simStopHour = stop_min / 60;
+        int simStopMin = stop_min - (simStopHour*60);
+        String starttime = (simStartHour < 10 ? "0"+simStartHour : simStartHour)+""+(simStartMin < 10 ? "0"+simStartMin : simStartMin);
+        String endtime = (simStopHour < 10 ? "0"+simStopHour : simStopHour)+""+(simStopMin < 10 ? "0"+simStopMin : simStopMin);
         try {
             //3.140 update
             statement.execute("UPDATE iris.action_plan SET active = false");
             if (useMetering) {
+                //update action_plan
+                String ACTION_PLAN_NAME = "METER_"+starttime+"_"+endtime;
+                System.out.println(ACTION_PLAN_NAME+"    "+starttime + "     " + endtime);
+                ResultSet actionresult = statement.executeQuery("SELECT * from iris.action_plan WHERE name ='"+ACTION_PLAN_NAME+"'");
+                
+                int actioncnt = 0;
+                while(actionresult.next()){
+                    actioncnt ++;
+                }
+                System.out.println(actionresult.getRow() + " " + actioncnt);
+                if(actioncnt == 0){
+                    statement.execute("insert into iris.action_plan (name,description,active,sync_actions,default_phase,phase,sticky) values('"+ACTION_PLAN_NAME+"','Meters starting at "+starttime+"',false,false,'undeployed','undeployed',false)");
+                }
+                
                 for (String name : meterNames) {
                     if (name == null) {
                         continue;
                     }
 
                     //3.140 updating
+                    //update meter_action
+//                    System.out.println("delete meter : "+name);
+                    statement.execute("delete from iris.meter_action WHERE ramp_meter = '" + name + "'");
+                    statement.execute("insert into iris.meter_action (name,action_plan,ramp_meter,phase) values('"+name+"_"+starttime+"_"+endtime+"','"+ACTION_PLAN_NAME+"','"+name+"','deployed')");
                     // Use timing plan that has max target value
                     ResultSet result = statement.executeQuery("SELECT * from iris.meter_action WHERE ramp_meter = '" + name + "'");
                     String id = null;                    
@@ -322,12 +344,13 @@ public class IRISDB_3_140 {
                         id = result.getString("action_plan");
                         ramp_name = result.getString("ramp_meter");
                         //set action_plan by time!!!!
-                        statement.addBatch("UPDATE iris.action_plan SET active = TRUE WHERE name = '" + id + "'");
+                        statement.addBatch("UPDATE iris.action_plan SET active = TRUE, phase='deployed' WHERE name = '" + id + "'");
                     }           
                     
                     if(id != null) {
                         //statement.addBatch("UPDATE iris.timing_plan SET start_min = "+start_min+", stop_min = "+stop_min+", plan_type = " + planId + ", active = TRUE WHERE name = '" + id + "'");
-                        statement.addBatch("UPDATE iris._ramp_meter SET algorithm = " + planId + " WHERE name = '" + id + "'");
+//                        System.out.println("meteral :" + planId);
+                        statement.addBatch("UPDATE iris._ramp_meter SET algorithm = " + planId + " WHERE name = '" + ramp_name + "'");
                     } else {
                         System.out.println("  !! WARNNING : there's no timing plan for " + name);
                     }

@@ -967,6 +967,7 @@ public class MeteringSectionHelper {
             return sum/validCount;                        
         }
         
+        
         /**
          * Return aggregated speed
          * @param lastSampleIndex
@@ -1171,7 +1172,12 @@ public class MeteringSectionHelper {
             }        
             return list;
         }          
-        
+        public double getVolume(){
+            return this.station.getData(dc,TrafficType.VOLUME);
+        }
+        public double getFlow(){
+            return this.station.getData(dc,TrafficType.FLOW);
+        }
         /**
          * @deprecated 
          * @return 

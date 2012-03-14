@@ -34,7 +34,7 @@ public class SFIMConfig {
     public static int SERVER_PORT_START = 4000;
     
     // database
-    public static String IRIS_SERVER_ADDR = "131.212.105.237";
+    public static String IRIS_SERVER_ADDR = "131.212.105.233";
     public static int TIMESYNC_PORT = 5555;
     public static int REMOTE_OUT_PORT = 5556;
     public static int REMOTE_ERR_PORT = 5557;  

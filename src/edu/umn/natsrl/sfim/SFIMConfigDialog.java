@@ -34,7 +34,7 @@ public class SFIMConfigDialog extends javax.swing.JDialog {
         this.tbxIrisDbName.setText(SFIMConfig.LOADED_IRIS_DB_NAME);
         this.tbxIrisDbPasswd.setText(SFIMConfig.LOADED_IRIS_DB_PASSWD);
         this.tbxIrisDbUser.setText(SFIMConfig.LOADED_IRIS_DB_USER);
-        //this.tbxIrisServerAddr.setText(SFIMConfig.IRIS_SERVER_ADDR);
+        this.tbxIrisServerAddr.setText(SFIMConfig.IRIS_SERVER_ADDR);
         this.tbxRemoteDebugErrPort.setText(s(SFIMConfig.REMOTE_ERR_PORT));
         this.tbxRemoteDebugOutPort.setText(s(SFIMConfig.REMOTE_OUT_PORT));
         this.tbxTimeSyncPort.setText(s(SFIMConfig.TIMESYNC_PORT));

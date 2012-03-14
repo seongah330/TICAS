@@ -110,7 +110,26 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
             
             vc.run(30);
             
-            if(!noMetering) metering.run(samples, vc.getCurrentTime());
+            if(!noMetering){
+                metering.run(samples, vc.getCurrentTime());
+                //for debuging
+                for (int i = 0; i < stationStates.size(); i++) {
+                    System.out.println(stationStates.get(i).id + " : q="+stationStates.get(i).getFlow()
+                            + " k=" +stationStates.get(i).getDensity()+"("+stationStates.get(i).getAggregatedDensity()+")"
+                            + " u=" + stationStates.get(i).getSpeed()+"("+stationStates.get(i).getAggregatedSpeed()+")"
+                            + " v=" + stationStates.get(i).getVolume());
+                }
+//                StringBuilder ulog = new StringBuilder();
+//                StringBuilder klog = new StringBuilder();
+//                for (int i = 0; i <stationStates.size(); i++) {
+//                    StationState s = stationStates.get(i);
+//                    ulog.append(s.id+"("+String.format("%.1f", s.getSpeed())+")->");
+//                    klog.append(s.id+"("+String.format("%.1f", s.getDensity())+")->");
+//                }
+//                System.out.println("U : " + ulog.toString());
+//                //System.out.println("K : " + klog.toString());
+//                System.out.println("--------------------------------------------");
+            }
             else {
                 StringBuilder ulog = new StringBuilder();
                 StringBuilder klog = new StringBuilder();
