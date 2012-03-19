@@ -934,6 +934,9 @@ public class MeteringSectionHelper {
             int validCount = 0;
             for(int i=0; i<MOVING_K_AVG_WINDOW; i++) {
                 double k = station.getData(dc, TrafficType.DENSITY, prevStep+i);
+                //debug
+//                double k = station.getData(dc, TrafficType.DENSITY, prevStep+i);
+
                 if(k > 0) {
                     sum += k;
                     validCount++;
@@ -1192,6 +1195,7 @@ public class MeteringSectionHelper {
          */
         public double getDensity() {
             return this.station.getData(dc, TrafficType.DENSITY);
+//            return this.station.getDataForDebug(dc, TrafficType.DENSITY);
         }
         
         public void afterMetering() {

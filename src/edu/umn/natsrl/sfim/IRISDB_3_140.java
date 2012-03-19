@@ -106,7 +106,7 @@ public class IRISDB_3_140 {
 
             for (InfoCommLink ci : activeCommLinkInfo) {
 //                statement.execute("update iris.comm_link set uri = '" + ip + ":" + ci.serverPort + "', timeout=1500 where name = '" + ci.name + "'");
-                statement.execute("update iris.comm_link set uri = '" + ip + ":" + ci.serverPort + "' where name = '" + ci.name + "'");
+                statement.execute("update iris.comm_link set uri = '" + ip + ":" + ci.serverPort + "', timeout=1500 where name = '" + ci.name + "'");
                 CommLink cl = manager.getCommLink(ci.name);
                 Vector<InfoController> ctrls = loadControllers(ci.name);
                 for (Controller c : cl.getControllers()) {

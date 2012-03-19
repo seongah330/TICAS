@@ -224,7 +224,10 @@ public class SFIMManager implements ITravelTimeListener {
                         double k = s.station.getData(dc, TrafficType.DENSITY);
                         double q = s.station.getData(dc, TrafficType.FLOW);
                         double v = s.station.getData(dc, TrafficType.VOLUME);
-                        System.out.println(String.format("  " + s.station.getId() + " : u=%.1f, k=%.1f, q=%.1f, v=%.1f", u, k, q,v));
+                        double scan = s.station.getData(dc, TrafficType.SCAN);
+                        short sscan = (short)scan;
+                        
+                        System.out.println(String.format("  " + s.station.getId() + " : u=%.1f, k=%.1f, q=%.1f, v=%.1f, s=%.1f("+sscan+")", u, k, q,v,scan));
                     }
                     
                     for (EntranceState e : sectionHelper.getEntranceStates()) {

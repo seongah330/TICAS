@@ -81,7 +81,7 @@ public class DetecterDataReaderGUI extends javax.swing.JPanel {
         WritableWorkbook workbook = Workbook.createWorkbook(new File(filepath));
         WritableSheet sheet = workbook.createSheet(String.valueOf(detector.getDetectorId()), 0);
         int colldx = 0;
-        
+        System.out.println("detector Length("+detector.getLabel()+") : "+detector.getFieldLength());
         addData(sheet,colldx++,new String[]{"",""},peroids.get(0).getTimeline());
         
         for(Period p : peroids){

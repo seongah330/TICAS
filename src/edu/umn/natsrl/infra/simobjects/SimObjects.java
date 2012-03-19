@@ -89,6 +89,11 @@ public class SimObjects {
             }
         } else return sd;
     }    
+    
+    public SimDetector getDetectorWithoutNull(String detector_id){
+        SimDetector sd = detectors.get(detector_id);
+        return sd;
+    }
 
     public SimMeter getMeter(String meter_id)
     {

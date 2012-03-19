@@ -485,7 +485,12 @@ public class Detector extends InfraObject implements Comparable {
     public boolean isAbandoned() {
         return "t".equals(getProperty(InfraProperty.abandoned));
     }
-
+    public boolean isStationOrCD(){
+        return ("".equals(getCategory()) || "CD".equals(getCategory()));
+//                return this.laneType.isStationOrCD();
+//        return "t".equals(getProperty(InfraProperty.))
+    }
+    
     public String getCategory() {
         String cat = getProperty(InfraProperty.category);
         return (cat == null ? "" : cat);

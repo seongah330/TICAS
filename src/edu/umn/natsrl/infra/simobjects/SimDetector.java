@@ -34,7 +34,7 @@ import java.util.Vector;
 public class SimDetector extends SimObject {
 
     private int detectorId;
-    Detector detector;
+    public Detector detector;
     final int FEET_PER_MILE = 5280;
     final int MAX_SCANS = 1800;
     
@@ -143,7 +143,18 @@ public class SimDetector extends SimObject {
     
     private Double calculateScan(double k) {
         double s = 0;
-        s = ( k * this.detector.getFieldLength()  / FEET_PER_MILE * MAX_SCANS );
+        double fieldlength = this.detector.getFieldLength();
+        /*
+         * temp variable
+         */
+        if(this.detector.getDetectorId() == 1052){
+//            System.out.println("=========================================================================================================================ok");
+            fieldlength = 18.5;
+        }
+        else if(this.detector.getDetectorId() == 1059)
+            fieldlength = 22.9;
+        
+        s = ( k * fieldlength  / FEET_PER_MILE * MAX_SCANS );
         s = ( s > MAX_SCANS ? MAX_SCANS : s);
         return s / getAvg();
     }
@@ -323,15 +334,47 @@ public class SimDetector extends SimObject {
 
     public void addData(double v, double q, double u, double k, double occupancy) {
         
-        double scanData = calculateScan(k);
+         double scanData = calculateScan(k);
+        double occData = scanData / InfraConstants.MAX_SCANS * 100;
+        
+        if(occupancy > 0) {
+            occData = occupancy;
+            scanData = occData * InfraConstants.MAX_SCANS / 100;
+            k = occupancy * 5280 / this.detector.getFieldLength() / 100;   
+            u = q / k;
+        }
+        this.volume.add(v);
+        this.flow.add(q);
+        this.speed.add(u);
+        this.density.add(k);
+        this.scan.add(scanData);
+        this.occupancy.add(occData);        
+    }
+    
+    //for Debug
+    public void addDataForDebug(double v, double q, double u, double k, double occupancy) {
+        
+        double scanData = Math.round(calculateScan(k));
+//         double scanData = calculateScan(k);
         double occData = scanData / InfraConstants.MAX_SCANS * 100;
         
         if(occupancy > 0) {
             occData = occupancy;
             scanData = occData * InfraConstants.MAX_SCANS / 100;
             k = occupancy * 5280 / this.detector.getFieldLength() / 100;
+            
             u = q / k;
         }
+        
+         //for debug
+        if(k>0){
+//            double s = ( k * this.detector.getFieldLength() / 5280 * 1800 );
+//            short ss = (short)Math.round(s);
+            k = ((double)scanData)*5280/(this.detector.getFieldLength()*1800);
+            u = q==0 ? 0 : q/k;
+        }else
+            u = 0;
+        
         this.volume.add(v);
         this.flow.add(q);
         this.speed.add(u);

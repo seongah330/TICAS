@@ -68,7 +68,13 @@ public class Read30sData  extends MnDotResponser {
                 if (d == null) {
                     scandata = 0;
                 } else {
-                    scandata = (short)d.getRecentScan();
+                    scandata = (short)Math.round(d.getRecentScan());
+                    //Debug
+//                    if(d.detector.getStation() != null){
+//                        System.out.println(d.detector.getStation().getStationId()+"detector "+d.getId()+"("+d.detector.getLabel()+ ") - k : " +d.getRecentScan()+"("+d.getRecentDensity()+"),"
+//                                +" u:"+d.getRecentSpeed()
+//                                +" q:"+d.getRecentVolume()+"("+d.getRecentFlow()+")");
+//                    }
                 }
                 byte[] scan = ByteBuffer.allocate(2).putShort(scandata).array();
                 dos.write(scan); //scan data

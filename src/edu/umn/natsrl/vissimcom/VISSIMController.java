@@ -198,7 +198,6 @@ public class VISSIMController {
                         if (k > 300) {
                             System.out.println("WARNING!! VISSIMController > too high density : " + k);
                         }
-
                         SimDetector simDetector = simObjects.getDetector("D" + detector_id);
                         simDetector.addData(v, q, u, k, occupancy);
 
