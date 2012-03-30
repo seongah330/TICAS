@@ -147,12 +147,9 @@ public class SimDetector extends SimObject {
         /*
          * temp variable
          */
-        if(this.detector.getDetectorId() == 1052){
-//            System.out.println("=========================================================================================================================ok");
-            fieldlength = 18.5;
-        }
-        else if(this.detector.getDetectorId() == 1059)
-            fieldlength = 22.9;
+//        if(this.detector.getDetectorId() == 1052 ||this.detector.getDetectorId() == 1059){
+//            System.out.println("Did : " + this.detector.getId() + "-"+this.detector.getFieldLength());
+//        }
         
         s = ( k * fieldlength  / FEET_PER_MILE * MAX_SCANS );
         s = ( s > MAX_SCANS ? MAX_SCANS : s);

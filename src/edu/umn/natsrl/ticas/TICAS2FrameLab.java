@@ -59,6 +59,7 @@ import edu.umn.natsrl.ticas.plugin.VideoChecker.VideoChecker;
 import edu.umn.natsrl.ticas.plugin.cumulative.CumulativeRamp;
 import edu.umn.natsrl.ticas.plugin.datareader.DataReader;
 import edu.umn.natsrl.ticas.plugin.detecterdatareader.DetecterDataReader;
+import edu.umn.natsrl.ticas.plugin.srte.TICASPluginSRTE;
 import edu.umn.natsrl.ticas.plugin.vissimcalibration2.VissimCalibration2;
 import edu.umn.natsrl.ticas.plugin.traveltimeIndexer.TTIndexterPlugin;
 import java.awt.BorderLayout;
@@ -107,8 +108,8 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         //InfraConstants.TRAFFIC_DATA_URL = "http://iris.byfun.com/trafdat";
         TICASOption opt = TICASOption.load("ticas.cfg");
         if (opt.isLoaded()) {
-            InfraConstants.TRAFFIC_CONFIG_URL = opt.getTrafficConfigUrl();
-            InfraConstants.TRAFFIC_DATA_URL = opt.getTrafficDataUrl();
+//            InfraConstants.TRAFFIC_CONFIG_URL = opt.getTrafficConfigUrl();
+//            InfraConstants.TRAFFIC_DATA_URL = opt.getTrafficDataUrl();
         }
 
         // create ticas frame
@@ -468,6 +469,9 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             PluginInfo videochecker = new PluginInfo("Video Checker", PluginType.TOOL, VideoChecker.class);       
             addTools(videochecker);        
         }
+        
+//        PluginInfo srte = new PluginInfo("SRTE", PluginType.TOOL, TICASPluginSRTE.class);       
+//        addSimulationPlugins(srte);        
     }
 
     /**

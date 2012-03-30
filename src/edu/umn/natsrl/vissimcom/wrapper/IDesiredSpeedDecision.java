@@ -202,7 +202,6 @@ public class IDesiredSpeedDecision extends DispatchPtr {
     {
          return get("AttValue", Attribute);
     }
-    
         
     /**
     *
@@ -217,7 +216,7 @@ public class IDesiredSpeedDecision extends DispatchPtr {
     *
     * @return Variant
     **/
-    public Object getAttValue1(String Attribute,int Parameter) throws COMException
+    public Object getAttValue1(String Attribute,Variant Parameter) throws COMException
     {
          return getN("AttValue1", new Object[] {Attribute,Parameter});
     }

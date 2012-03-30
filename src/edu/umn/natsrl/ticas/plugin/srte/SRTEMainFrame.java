@@ -18,6 +18,7 @@
 package edu.umn.natsrl.ticas.plugin.srte;
 
 import edu.umn.natsrl.infra.TMO;
+import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 

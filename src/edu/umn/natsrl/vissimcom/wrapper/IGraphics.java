@@ -245,4 +245,16 @@ public class IGraphics extends DispatchPtr {
 		invokeN("ZoomTo", new Object[] {new Double(X1), new Double(Y1), new Double(X2), new Double(Y2)});
         
     }
+    /**
+    *
+    
+    * @param StartTime
+    * @return void
+    **/
+    public void SetActiveKeyFrame(double StartTime) throws COMException
+    {
+      
+		invokeN("SetActiveKeyFrame", new Object[] {new Double(StartTime)});
+        
+    }
 }

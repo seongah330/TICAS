@@ -270,7 +270,7 @@ public class IVissim extends DispatchPtr {
     *
     * @param AttValue
     **/
-    public void setAttValue(String Attribute,int newValue2) throws COMException
+    public void setAttValue(String Attribute,Variant newValue2) throws COMException
     {
         put("AttValue", Attribute, newValue2);
     }

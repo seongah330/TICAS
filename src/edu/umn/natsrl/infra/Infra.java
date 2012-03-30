@@ -147,8 +147,10 @@ public class Infra implements Serializable {
             System.out.println(" (OK)");
         } catch (Exception ex) {
             ex.printStackTrace();
+            System.out.println(ex.getStackTrace().toString());
         } finally {
             try {
+                
                 fileOut.close();
             } catch (IOException ex) {
             }

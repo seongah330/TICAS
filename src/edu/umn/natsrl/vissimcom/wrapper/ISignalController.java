@@ -230,7 +230,7 @@ public class ISignalController extends DispatchPtr {
     **/
     public ISignalGroups getSignalGroups() throws COMException
     {
-          ISignalGroups res = new ISignalGroups();
+        ISignalGroups res = new ISignalGroups();
           DispatchPtr dispPtr = (DispatchPtr)get("SignalGroups");
           res.stealUnknown(dispPtr);
           return res;

@@ -19,7 +19,7 @@ import java.io.*;
 
 public class Vissim
 {
-	public static final GUID CLSID = new GUID("{325df941-0b2d-40b1-B6C5-133E632203CD}");
+	public static final GUID CLSID = new GUID("{cd13ec64-8a38-4363-8335-8BE904343F07}");
 	
 	
 }

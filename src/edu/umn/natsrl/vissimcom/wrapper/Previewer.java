@@ -19,7 +19,7 @@ import java.io.*;
 
 public class Previewer
 {
-	public static final GUID CLSID = new GUID("{76d73a33-6893-4f80-A881-C46881173CD6}");
+	public static final GUID CLSID = new GUID("{a7594508-0110-4f47-B769-7C7E08860E09}");
 	
 	
 }

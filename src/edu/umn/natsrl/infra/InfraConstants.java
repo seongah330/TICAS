@@ -28,7 +28,9 @@ public class InfraConstants {
 
     /** reading traffic data */
     public static String TRAFFIC_DATA_URL= "http://data.dot.state.mn.us:8080/trafdat";
-    public static String TRAFFIC_CONFIG_URL = "http://data.dot.state.mn.us/dds/tms_config.xml.gz";
+    public static String TRAFFIC_CONFIG_URL = "http://131.212.105.237/tms_config.xml.gz";
+//    public static String TRAFFIC_CONFIG_URL = "http://data.dot.state.mn.us/dds/tms_config.xml.gz";
+//    public static String TRAFFIC_CONFIG_URL = "http://data.dot.state.mn.us/iris_xml/metro_config.xml.gz";
     
     public static final String CACHE_DIR = "caches";
     public static final String SECTION_DIR = "section";

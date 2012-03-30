@@ -44,6 +44,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
     public SRTEMainPanel(PluginFrame parent) {
         this();
         this.simFrame = parent;
+        this.simFrame.setSize(810, 580);
     }
     
     /**
@@ -52,7 +53,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
     public SRTEMainPanel() {
         initComponents();
         
-        this.setSize(800, 520);        
+        this.setSize(800, 580);        
         config.load();
 
         if(config.isLoaded()) {

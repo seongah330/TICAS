@@ -17,6 +17,11 @@
  */
 package edu.umn.natsrl.ticas.plugin.srte;
 
+import edu.umn.natsrl.ticas.plugin.ITicasPlugin;
+import edu.umn.natsrl.ticas.plugin.PluginFrame;
+import edu.umn.natsrl.ticas.plugin.metering.MeteringSimulationGUI;
+import java.awt.BorderLayout;
+import java.awt.Container;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
@@ -25,18 +30,25 @@ import javax.swing.JOptionPane;
  * @author Chongmyung Park (chongmyung.park@gmail.com)
  * @author Subok Kim (derekkim29@gmail.com)
  */
-public class TICASPluginSRTE {
+public class TICASPluginSRTE implements ITicasPlugin{
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
-        try {
-            JFrame srteFrame = new SRTEMainFrame();
-            srteFrame.setVisible(true);
-        } catch(OutOfMemoryError ex) {
-            JOptionPane.showMessageDialog(null, "Out of Memory : Heap");
-        }
-    }
+//    public static void main(String[] args) {
+//        try {
+//            JFrame srteFrame = new SRTEMainFrame();
+//            srteFrame.setVisible(true);
+//        } catch(OutOfMemoryError ex) {
+//            JOptionPane.showMessageDialog(null, "Out of Memory : Heap");
+//        }
+//    }
 
+    @Override
+    public void init(PluginFrame frame) {
+//        frame.setSize(990, 790);
+        Container container = frame.getContentPane();
+        container.setLayout(new BorderLayout());        
+        container.add(new SRTEMainPanel(frame));
+    }
 }
