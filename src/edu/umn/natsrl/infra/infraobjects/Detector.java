@@ -439,7 +439,7 @@ public class Detector extends InfraObject implements Comparable {
         if (trafficType.isDensity()) {
             return adjustInterval(density,AdjustType.DensityWithStation);
         }
-        if (trafficType.isFlow() || trafficType.isFlowForAverage()) { //modify soobin Jeon 02/15/2012
+        if (trafficType.isFlow() || trafficType.isFlowForAverage() || trafficType.isAverageFlow()) { //modify soobin Jeon 02/15/2012
             return adjustInterval(flow,AdjustType.Flow);
         }
         if (trafficType.isOccupancy()) {

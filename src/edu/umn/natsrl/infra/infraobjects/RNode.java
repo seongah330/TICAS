@@ -182,6 +182,7 @@ public class RNode extends InfraObject {
     public double[] getDensity() { return getData(null, TrafficType.DENSITY); }
     public double[] getFlow() { return getData(null, TrafficType.FLOW); }
     public double[] getFlowForAverageLaneFlow() { return getData(null, TrafficType.FLOWFORAVERAGE); } //modify soobin Jeon 02/15/2012
+    public double[] getAverageLaneFlow() { return getData(null, TrafficType.AVERAGEFLOW); } //modify soobin Jeon 02/15/2012
     public double[] getVolume() { return getData(null, TrafficType.VOLUME); }
     public double[] getScan() { return getData(null, TrafficType.SCAN); }    
     public double[] getOccupancy() { return getData(null, TrafficType.OCCUPANCY); }        
@@ -190,6 +191,7 @@ public class RNode extends InfraObject {
     public double[] getDensity(IDetectorChecker checker) { return getData(checker, TrafficType.DENSITY); }
     public double[] getFlow(IDetectorChecker checker) { return getData(checker, TrafficType.FLOW); }
     public double[] getFlowForAverageLaneFlow(IDetectorChecker checker) { return getData(checker, TrafficType.FLOWFORAVERAGE); }//modify soobin Jeon 02/15/2012
+    public double[] getAverageLaneFlow(IDetectorChecker checker) { return getData(checker, TrafficType.AVERAGEFLOW); }//modify soobin Jeon 02/15/2012
     public double[] getVolume(IDetectorChecker checker) { return getData(checker, TrafficType.VOLUME); }
     public double[] getScan(IDetectorChecker checker) { return getData(checker, TrafficType.SCAN); }    
     public double[] getOccupancy(IDetectorChecker checker) { return getData(checker, TrafficType.OCCUPANCY); }    

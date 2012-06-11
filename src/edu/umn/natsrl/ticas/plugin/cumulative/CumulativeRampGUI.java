@@ -239,85 +239,119 @@ public class CumulativeRampGUI extends javax.swing.JPanel {
         }
     }
     
+    private double CalculateWaitingTime(BoundedSampleHistory cumulativeDemand, double Cf_current){
+        int STEP_SECONDS = 30;
+        int maxWaitTimeIndex = 7;
+        // current cumulative passage flow
+        if(cumulativeDemand.size() - 1 < maxWaitTimeIndex-1)
+                return 0;
+
+        for(int i = 0; i < cumulativeDemand.size(); i++) {
+                double queue = cumulativeDemand.get(i);
+                if(queue < Cf_current) {
+                        if(i == 0){
+                                return 0;
+                        }
+                        double bf_queue =
+                                cumulativeDemand.get(i - 1);
+                        double qd = bf_queue - queue;
+                        if(qd != 0) {
+                                double IF_time = STEP_SECONDS *
+                                        (Cf_current - queue) / qd;
+                                return  STEP_SECONDS * i -
+                                        IF_time;
+
+                        } else{
+                                return 0;
+                        }
+                }
+        }
+        return maxWaitTimeIndex * (STEP_SECONDS + 1);
+    }
     /*
      * Caculate Waiting Time
      */
     private void CalculateWaitingTime(double[] ci, double[] co, double[] waitingtime, int interval){
         //calculate waiting time
-            for(int i=0;i<co.length;i++){
-                if((ci[i] > co[i]) && i > 0){
-                    
-                    //else{
-                        double  outputvalue = co[i];
-                        double outputidx = (i+1) * interval;
-                        double[] startdot = new double[2]; //start dot
-                        double[] enddot = new double[2]; // end dot
-
-                        /*System.out.print("debug : outputvalue = " + outputvalue
-                                + " outputidx = " + outputidx);*/
-
-                        //Find input line
-                        /*for(int z = i; z>=0; z--){
-                            if(ci[z] <= outputvalue){
-                                startdot[0] = (z+1) * interval;
-                                startdot[1] = ci[z];
-                                enddot[0] = (z+2) * interval;
-                                enddot[1] = ci[z+1];
-                                break;
-                            }
-                        }*/
-                        startdot[0] = outputidx-interval;
-                        startdot[1] = ci[i-1];
-                        enddot[0] = outputidx;
-                        enddot[1] = ci[i];
-
-                        if(startdot[0] == 0 && startdot[1] == 0 && enddot[0] == 0 && enddot[1] == 0){
-                            //System.out.println("Not found compare equation");
-                            waitingtime[i] = 0;
-                        }else if(startdot[1] == outputvalue && startdot[0] == outputidx-interval){
-                           // System.out.println("30sec error");
-                            waitingtime[i] = 0;
-                        }else if(startdot[1] > outputvalue && this.Cbxequation.isSelected()){ //if input equatoin doesn't match of inputvalue//input start dot is upper than outputvalue.
-                         //   System.out.print("debug : outputvalue = " + outputvalue
-                         //       + " outputidx = " + outputidx);
-                          //  System.out.print(" startdot = (" + startdot[0] + ","+startdot[1] +")"
-                          //          + "enddot = (" + enddot[0] + ","+enddot[1] +")");
-                          //  System.out.println("input equation error");
-                        }/*else if(i != 0 && (ci[i] == ci[i-1] && co[i] == co[i-1]))
-                            waitingtime[i] = 0;*/
-                        else{
-                            /*System.out.print(" startdot = (" + startdot[0] + ","+startdot[1] +")"
-                                    + "enddot = (" + enddot[0] + ","+enddot[1] +")");*/
-                            //calculate line equation
-                            //S0, E0 = x
-                            //S1, E1 = y
-
-
-                            double alpha = 0;
-                            double constant = 0;
-                            double ex = 0;
-                            double ey = 0;
-
-                            alpha = (enddot[1] - startdot[1]) / (enddot[0] - startdot[0]); // alpha = (E0 - S0) / (E1 - S1)
-                            constant = startdot[1] - (alpha * startdot[0]); // constant = y - ax
-
-                            //calculate simultaneous equations input equation and output equation
-                            //ex = (y-constant) / alpha
-                            //ey = (alpha * ex) + constant
-                            ex = alpha == 0 ? outputidx : (outputvalue - constant) / alpha;
-                            ey = (alpha * ex) + constant;
-
-                            waitingtime[i] = outputidx - ex;
-
-                            /*System.out.println(" ex(y=" + alpha + "x+"+constant +")"
-                                    + " result(" + ex + ","+ey +")"
-                                    + " waitingtime = output - ex("+waitingtime[i]+"="+outputidx+"-"+ex+")");*/
-                            //waitingtime[i] = 1;
-                        }
-                    //}
-                }
-                else
-                    waitingtime[i] = 0;
+            
+            BoundedSampleHistory cumulativeDemand = new BoundedSampleHistory((240/30));
+            for(int z=0;z<co.length;z++){
+                  double Cf_current = co[z];
+                  cumulativeDemand.push(ci[z]);
+                  waitingtime[z] = CalculateWaitingTime(cumulativeDemand, Cf_current);
+//                if((ci[i] > co[i]) && i > 0){
+//                    
+//                    //else{
+//                        double  outputvalue = co[i];
+//                        double outputidx = (i+1) * interval;
+//                        double[] startdot = new double[2]; //start dot
+//                        double[] enddot = new double[2]; // end dot
+//
+//                        /*System.out.print("debug : outputvalue = " + outputvalue
+//                                + " outputidx = " + outputidx);*/
+//
+//                        //Find input line
+//                        /*for(int z = i; z>=0; z--){
+//                            if(ci[z] <= outputvalue){
+//                                startdot[0] = (z+1) * interval;
+//                                startdot[1] = ci[z];
+//                                enddot[0] = (z+2) * interval;
+//                                enddot[1] = ci[z+1];
+//                                break;
+//                            }
+//                        }*/
+//                        startdot[0] = outputidx-interval;
+//                        startdot[1] = ci[i-1];
+//                        enddot[0] = outputidx;
+//                        enddot[1] = ci[i];
+//
+//                        if(startdot[0] == 0 && startdot[1] == 0 && enddot[0] == 0 && enddot[1] == 0){
+//                            //System.out.println("Not found compare equation");
+//                            waitingtime[i] = 0;
+//                        }else if(startdot[1] == outputvalue && startdot[0] == outputidx-interval){
+//                           // System.out.println("30sec error");
+//                            waitingtime[i] = 0;
+//                        }else if(startdot[1] > outputvalue && this.Cbxequation.isSelected()){ //if input equatoin doesn't match of inputvalue//input start dot is upper than outputvalue.
+//                         //   System.out.print("debug : outputvalue = " + outputvalue
+//                         //       + " outputidx = " + outputidx);
+//                          //  System.out.print(" startdot = (" + startdot[0] + ","+startdot[1] +")"
+//                          //          + "enddot = (" + enddot[0] + ","+enddot[1] +")");
+//                          //  System.out.println("input equation error");
+//                        }/*else if(i != 0 && (ci[i] == ci[i-1] && co[i] == co[i-1]))
+//                            waitingtime[i] = 0;*/
+//                        else{
+//                            /*System.out.print(" startdot = (" + startdot[0] + ","+startdot[1] +")"
+//                                    + "enddot = (" + enddot[0] + ","+enddot[1] +")");*/
+//                            //calculate line equation
+//                            //S0, E0 = x
+//                            //S1, E1 = y
+//
+//
+//                            double alpha = 0;
+//                            double constant = 0;
+//                            double ex = 0;
+//                            double ey = 0;
+//
+//                            alpha = (enddot[1] - startdot[1]) / (enddot[0] - startdot[0]); // alpha = (E0 - S0) / (E1 - S1)
+//                            constant = startdot[1] - (alpha * startdot[0]); // constant = y - ax
+//
+//                            //calculate simultaneous equations input equation and output equation
+//                            //ex = (y-constant) / alpha
+//                            //ey = (alpha * ex) + constant
+//                            ex = alpha == 0 ? outputidx : (outputvalue - constant) / alpha;
+//                            ey = (alpha * ex) + constant;
+//
+//                            waitingtime[i] = outputidx - ex;
+//
+//                            /*System.out.println(" ex(y=" + alpha + "x+"+constant +")"
+//                                    + " result(" + ex + ","+ey +")"
+//                                    + " waitingtime = output - ex("+waitingtime[i]+"="+outputidx+"-"+ex+")");*/
+//                            //waitingtime[i] = 1;
+//                        }
+//                    //}
+//                }
+//                else
+//                    waitingtime[i] = 0;
             }
     }
     
@@ -551,7 +585,7 @@ public class CumulativeRampGUI extends javax.swing.JPanel {
          * Detector datas don't correct
          * Th 62 -> Th100 Entrance -> D5321(x), D3614(o)
          */
-        double[] input = es.getRampDemand();//getRampDemandbyD3614();
+        double[] input = es.getRampDemandOld();//getRampDemandbyD3614();
         double[] output = es.getRampFlowNew();
         double[] vinput = null;
         double[] voutput = null;

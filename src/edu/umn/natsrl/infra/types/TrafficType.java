@@ -32,6 +32,7 @@ public enum TrafficType {
         SPEEDFORSTATION(7, null, 0),
         FLOW(6, null, 0),
         FLOWFORAVERAGE(8,null,0),
+        AVERAGEFLOW(9,null,0),
         UNKNOWN(99, null, 0);
         
         int id;
@@ -68,6 +69,7 @@ public enum TrafficType {
         public boolean isDensity() { return this == DENSITY; }
         public boolean isFlow() { return this == FLOW; }
         public boolean isFlowForAverage() { return this == FLOWFORAVERAGE; }
+        public boolean isAverageFlow() { return this == AVERAGEFLOW; }
         public boolean isScan() { return this == SCAN; }
         public boolean isVolume() { return this == VOLUME; }
         public boolean isOccupancy() { return this == OCCUPANCY; }

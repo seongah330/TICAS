@@ -140,8 +140,9 @@ public class EvaluationForCalibration extends TimerTask {
                         this.ReadAvgData(_sr);
                     }
                     RunContourData();
-                }else
+                }else{
                     RunContourData();
+                }
 
 //                //Each Data
 //                for(SimulationResult _sr : this.simResultList){
@@ -693,7 +694,6 @@ public class EvaluationForCalibration extends TimerTask {
                     } else if (ot.equals(OptionType.STATION_DENSITY)) {
                         saveContour(ev, selectedOption, opts, ContourType.DENSITY);
                     }
-
                 }
                 Desktop.getDesktop().open(new File(selectedOption.getOutputPath()));
             } catch(Exception ex) {

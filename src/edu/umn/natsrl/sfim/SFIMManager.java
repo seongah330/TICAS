@@ -83,6 +83,8 @@ public class SFIMManager implements ITravelTimeListener {
     private SFIMSectionHelper sectionHelper;
     /** for logging **/
     private HashMap<String, ArrayList<Double>> travelTimes = new HashMap<String, ArrayList<Double>>();
+    private HashMap<String, ArrayList<Double>> WaitTimes = new HashMap<String, ArrayList<Double>>();
+    private HashMap<String, ArrayList<Double>> ReleaseRate = new HashMap<String, ArrayList<Double>>();
     private HashMap<SimMeter, Float> shouldUpdateRedTime = new HashMap<SimMeter, Float>();
     private HashMap<SimMeter, Byte> shouldUpdateMeterRate = new HashMap<SimMeter, Byte>();
     /** total execution time and samples of VISSIM **/
@@ -214,6 +216,10 @@ public class SFIMManager implements ITravelTimeListener {
                     if (samples >= totalSamples) {
                         System.out.println("[" + getTimeString() + "] Simulation has been done");
                         writeTTLog();
+                        writeDataLog("WT",30,WaitTimes);
+                        writeDataLog("WT",300,WaitTimes);
+                        writeDataLog("RT",30,ReleaseRate);
+                        writeDataLog("RT",300,ReleaseRate);
                         sfimPanel.signalSimulationEnd();
                         done = true;
                         return;
@@ -235,11 +241,17 @@ public class SFIMManager implements ITravelTimeListener {
                             continue;
                         }
                         e.updateState();
+                        
+                        //log for waitTime and Rate
+                        caculateWaitTime(e.meter.getId(),e.getWaitingTime());
+                        caculateRate(e.meter.getId(),e.meter.getReleaseRate());
+                        
                         System.out.println(
                                 "  !! " + e.meter.getId()
                                 + ", flow!=" + String.format("%.2f", e.getFlow())
                                 + ", demand=" + String.format("%.2f", e.getDemand())
-                                + ", rate=" + String.format("%.2f", e.meter.getReleaseRate()));
+                                + ", rate=" + String.format("%.2f", e.meter.getReleaseRate())
+                                + ", waittime=" + String.format("%.2f", e.getWaitingTime()));
 //                                + ", volume =" + String.format("%.2f", e.getFlow()));
                     }                   
                 } catch (Exception ex) {
@@ -298,7 +310,7 @@ public class SFIMManager implements ITravelTimeListener {
             ttData.add(tt);
         }
     }
-
+    
     /**
      * Save Time Travel Log
      */
@@ -341,6 +353,76 @@ public class SFIMManager implements ITravelTimeListener {
             ex.printStackTrace();
         }
     }
+    
+    /**
+     * caculate WaitTime
+     * @param id
+     * @param waittime 
+     */
+    private void caculateWaitTime(String id, double waittime){
+            String ttid = id;
+            double tt = waittime;
+
+            ArrayList<Double> ttData = this.WaitTimes.get(ttid);
+            if (ttData == null) {
+                ttData = new ArrayList<Double>();
+                this.WaitTimes.put(ttid, ttData);
+            }
+            ttData.add(tt);
+    }
+    
+    /**
+     * caculate Release Rate
+     * @param id
+     * @param waittime 
+     */
+    private void caculateRate(String id, double rate){
+            String ttid = id;
+            double tt = rate;
+
+            ArrayList<Double> ttData = this.ReleaseRate.get(ttid);
+            if (ttData == null) {
+                ttData = new ArrayList<Double>();
+                this.ReleaseRate.put(ttid, ttData);
+            }
+            ttData.add(tt);
+    }
+    
+    /**
+     * write waitTime
+     */
+    private void writeDataLog(String type, int value, HashMap<String, ArrayList<Double>> datalog) {
+        try {
+            WritableWorkbook workbook = Workbook.createWorkbook(new File(FileHelper.getNumberedFileName("IRIS_"+value+type+"_LOG.xls")));
+            WritableSheet sheet = workbook.createSheet("tt", 0);
+            Iterator<String> itr = datalog.keySet().iterator();
+            int col = 0;
+            while (itr.hasNext()) {
+                String key = itr.next();
+                sheet.addCell(new Label(col, 0, key));
+                ArrayList<Double> data = datalog.get(key);
+                int row = 1;
+                int cnt = 1;
+                double R_data = 0;
+                for (Double d : data) {
+                    R_data += d;
+                    if(cnt % (value/30) == 0){
+                        double avg = R_data <= 0 ? 0 : R_data / (value/30);
+                        sheet.addCell(new Number(col, row++, avg));
+                        R_data = 0;
+                    }
+                    cnt ++;
+                }
+                col++;
+            }
+            workbook.write();
+            workbook.close();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    
 
     /**
      * Make comm_links to communicate with IRIS

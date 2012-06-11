@@ -178,8 +178,9 @@ public class SRTEAlgorithm {
             for(int i=0;i<stations.length; i++)
             {
                 addData(sheet, colIdx++, "U-"+stations[i].toString(), stations[i].getSpeed());
+                addData(sheet, colIdx++, "U(A)-"+stations[i].toString(), stations[i].getAverageLaneFlow(),stations[i].getDensity());
                 addData(sheet, colIdx++, "K-"+stations[i].toString(), stations[i].getDensity());
-                addData(sheet, colIdx++, "Q-"+stations[i].toString(), stations[i].getFlow());
+                addData(sheet, colIdx++, "Q-"+stations[i].toString(), stations[i].getAverageLaneFlow());
                 addData(sheet, colIdx++, "O-"+stations[i].toString(), stations[i].getOccupancy());
             }
             
@@ -201,7 +202,22 @@ public class SRTEAlgorithm {
         }
     }
 
-
+    /*
+     * addData for Average U
+     */
+    private void addData(WritableSheet sheet, int column, String label, double[] data, double[] data2)
+    {
+        try {
+            sheet.addCell(new Label(column, 0, label));
+            for(int r=0; r<data.length; r++)
+            {
+                sheet.addCell(new Number(column, r+1, data[r] == 0 ? 0 : data[r]/data2[r]));
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(SRTEAlgorithm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     private void addData(WritableSheet sheet, int column, String label, double[] data)
     {
         try {

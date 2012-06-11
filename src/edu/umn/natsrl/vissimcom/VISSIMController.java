@@ -124,7 +124,6 @@ public class VISSIMController {
      * @param runTime time in second to runStepListener
      */
     public int run(int runTime) {
-
         // duration must be multiple of 30
         if (runTime <= 0 || runTime % RUNNING_STEP != 0) {
             return -1;
@@ -141,7 +140,7 @@ public class VISSIMController {
 
             // loop for running
             for (step = simStep; step <= runToThisStep; step++, simStep++) {
-                
+               
                 //sooba intend
                 /*try {
                     int nDelayTime;
@@ -219,6 +218,7 @@ public class VISSIMController {
                         travelTimeNames[i] = this.travelTimeList[i].getName();
                         // get travel time from starting to this second
                         travelTimeValues[i] = getDouble(this.travelTimeList[i].GetResult(second, "TRAVELTIME", "", 0));
+                        System.out.println("TravelTime : " + this.travelTimeList[i].getName() + " = " + getDouble(this.travelTimeList[i].GetResult(second, "TRAVELTIME", "", 0)));
                     }
 
                     // notify traffic data to listener

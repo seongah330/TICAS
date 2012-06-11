@@ -470,8 +470,8 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             addTools(videochecker);        
         }
         
-//        PluginInfo srte = new PluginInfo("SRTE", PluginType.TOOL, TICASPluginSRTE.class);       
-//        addSimulationPlugins(srte);        
+        PluginInfo srte = new PluginInfo("SRTE", PluginType.TOOL, TICASPluginSRTE.class);       
+        addSimulationPlugins(srte);        
     }
 
     /**

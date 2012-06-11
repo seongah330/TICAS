@@ -29,6 +29,8 @@ import edu.umn.natsrl.infra.simobjects.SimStation;
 import edu.umn.natsrl.infra.types.TrafficType;
 import edu.umn.natsrl.vissimctrl.VISSIMHelper;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  *
@@ -149,6 +151,12 @@ public class SFIMSectionHelper {
         double lastDemand = 0;
         double lastFlowOfRamp = 0;
         
+        /** Cumulative demand history */
+        private LimitedQueue<Double> cumulativeDemand = new LimitedQueue<Double>(8);
+        
+        /** Cumulative merging flow history */
+        private LimitedQueue<Double> cumulativeMergingFlow = new LimitedQueue<Double>(1);
+        
         public EntranceState(Entrance e) {
             this.rnode = e;
         }
@@ -178,8 +186,68 @@ public class SFIMSectionHelper {
             
             this.lastDemand = demand;                
             this.lastFlowOfRamp = p_flow;      
+            
+            double prevCd = 0;
+            double prevCq = 0;
+
+            if (this.cumulativeDemand.size() > 0) {
+                prevCd = this.cumulativeDemand.tail();
+            }
+            if (this.cumulativeMergingFlow.size() > 0) {
+                prevCq = this.cumulativeMergingFlow.tail();
+            }
+
+            this.cumulativeDemand.push(prevCd + demand);
+            this.cumulativeMergingFlow.push(prevCq + p_flow);
+
         }
         
+        public float getMinRatefromRType(float value, RateType rtype){
+            float Rmax = 1714;
+            float Rmin = 240;
+            float x = value;
+            if(x < 0){
+                return Rmin;
+            }else if(x > rtype.MaxValue){
+                return Rmax;
+            }else{
+                return ((Rmax - Rmin) / rtype.MaxValue) * x + 240;
+            }
+        }
+        
+        public double getWaitingTime(){
+            //current cumulative passage flow
+            double Cf_current = this.cumulativeMergingFlow.tail();
+            
+            if(this.cumulativeDemand.size() -1 < 7){
+                return 0;
+            }
+            
+            for(int i=0;i<this.cumulativeDemand.size();i++){
+                double queue = this.cumulativeDemand.get(i);
+                if(queue < Cf_current){
+                    if(i == 0){
+                        return 0;
+                    }
+                    
+                    double bf_queue = this.cumulativeDemand.get(i-1);
+                    double IF_time = 30 * (Cf_current-queue) / (bf_queue - queue);
+                    return ((30 * i) - IF_time);
+                }
+            }
+            
+            return 8 * 30;
+        }
+        
+//        private void updateState() {
+//
+//            this.isRateUpdated = false;
+//            calculateRampFlowAndDemand();
+//
+//            
+//
+//            this.calculateMinimumRate();
+//        }
         /**
          * Return ramp demand
          * @return 
@@ -264,6 +332,131 @@ public class SFIMSectionHelper {
             return false;
         }        
         
+    }
+    
+    private enum RateType{
+            Wait(240),
+            Occupancy(30);
+            float MaxValue;
+            RateType(float value){
+                MaxValue = value;
+            }
+            
+            public float getMaxValue(){
+                return MaxValue;
+            }
+            
+            public boolean isWait(){
+                return (this == Wait);
+            }
+            public boolean isOccupancy(){
+                return (this == Occupancy);
+            }
+    }
+    
+    /**
+     * Class : Limited Queue
+     * @param <T> 
+     */
+    class LimitedQueue<T> {
+
+        /** Storage limit */
+        int limit;
+        
+        /** Linked list to store data */
+        Queue<T> queue = new LinkedList<T>();
+
+        /**
+         * Construct
+         * @param limit storage limit
+         */
+        public LimitedQueue(int limit) {
+            this.limit = limit;
+        }
+
+        /**
+         * Add data
+         * @param obj
+         * @return 
+         */
+        public boolean push(T obj) {
+            boolean res = this.queue.offer(obj);
+            if (this.queue.size() > this.limit) {
+                this.queue.poll();
+            }
+            return res;
+        }
+
+        /**
+         * Return head data
+         * @return T data
+         */
+        public T head() {
+            return this.queue.poll();
+        }
+
+        /**
+         * Return tail data
+         * @return T data
+         */
+        public T tail() {
+            return this.get(0);
+        }
+
+        /**
+         * Return data at given index (in reversed direction)
+         *   e.g. get(0) : most recent data
+         * @return T data
+         */
+        public T get(int index) {
+
+            int idx = this.queue.size() - 1;
+            for (T obj : this.queue) {
+                if (index == idx) {
+                    return obj;
+                }
+                idx--;
+            }
+            return null;
+        }
+
+        /**
+         * Clear storage
+         */
+        public void clear() {
+            this.queue.clear();
+        }
+
+        /**
+         * Return current storage size
+         * @return queue size
+         */
+        public int size() {
+            return this.queue.size();
+        }
+
+        /**
+         * Return average data
+         * @param fromIndex start index
+         * @param length length to calculate average
+         */
+        public Double getAverage(int fromIndex, int length) {
+            Double sum = 0D;
+            int count = 0;
+            for (int i = fromIndex; i < fromIndex + length; i++) {
+                Double d = (Double) this.get(i);
+                if (d == null) {
+                    break;
+                }
+                sum += d;
+                count++;
+            }
+            if (count > 0) {
+                return sum / count;
+            } else {
+                return 0D;
+            }
+        }
     }
     
     /**

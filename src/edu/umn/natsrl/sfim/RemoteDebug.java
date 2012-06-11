@@ -107,7 +107,9 @@ public class RemoteDebug extends Thread {
                     if (ps != null) {
                         ps.write(is.read());
                     } else {
-                        if(sos != null) sos.write(is.read());
+                        if(sos != null){
+                            sos.write(is.read());
+                        }
                     }
                 } catch (IOException ex) {
                 }

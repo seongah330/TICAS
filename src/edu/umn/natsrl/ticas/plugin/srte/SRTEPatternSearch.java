@@ -114,7 +114,7 @@ public class SRTEPatternSearch {
             Station station = stations[i];
             speed_2d[i] = station.getSpeed();
             density_2d[i] = station.getDensity();
-            flow_2d[i] = station.getFlow();
+            flow_2d[i] = station.getAverageLaneFlow();
         }
 
         // data buffer for route-wide average data
@@ -468,7 +468,7 @@ public class SRTEPatternSearch {
             Station station = stations[i];
             speed_2d[i] = station.getSpeed();
             density_2d[i] = station.getDensity();
-            flow_2d[i] = station.getFlow();
+            flow_2d[i] = station.getAverageLaneFlow();
         }
 
         double[] speed = new double[dataLength];
@@ -512,7 +512,7 @@ public class SRTEPatternSearch {
             Station station = stations[i];
             speed_2d[i] = station.getSpeed();
             occupancy_2d[i] = station.getOccupancy();
-            flow_2d[i] = station.getFlow();
+            flow_2d[i] = station.getAverageLaneFlow();
         }
 
         double[] speed = new double[dataLength];
@@ -547,7 +547,7 @@ public class SRTEPatternSearch {
         station.loadData(period, false);
         double[] speed = station.getSpeed();
         double[] density = station.getDensity();
-        double[] flow = station.getFlow();
+        double[] flow = station.getAverageLaneFlow();
 
         this.search(station.getStationId(), speed, density, flow, period, log);
     }
@@ -565,7 +565,7 @@ public class SRTEPatternSearch {
         station.loadData(period, false);
         double[] speed = station.getSpeed();
         double[] occupancy = station.getOccupancy();
-        double[] flow = station.getFlow();
+        double[] flow = station.getAverageLaneFlow();
 
         this.search_by_occupancy(station.getStationId(), speed, occupancy, flow, period, log);
     }
