@@ -31,6 +31,13 @@ public class SRTEResult {
     public int lst; // low speed point for 5 min data
     public int rst; // speed recovery point for 5 min data
     public ArrayList<Integer> srt = new ArrayList<Integer>(); // stable speed point for 5 min data
+    
+    /**
+     * new Algorithm
+     */
+    public PatternType pType;
+    public int RCR;
+    public int TPR;
 
     public double[] data_origin;   // original 5 min speed data
     public double[] data_smoothed;   // smoothed 5 min speed data

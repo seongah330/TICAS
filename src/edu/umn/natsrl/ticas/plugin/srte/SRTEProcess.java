@@ -69,8 +69,11 @@ public class SRTEProcess {
         }
         result.addLog("RST : " + result.rst);
 
+        result.pType = new PatternType(filteredData,result.k_smoothed,result.lst);
+        result.pType.Process();
+//        findType(filteredData, result);
         findSRT(qData, result);
-
+        
         for (int i = 0; i < result.srt.size(); i++) {
             System.err.println("SRT : " + result.srt.get(i));
         }

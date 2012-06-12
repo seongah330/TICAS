@@ -33,7 +33,17 @@ public class SRTEConfig {
     private boolean loaded = false;
     
     public static int DATA_READ_EXTENSION_BEFORE_SNOW = 2;
-    public static int DATA_READ_EXTENSION_AFTER_SNOW = 6;
+    /**
+     * new Algorithm
+     * Modify - Time 6 -> 7
+     */
+    public static int DATA_READ_EXTENSION_AFTER_SNOW = 7;
+    
+    public static double RCR_Q = 0;
+    public static double RCR_K = 0;
+    public static double RCR_U = 0;
+    public static double TPR_U = 0;
+    public static double SDC_K = 0;
     
     private SRTEConfig() {   }
 
