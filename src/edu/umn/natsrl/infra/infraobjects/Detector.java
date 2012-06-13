@@ -101,9 +101,8 @@ public class Detector extends InfraObject implements Comparable {
         double[] scan_data = ddr.read(TrafficType.SCAN);
         double[] volume_data = ddr.read(TrafficType.VOLUME);
         double[] density_data = ddr.read(TrafficType.DENSITY);
-
+        
         this.adjustTrafficData(volume_data, scan_data, density_data);
-
         /*
          * modify soobin Jeon 02/17/2012
          * not correct.. wavetronics speed calculate... perhaps...

@@ -6,12 +6,13 @@ package edu.umn.natsrl.ticas.plugin.srte;
  */
 
 public class PatternType {
-    double[] q;
-    double[] k;
-    double[] u;
-    int sPoint = -1;
-    int RCRPoint = -1;
-    int TPRPoint = -1;
+    private double[] q;
+    private double[] k;
+    private double[] u;
+    private int sPoint = -1;
+    private int RCRPoint = -1;
+    private int TPRPoint = -1;
+    private int KfPoint = -1;
     public pType type;
     
     //temporary
@@ -53,13 +54,19 @@ public class PatternType {
     public void Process() {
         
         findType(q,k,u,sPoint);
-        
+//        System.out.println("After FinType : RCR-" + RCRPoint + " TPR-"+TPRPoint);
         RCRPoint = findRCRusingType(q,k,u,sPoint);
-        TPRPoint = findTPRusingType(q,k,u,sPoint);
+        
+        if(RCRPoint < 0)
+            TPRPoint = findTPRusingType(q,k,u,sPoint);
+        else
+            TPRPoint = findTPRusingType(q,k,u,RCRPoint);
+        
+//        System.out.println("After end : RCR-" + RCRPoint + " TPR-"+TPRPoint);
         
     }
 
-    private double[] CalculateSmoothedSpeed(double[] q, double[] k) {
+    public static double[] CalculateSmoothedSpeed(double[] q, double[] k) {
         double[] u = new double[q.length];
         
         for(int i = 0; i < q.length; i++)
@@ -140,20 +147,27 @@ public class PatternType {
     
     private int findTPRusingType(double[] q, double[] k, double[] u, int sPoint) {
         if(type == pType.ATYPE || type == pType.CTYPE)
-            return TPRPoint;
+            return findFreeflow(q,k,u,sPoint);
         
-        int Range = 2;
+        double kstateMax = 0;
+        int kstatePoint = -1;
+        int Range = 3;
+//        System.out.println("findTPR : sPoint-" + sPoint);
         for(int i=sPoint; i<q.length;i++){
             if(i < sPoint + Range)
                 continue;
             
-            double kstate = Math.abs(k[i-2] + k[i-1] + k[i]);
+            double kstate = Math.abs(k[i-3] - k[i]);
             
-            if(kstate > SDCk)
-                return i-1;
+            if(kstateMax < kstate){
+                kstateMax = kstate;
+                kstatePoint = i;
+            }
+//            if(kstate > SDCk)
+//                return i-1;
         }
         
-        return -1;
+        return kstatePoint;
     }
 
     private void findType(double[] q, double[] k, double[] u, int sPoint) {
@@ -162,14 +176,17 @@ public class PatternType {
          * Afer LST ~ 7 hour after event end
          */
         RCRPoint = findUpperPattern(q,k,u,sPoint);
-        TPRPoint = findFreeflow(q,k,u,sPoint);
         /**
          * if there is upper pattern.. CTYPE
          */
         if(RCRPoint == -1){
             type = pType.CTYPE;
+            TPRPoint = findFreeflow(q,k,u,sPoint);
             return;
         }
+        
+        TPRPoint = findFreeflow(q,k,u,RCRPoint);
+        KfPoint = RCRPoint;
         
         //caculate Kr, Kf for determining Type
         double kr = getRecoveryDensity(k,RCRPoint);
@@ -190,9 +207,11 @@ public class PatternType {
     private double getFreeflowDensity(double[] k, int TPRPoint) {
         return k[TPRPoint];
     }
-    
     public double getFreeflowDensity(){
         return getFreeflowDensity(k,TPRPoint);
+    }
+    public double getKfDensity(){
+        return k[KfPoint];
     }
     
     public int getRecoveryPoint(){
@@ -200,6 +219,20 @@ public class PatternType {
     } 
     public int getFreeflowPoint(){
         return TPRPoint;
+    }
+    
+    public int getKfPoint(){
+        return KfPoint;
+    }
+    public int getTypeNumber(){
+        if(this.type == pType.ATYPE)
+            return 1;
+        else if(this.type == pType.BTYPE)
+            return 2;
+        else if(this.type == pType.CTYPE)
+            return 3;
+        else
+            return -1;
     }
     
     enum pType{

@@ -17,6 +17,7 @@
  */
 package edu.umn.natsrl.ticas.plugin.srte;
 
+import edu.umn.natsrl.infra.infraobjects.Station;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,26 +27,36 @@ import java.util.List;
  * @author Subok Kim (derekkim29@gmail.com)
  */
 public class SRTEResult {
-    public String name;
+    public String sectionName;
     public int srst; // speed decline point for 5 min data
     public int lst; // low speed point for 5 min data
     public int rst; // speed recovery point for 5 min data
+    /**
+     * @deprecated
+     * */
     public ArrayList<Integer> srt = new ArrayList<Integer>(); // stable speed point for 5 min data
     
     /**
      * new Algorithm
      */
+    public Station station;
     public PatternType pType;
-    public int RCR;
-    public int TPR;
 
     public double[] data_origin;   // original 5 min speed data
     public double[] data_smoothed;   // smoothed 5 min speed data
     public double[] data_quant;   // 5 min speed data after quantization
+    
+    public double[] u_Avg_origin;
+    public double[] u_Avg_smoothed;
+    public double[] u_Avg_quant;
 
     public double[] k_smoothed;
     public double[] k_origin;
     public double[] k_quant;
+    
+    public double[] q_origin;
+    public double[] q_smoothed;
+    public double[] q_quant;
     
     public int[] phases;
     public List<String> msgs = new ArrayList<String>();
@@ -58,13 +69,22 @@ public class SRTEResult {
         this.rst = srp;
     }
 
+    /**
+     * @deprecated
+     * */
     public void addSRT(int srt)
     {
         this.srt.add(srt);
     }
 
     void addLog(String msg) {
-        System.out.println(msg);
+        addLog(msg,true);
+    }
+    void addLog(String msg,boolean entrance) {
+        if(entrance)
+            System.out.println(msg);
+        else
+            System.out.print(msg);
         this.msgs.add(msg);
     }
 

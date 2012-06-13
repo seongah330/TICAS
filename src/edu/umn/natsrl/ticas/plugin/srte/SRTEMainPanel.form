@@ -533,7 +533,7 @@
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Verdana" size="12" style="0"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="&#x394;Q &lt; "/>
+                <Property name="text" type="java.lang.String" value="&#x394;Q &gt; "/>
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="tbxRCRPIP_Q">
@@ -557,7 +557,7 @@
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Verdana" size="12" style="0"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="&#x394;U &lt; "/>
+                <Property name="text" type="java.lang.String" value="&#x394;U &gt; "/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel24">
@@ -597,7 +597,7 @@
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Verdana" size="12" style="0"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="&#x394;K &lt; "/>
+                <Property name="text" type="java.lang.String" value="&#x394;K &gt; "/>
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="tbxSDC_k">

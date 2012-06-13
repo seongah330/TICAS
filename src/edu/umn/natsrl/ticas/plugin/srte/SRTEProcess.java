@@ -19,6 +19,7 @@ package edu.umn.natsrl.ticas.plugin.srte;
 
 import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
+import edu.umn.natsrl.infra.infraobjects.Station;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,10 +35,44 @@ public class SRTEProcess {
     private int STEADY_TIMELSP = 8;
     
     private SRTEResult result = new SRTEResult();
-    private double[] u15m;
     private final Section section;
     private Period period;
+    private Station selectedStation;
 
+    public SRTEProcess(Section section, Period period,Station station, SRTEConfig config) {
+        this.selectedStation = station;
+        this.section = section;
+        this.period = period;
+        
+        //result base sett
+        result.station = selectedStation;
+        result.sectionName = this.section.getName();
+
+        //Speed Setting
+        result.data_origin = selectedStation.getSpeed();
+        result.data_smoothed = smoothing(result.data_origin);
+        result.data_quant = quantization(result.data_smoothed);
+        
+        //Flow setting
+        result.q_origin = selectedStation.getAverageLaneFlow();
+        result.q_smoothed = smoothing(result.q_origin);
+        result.q_quant = quantization(result.q_smoothed);
+        
+        // density setting
+        result.k_origin = selectedStation.getDensity();
+        result.k_smoothed = smoothing(result.k_origin);
+        result.k_quant = quantization(result.k_smoothed);
+        
+        //Average u Data
+        result.u_Avg_origin = PatternType.CalculateSmoothedSpeed(result.q_origin, result.k_origin);
+        result.u_Avg_smoothed = PatternType.CalculateSmoothedSpeed(result.q_smoothed, result.k_smoothed);
+        result.u_Avg_quant = PatternType.CalculateSmoothedSpeed(result.q_quant, result.k_quant);
+
+        // config setting
+        this.SMOOTHING_FILTERSIZE = config.getInt("SMOOTHING_FILTERSIZE");
+        this.QUANTIZATION_THRESHOLD = config.getInt("QUANTIZATION_THRESHOLD");
+
+    }
     /**
      * Main algorithm process
      *  - smoothing => Quantization => find SRST / LST / RST / SRT
@@ -47,8 +82,8 @@ public class SRTEProcess {
         double filteredData[];
         double qData[];
 
-        filteredData = smoothing(u15m);
-        qData = quantization(filteredData);
+        filteredData = result.data_smoothed;
+        qData = result.data_quant;
         //filteredData = qData;
 
         result.srst = findSRST(qData, filteredData);
@@ -67,21 +102,16 @@ public class SRTEProcess {
                 break;
             }
         }
-        result.addLog("RST : " + result.rst);
+        result.addLog(", RST : " + result.rst);
 
-        result.pType = new PatternType(filteredData,result.k_smoothed,result.lst);
+        result.addLog("calculate New Algorithm");
+        result.pType = new PatternType(result.q_smoothed,result.k_smoothed,result.lst);
         result.pType.Process();
-//        findType(filteredData, result);
-        findSRT(qData, result);
-        
-        for (int i = 0; i < result.srt.size(); i++) {
-            System.err.println("SRT : " + result.srt.get(i));
-        }
 
-        result.name = this.section.getName();
-        result.data_origin = u15m;
-        result.data_smoothed = filteredData;
-        result.data_quant = qData;
+//        findSRT(qData, result);
+//        for (int i = 0; i < result.srt.size(); i++) {
+//            System.err.println("SRT : " + result.srt.get(i));
+//        }
 
         return result;
     }
@@ -152,7 +182,7 @@ public class SRTEProcess {
      * @return
      */
     private int findSRST(double[] qData, double[] smootedData) {
-        result.addLog("Finding SRST..........");
+        result.addLog("Finding SRST..........",false);
         int declineCount = 0;
         int srst = 0;
         int endPoint = qData.length - 1;
@@ -205,7 +235,7 @@ public class SRTEProcess {
         int increaseCountB = 0;
         int steadyState = 0;
         int endPoint = qData.length-1;
-        result.addLog("Finding LST..........");
+        result.addLog("Finding LST..........",false);
         for (int i = srst + 1; i <= endPoint - 1; i++) {
             if (increaseCount == 2) {
                 //search retrospectively to find lsp
@@ -267,17 +297,17 @@ public class SRTEProcess {
         int steadyState = 0;
          int endPoint = qData.length - 1;
         //int decreaseCount = 0;
-        result.addLog("Finding RST (" + targetIncreaseCount + ").............");
+        result.addLog("Finding RST (" + targetIncreaseCount + ").............",false);
         for (int i = lst + 1; i <= endPoint - 1; i++) {
             if (increaseCount == targetIncreaseCount) {
                 for (int j = rst - 1; j > lst; j--) {
                     if (filteredData[j] < qData[j]) {
                         rst = j;
-                        result.addLog(" -> case 1");
+                        result.addLog(" -> case 1",false);
                         return rst;
                     }
                 }
-                result.addLog(" -> case 2");
+                result.addLog(" -> case 2",false);
                 return rst;
             }
 
@@ -300,7 +330,7 @@ public class SRTEProcess {
                 steadyState = 0;
             }
         }
-        result.addLog(" -> case 3");
+        result.addLog(" -> case 3",false);
         return rst;
     }
 
@@ -330,6 +360,7 @@ public class SRTEProcess {
      * - Condition D: If the point meets all above conditions, then the time
      *   value of the earliest one will be the Speed Recovery Time.
      *
+     * @deprecated
      * @param filteredData
      * @param qData
      * @param result 
@@ -440,27 +471,5 @@ public class SRTEProcess {
         int pos = 0;    // index
         int tick_pattern = 0;   // pattern at tick
         int phase_2_count = 0;    // count of phase 2 after tick
-    }
-
-    /**
-     * constructor
-     * @param stationName
-     * @param u5m
-     * @param k15m
-     */
-    public SRTEProcess(Section section, Period period, double[] u15m, double[] k15m, SRTEConfig config) {
-        this.section = section;
-        this.period = period;
-        this.u15m = u15m;
-        
-        // density setting
-        result.k_origin = k15m;
-        result.k_smoothed = smoothing(k15m);
-        result.k_quant = quantization(result.k_smoothed);
-
-        // config setting
-        this.SMOOTHING_FILTERSIZE = config.getInt("SMOOTHING_FILTERSIZE");
-        this.QUANTIZATION_THRESHOLD = config.getInt("QUANTIZATION_THRESHOLD");
-
     }
 }

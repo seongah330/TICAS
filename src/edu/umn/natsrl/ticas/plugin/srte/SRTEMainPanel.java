@@ -21,6 +21,7 @@ import edu.umn.natsrl.evaluation.Interval;
 import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.TMO;
+import edu.umn.natsrl.infra.section.SectionManager;
 import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -51,7 +52,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
     public SRTEMainPanel(PluginFrame parent) {
         this();
         this.simFrame = parent;
-        this.simFrame.setSize(1110, 580);
+        this.simFrame.setSize(1310, 580);
     }
     
     /**
@@ -99,6 +100,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         
         redirectOutput();
         this.updateOption();
+        config.save();
         
         SRTEAlgorithm srte = new SRTEAlgorithm();
 
@@ -111,14 +113,14 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         int hour = Integer.parseInt(this.cbxStartHour.getSelectedItem().toString());
         cs.set(Calendar.HOUR_OF_DAY, hour);
         cs.set(Calendar.MINUTE, Integer.parseInt(this.cbxStartMin.getSelectedItem().toString()));
-        cs.set(Calendar.SECOND, 0);
+//        cs.set(Calendar.SECOND, 0);
        
         // set period for ending time
         Calendar ce = this.calEndDate.getSelectedDate();
         hour = Integer.parseInt(this.cbxEndHour.getSelectedItem().toString());
         ce.set(Calendar.HOUR_OF_DAY, hour);
         ce.set(Calendar.MINUTE, Integer.parseInt(this.cbxEndMin.getSelectedItem().toString()));
-        ce.set(Calendar.SECOND, 0);
+//        ce.set(Calendar.SECOND, 0);
 
 
         // set period with staing and enting time and 15min interval
@@ -205,12 +207,13 @@ public class SRTEMainPanel extends javax.swing.JPanel {
      * Load section data into combo box
      */
     private void loadSection() {
+        SectionManager sm = tmo.getSectionManager();
+        if(sm == null) return;
         this.sections.clear();
-        this.tmo.getSectionManager().loadSections();
-        this.sections.addAll(tmo.getSectionManager().getSections());
-
+        sm.loadSections();
+        this.sections.addAll(sm.getSections());
         this.cbxSection.removeAllItems();
-
+        
         for (Section s : this.sections) {
             this.cbxSection.addItem(s);
         }
@@ -516,7 +519,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         jLabel21.setText("Road Condition Recovery Pattern Identification Parameters");
 
         jLabel22.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel22.setText("ΔQ < ");
+        jLabel22.setText("ΔQ > ");
 
         tbxRCRPIP_Q.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxRCRPIP_Q.setText("0");
@@ -525,7 +528,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         tbxRCRPIP_U.setText("0");
 
         jLabel23.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel23.setText("ΔU < ");
+        jLabel23.setText("ΔU > ");
 
         jLabel24.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel24.setText("Free Flow Identification Parameter");
@@ -540,7 +543,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         jLabel26.setText("Signification Density Change parameter");
 
         jLabel27.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel27.setText("ΔK < ");
+        jLabel27.setText("ΔK > ");
 
         tbxSDC_k.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxSDC_k.setText("1");

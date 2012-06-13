@@ -49,9 +49,8 @@ public class SRTEAlgorithm {
      * @throws OutOfMemoryError
      * @throws Exception
      */
-    public SRTEResult start() throws OutOfMemoryError, Exception
+    public SRTEResult[] start() throws OutOfMemoryError, Exception
     {
-        SRTEResult result;       
         Station[] stations = this.section.getStations();                
         //read data
         System.out.print("Loading Data.............");
@@ -60,18 +59,27 @@ public class SRTEAlgorithm {
         long et = new Date().getTime();
         System.out.println(" (OK : " + (et-st) + "ms)");
 
-        //saveData();
+//        saveData();
 
-        //make route-wide average data
-        double[] avgSpeedData = getAverageSpeed(stations);
-        double[] avgDensityData = getAverageDensity(stations);
+//        //make route-wide average data
+//        double[] avgSpeedData = getAverageSpeed(stations);
+//        double[] avgDensityData = getAverageDensity(stations);
+//        
+//        
+//        // create algorithm process instance
+//        SRTEProcess process = new SRTEProcess(section, period, avgSpeedData, avgDensityData, config);
+//
+//        // run
+//        result = process.stateDecision();
 
-        // create algorithm process instance
-        SRTEProcess process = new SRTEProcess(section, period, avgSpeedData, avgDensityData, config);
-
-        // run
-        result = process.stateDecision();
-
+//        SRTEProcess[] proc = new SRTEProcess[stations.length];
+        SRTEResult[] result = new SRTEResult[stations.length];
+        for(int i=0;i<stations.length;i++){
+            System.out.println("\nCalculate Station..."+stations[i].getLabel()+"("+stations[i].getStationId()+")");
+            SRTEProcess proc = new SRTEProcess(section, period,stations[i],config);
+            result[i] = proc.stateDecision();
+            System.out.println("End Station..."+stations[i].getLabel()+"("+stations[i].getStationId()+")");
+        }
         // print out result
         presentResult(result);
 
@@ -82,7 +90,7 @@ public class SRTEAlgorithm {
 
     public void extractData() throws Exception
     {
-        section.loadData(this.period);
+        section.loadData(this.period,false);
         saveData();
     }
 
@@ -100,6 +108,209 @@ public class SRTEAlgorithm {
         this.period.addEndHour(SRTEConfig.DATA_READ_EXTENSION_AFTER_SNOW);
     }    
 
+    private void presentResult(SRTEResult[] result) {
+        try {
+            String workbookFile = getFileName("SRTEResult ("+this.period.getPeriodString()+")", "xls");
+            WritableWorkbook workbook = Workbook.createWorkbook(new File(workbookFile));        
+            int sheet_count = 0;                   
+            int idx = 0;
+            int colIdx = 0;
+            
+            // summary sheet //////////////////////////////////////////////////////
+            WritableSheet sheet = workbook.createSheet("Summary", sheet_count++);
+            
+            sheet.addCell(new Label(colIdx++, 0, result[0].sectionName));
+            colIdx += 1;
+            sheet.addCell(new Label(colIdx++, 0, "SRST"));
+//            sheet.addCell(new Label(colIdx++, 0, "U(SRST)"));                
+            sheet.addCell(new Label(colIdx++, 0, "LST"));
+//            sheet.addCell(new Label(colIdx++, 0, "U(LST)"));                
+            sheet.addCell(new Label(colIdx++, 0, "RST"));
+//            sheet.addCell(new Label(colIdx++, 0, "U(RST)"));                
+            sheet.addCell(new Label(colIdx++, 0, "Kf"));
+            sheet.addCell(new Label(colIdx++, 0, "RCR"));
+            sheet.addCell(new Label(colIdx++, 0, "TPR"));
+//            sheet.addCell(new Label(colIdx++, 0, "SST"));
+            
+            
+            colIdx += 1;
+            sheet.addCell(new Label(colIdx++, 0, "TYPE"));
+            colIdx += 1;
+            sheet.addCell(new Label(colIdx++, 0, "SRST"));
+            sheet.addCell(new Label(colIdx++, 0, "LST"));
+            sheet.addCell(new Label(colIdx++, 0, "RST"));
+            sheet.addCell(new Label(colIdx++, 0, "Kf"));
+            sheet.addCell(new Label(colIdx++, 0, "RCR"));
+            sheet.addCell(new Label(colIdx++, 0, "TPR"));
+//            sheet.addCell(new Label(colIdx++, 0, "SST"));
+            
+            colIdx += 1;
+            sheet.addCell(new Label(colIdx++, 0, "SRST(T)"));
+            sheet.addCell(new Label(colIdx++, 0, "SRST"));
+            sheet.addCell(new Label(colIdx++, 0, "Q(SRST)"));
+            sheet.addCell(new Label(colIdx++, 0, "K(SRST)"));
+            sheet.addCell(new Label(colIdx++, 0, "U(SRST)"));
+            colIdx += 1;
+            sheet.addCell(new Label(colIdx++, 0, "LST(T)"));
+            sheet.addCell(new Label(colIdx++, 0, "LST"));
+            sheet.addCell(new Label(colIdx++, 0, "Q(LST)"));
+            sheet.addCell(new Label(colIdx++, 0, "K(LST)"));
+            sheet.addCell(new Label(colIdx++, 0, "U(LST)"));
+            colIdx += 1;
+            sheet.addCell(new Label(colIdx++, 0, "RST(T)"));
+            sheet.addCell(new Label(colIdx++, 0, "RST"));
+            sheet.addCell(new Label(colIdx++, 0, "Q(RST)"));
+            sheet.addCell(new Label(colIdx++, 0, "K(RST)"));
+            sheet.addCell(new Label(colIdx++, 0, "U(RST)"));
+            colIdx += 1;
+            sheet.addCell(new Label(colIdx++, 0, "Kf(T)"));
+            sheet.addCell(new Label(colIdx++, 0, "Kf"));
+            sheet.addCell(new Label(colIdx++, 0, "Q(Kf)"));
+            sheet.addCell(new Label(colIdx++, 0, "K(Kf)"));
+            sheet.addCell(new Label(colIdx++, 0, "U(Kf)"));
+            
+            colIdx += 1;
+            sheet.addCell(new Label(colIdx++, 0, "RCR(T)"));
+            sheet.addCell(new Label(colIdx++, 0, "RCR"));
+            sheet.addCell(new Label(colIdx++, 0, "Q(RCR)"));
+            sheet.addCell(new Label(colIdx++, 0, "K(RCR)"));
+            sheet.addCell(new Label(colIdx++, 0, "U(RCR)"));
+            
+            colIdx += 1;
+            sheet.addCell(new Label(colIdx++, 0, "TPR(T)"));
+            sheet.addCell(new Label(colIdx++, 0, "TPR"));
+            sheet.addCell(new Label(colIdx++, 0, "Q(TPR)"));
+            sheet.addCell(new Label(colIdx++, 0, "K(TPR)"));
+            sheet.addCell(new Label(colIdx++, 0, "U(TPR)"));
+            
+            
+            
+            for(int i=0;i<result.length;i++){
+                colIdx = 0;
+                int rows = i+1;
+                sheet.addCell(new Label(colIdx++, idx+rows, result[i].station.getLabel()));
+                colIdx += 1;
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(result[i].srst)));
+//                sheet.addCell(new Number(colIdx++, idx+rows, result[i].data_smoothed[result[i].srst]));
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(getPoint(result[i].lst))));
+//                sheet.addCell(new Number(colIdx++, idx+rows, result[i].data_smoothed[getPoint(result[i].lst)]));
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(result[i].rst)));
+//                sheet.addCell(new Number(colIdx++, idx+rows, result[i].data_smoothed[result[i].rst]));
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(result[i].pType.getKfPoint())));
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(result[i].pType.getRecoveryPoint())));
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(result[i].pType.getFreeflowPoint())));
+//                sheet.addCell(new Label(colIdx++, idx+rows, getTime(result[i].rst)));
+                
+                colIdx += 1;
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.getTypeNumber()));
+                colIdx += 1;
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].srst));
+                sheet.addCell(new Number(colIdx++, idx+rows, getPoint(result[i].lst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].rst));
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.getKfPoint()));
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.getRecoveryPoint()));
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.getFreeflowPoint()));
+                
+                //srst
+                colIdx += 1;
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(result[i].srst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].srst));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].srst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].srst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].srst)));
+                //lst
+                colIdx += 1;
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(getPoint(result[i].lst))));
+                sheet.addCell(new Number(colIdx++, idx+rows, getPoint(result[i].lst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].lst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].lst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].lst)));
+                //rst
+                colIdx += 1;
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(result[i].rst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].rst));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].rst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].rst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].rst)));
+                //kF
+                colIdx += 1;
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(result[i].pType.getKfPoint())));
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.getKfPoint()));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].pType.getKfPoint())));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].pType.getKfPoint())));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].pType.getKfPoint())));
+                //RCR
+                colIdx += 1;
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(result[i].pType.getRecoveryPoint())));
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.getRecoveryPoint()));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].pType.getRecoveryPoint())));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].pType.getRecoveryPoint())));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].pType.getRecoveryPoint())));
+                //TPR
+                colIdx += 1;
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(result[i].pType.getFreeflowPoint())));
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.getFreeflowPoint()));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].pType.getFreeflowPoint())));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].pType.getFreeflowPoint())));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].pType.getFreeflowPoint())));
+                
+                
+            }
+            
+            for(int i=0;i<result.length;i++){
+                // data sheet //////////////////////////////////////////////////////
+                colIdx = 0;
+                sheet = workbook.createSheet(result[i].station.getLabel()+"("+result[i].station.getStationId()+")", sheet_count++);
+                
+                addData(sheet, colIdx++, "Times", this.period.getTimelineJustTime());
+                
+                colIdx++;
+                addData(sheet, colIdx++, "Q", result[i].q_origin);
+                addData(sheet, colIdx++, "SQ", result[i].q_smoothed);
+                addData(sheet, colIdx++, "QQ", result[i].q_quant);
+                
+                colIdx++;
+                addData(sheet, colIdx++, "K", result[i].k_origin);
+                addData(sheet, colIdx++, "SK", result[i].k_smoothed);
+                addData(sheet, colIdx++, "QK", result[i].k_quant);
+                
+                colIdx++;
+                addData(sheet, colIdx++, "U", result[i].data_origin);
+                addData(sheet, colIdx++, "SU", result[i].data_smoothed);
+                addData(sheet, colIdx++, "QU", result[i].data_quant);
+                
+                colIdx++;
+                addData(sheet, colIdx++, "U(Avg)", result[i].u_Avg_origin);
+                addData(sheet, colIdx++, "SU(Avg)", result[i].u_Avg_smoothed);
+                addData(sheet, colIdx++, "QU(Avg)", result[i].u_Avg_quant);
+
+                colIdx++;colIdx++;
+
+//                Station[] stations = this.section.getStations();
+//                addData(sheet, colIdx++, "Avg", result[i].data_origin);
+//                for(int z=0;z<stations.length; z++)
+//                {
+//                    addData(sheet, colIdx++, "U-"+stations[i].toString(), stations[i].getSpeed());
+//                    addData(sheet, colIdx++, "U(A)-"+stations[i].toString(), stations[i].getAverageLaneFlow(),stations[i].getDensity());
+//                    addData(sheet, colIdx++, "K-"+stations[i].toString(), stations[i].getDensity());
+//                    addData(sheet, colIdx++, "Q-"+stations[i].toString(), stations[i].getAverageLaneFlow());
+//                    addData(sheet, colIdx++, "O-"+stations[i].toString(), stations[i].getOccupancy());
+//                }
+            }
+                        
+            workbook.write();
+            workbook.close();
+
+            // open result excel file
+            //Desktop.getDesktop().open(new File(workbookFile));
+
+
+
+        } catch (Exception ex) {
+            Logger.getLogger(SRTEAlgorithm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     private void presentResult(SRTEResult result) {
         try {
             String workbookFile = getFileName("SRTEResult ("+this.period.getPeriodString()+")", "xls");
@@ -121,7 +332,7 @@ public class SRTEAlgorithm {
             sheet.addCell(new Label(colIdx++, 0, "U(SRT)"));                                           
 
             colIdx = 0;
-            sheet.addCell(new Label(colIdx++, idx+1, result.name));
+            sheet.addCell(new Label(colIdx++, idx+1, result.sectionName));
             sheet.addCell(new Label(colIdx++, idx+1, getTime(result.srst)));
             sheet.addCell(new Number(colIdx++, idx+1, result.data_smoothed[result.srst]));
             sheet.addCell(new Label(colIdx++, idx+1, getTime(result.lst)));
@@ -432,5 +643,17 @@ public class SRTEAlgorithm {
         }
 
         return filteredData;
+    }
+
+    private int getPoint(int p) {
+        return p < 0 ? 0 : p;
+    }
+
+    private double getValue(double[] value, int p) {
+        if(p < 0)
+            return -1;
+        else{
+            return value[p];
+        }
     }
 }
