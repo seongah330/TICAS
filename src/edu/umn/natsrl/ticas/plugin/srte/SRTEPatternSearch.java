@@ -92,7 +92,7 @@ public class SRTEPatternSearch {
     public Object[] getPatternAndTransitionpoint(Section section, Period period) {
 
         // set interval of period to 15min interval
-        period.setInterval(Interval.I15MIN.second);
+//        period.setInterval(Interval.I15MIN.second);
 
         // load data
         section.loadData(period, false);

@@ -50,6 +50,11 @@ public final class NATSRLCalendar extends javax.swing.JPanel {
             return true;
         }
     };
+    
+    /**
+     * button Toggle Iistener
+     */
+    private DayToggleListener daybuttonListener;
 
     /** Creates new form TICASCalendar */
     public NATSRLCalendar() {
@@ -219,6 +224,7 @@ public final class NATSRLCalendar extends javax.swing.JPanel {
         int y = month.get(Calendar.YEAR);
         int m = month.get(Calendar.MONTH);
         GregorianCalendar calendar = new GregorianCalendar(y, m, day, 0, 0, 0);
+        
         if (button.isSelected()) {
             selected.add(calendar.getTime());
             if (selected.size() >= maxSelectedDays) {
@@ -231,6 +237,10 @@ public final class NATSRLCalendar extends javax.swing.JPanel {
                 enableMoreSelections();
             }
             processDateRemovedEvent(calendar);
+        }
+        
+        if(daybuttonListener != null){
+            daybuttonListener.onButtonToggle(button.isSelected(), day);
         }
     }
 
@@ -352,6 +362,10 @@ public final class NATSRLCalendar extends javax.swing.JPanel {
     public void setDateChecker(IDateChecker dc) {
         this.dateChecker = dc;
         this.initialize();
+    }
+    
+    public void setDayToggleListener(DayToggleListener listener){
+        this.daybuttonListener = listener;
     }
 
     public class Event extends EventObject {

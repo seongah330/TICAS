@@ -20,6 +20,7 @@ package edu.umn.natsrl.infra;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
@@ -183,5 +184,26 @@ public class Period implements Serializable {
     public Period clone()
     {
         return new Period(this);
+    }
+
+    public void syncInterval() {
+        int gap = (start_min - end_min);
+        int minterval = interval / 60;
+//        System.out.println("gap : " +gap);
+        int addTime = minterval == 0 ? gap : gap % minterval;
+//        System.out.println("addTime : " +addTime);
+        if(start_min < end_min)
+            addTime = minterval - addTime;
+//        System.out.println("interval - addTime : " +addTime);
+        if(addTime == 0)
+            return;
+        
+        Calendar c = Calendar.getInstance();
+        c.setTime(endDate);
+        SimpleDateFormat dateformatter = new SimpleDateFormat("yyyy.MM.dd HH:mm");
+//        System.out.println("beforetime : "+dateformatter.format(c.getTime()));
+        c.add(Calendar.MINUTE, addTime);
+//        System.out.println("aftertime : "+dateformatter.format(c.getTime()));
+        this.setTimes(startDate,c.getTime());
     }
 }

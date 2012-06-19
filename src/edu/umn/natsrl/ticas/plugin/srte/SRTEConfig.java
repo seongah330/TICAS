@@ -25,6 +25,7 @@ import java.util.Properties;
  *
  * @author Chongmyung Park (chongmyung.park@gmail.com)
  * @author Subok Kim (derekkim29@gmail.com)
+ * @author Soobin Jeon <j.soobin@gmail.com>
  */
 public class SRTEConfig {
     
@@ -43,6 +44,7 @@ public class SRTEConfig {
     public static double RCR_K = 0;
     public static double RCR_U = 0;
     public static double TPR_U = 0;
+    public static double TPR_hour = 0;
     public static double SDC_K = 0;
     
     private SRTEConfig() {   }

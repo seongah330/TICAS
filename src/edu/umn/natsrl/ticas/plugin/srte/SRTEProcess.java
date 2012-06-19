@@ -27,6 +27,7 @@ import java.util.List;
  *
  * @author Chongmyung Park (chongmyung.park@gmail.com)
  * @author Subok Kim (derekkim29@gmail.com)
+ * @author Soobin Jeon <j.soobin@gmail.com>
  */
 public class SRTEProcess {
 
@@ -66,7 +67,7 @@ public class SRTEProcess {
         //Average u Data
         result.u_Avg_origin = PatternType.CalculateSmoothedSpeed(result.q_origin, result.k_origin);
         result.u_Avg_smoothed = PatternType.CalculateSmoothedSpeed(result.q_smoothed, result.k_smoothed);
-        result.u_Avg_quant = PatternType.CalculateSmoothedSpeed(result.q_quant, result.k_quant);
+        result.u_Avg_quant = quantization(result.u_Avg_smoothed);
 
         // config setting
         this.SMOOTHING_FILTERSIZE = config.getInt("SMOOTHING_FILTERSIZE");
@@ -105,13 +106,13 @@ public class SRTEProcess {
         result.addLog(", RST : " + result.rst);
 
         result.addLog("calculate New Algorithm");
-        result.pType = new PatternType(result.q_smoothed,result.k_smoothed,result.lst);
+        result.pType = new PatternType(result.q_origin,result.k_origin,result.lst);
         result.pType.Process();
 
-//        findSRT(qData, result);
-//        for (int i = 0; i < result.srt.size(); i++) {
-//            System.err.println("SRT : " + result.srt.get(i));
-//        }
+        findSRT(qData, result);
+        for (int i = 0; i < result.srt.size(); i++) {
+            System.err.println("SRT : " + result.srt.get(i));
+        }
 
         return result;
     }
