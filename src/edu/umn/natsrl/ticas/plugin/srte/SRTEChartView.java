@@ -563,9 +563,9 @@ public class SRTEChartView extends javax.swing.JFrame {
             if(currentStationResult == null)
                 return;
             String thr = this.tbxACCPointThreshHold.getText();
-            int thd = 0;
+            double thd = 0;
             try{
-                thd = Integer.parseInt(thr);
+                thd = Double.parseDouble(thr);
             }catch(Exception e){
                 return;
             }
