@@ -306,9 +306,18 @@ public class SRTEResult {
         return count;
     }
     
+    void AddRCRAccPoint(ResultRCRAccPoint AccPoint) {
+        this.RCRAccPoint.add(AccPoint);
+    }
+    
+    ArrayList<ResultRCRAccPoint> getRCRAccPointList(){
+        return RCRAccPoint;
+    }
+    
     @Override
     public String toString(){
         return this.station.getLabel()+"("+station.getStationId()+")";
     }
+    
     
 }

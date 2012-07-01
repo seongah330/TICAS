@@ -17,6 +17,7 @@
  */
 package edu.umn.natsrl.ticas.plugin.srte;
 
+import edu.umn.natsrl.ticas.plugin.srte.SRTEChartView.DataType;
 import info.monitorenter.gui.chart.*;
 import info.monitorenter.gui.chart.IAxis.AxisTitle;
 import info.monitorenter.gui.chart.axis.AAxis;
@@ -156,7 +157,7 @@ public class SRTEChartLine {
         chart.removeAllTraces();
     }
     
-    public void setSpeedData(HashMap<Integer,Boolean> point, HashMap<Integer,Boolean> time, HashMap<Integer,Boolean> bare, double[] datas, String name){
+    public void setSpeedData(HashMap<Integer,Boolean> point, HashMap<Integer,Boolean> time, HashMap<Integer,Boolean> bare, double[] datas, DataType datatype){
         double Maxdata = 0;
         for(double d : datas){
             if(Maxdata < d)
@@ -164,7 +165,9 @@ public class SRTEChartLine {
         }
         
         this.setYRange(0,(int)(SRTEUtil.calculateStep(Maxdata,10)+20));
-        this.AddDataTrace(datas,name);
+        setAxisTitle("Time Interval",datatype.name);
+        
+        this.AddDataTrace(datas,datatype.toString());
         this.AddPointDataTrace(point, datas, "Point", true, new TracePainterVerticalBar(2, chart),Color.BLUE);
         this.AddPointDataTrace(time, datas, "Time Information", true, new TracePainterVerticalBar(3, chart),Color.GRAY);
         this.AddPointDataTrace(bare, datas, "BareLane Point", true, new TracePainterVerticalBar(3, chart),Color.GREEN);

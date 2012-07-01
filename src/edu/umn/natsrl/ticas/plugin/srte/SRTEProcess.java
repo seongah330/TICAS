@@ -621,12 +621,21 @@ public class SRTEProcess {
      */
     private void findRCRPoint(SRTEResult result) {
         int sPoint = result.getcurrentPoint().rst;
-        int ePoint = result.getEndTimeStep();
+        int ePoint = sPoint;
+        for(int srt : result.getcurrentPoint().srt)
+            ePoint = srt;
         
         double[] data = result.data_smoothed;
         
+        
         for(int i=sPoint; i<=ePoint;i++){
+            if(i < sPoint + 2)
+                continue;
             
+            SRTEResult.ResultRCRAccPoint p = new SRTEResult.ResultRCRAccPoint();
+            p.data = Math.abs((data[i]-data[i-1]) - (data[i-1]-data[i-2]));
+            p.point = i-1;
+            result.AddRCRAccPoint(p);
         }
     }
 

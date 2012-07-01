@@ -354,7 +354,7 @@ public class SRTEAlgorithm extends Thread{
                     sheet.addCell(new Label(colIdx++, idx+rows, "0"));//srt2
                 }
                 else{
-                    sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srt.get(0)))); //srt1
+                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));//srt2
                     sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srt.get(1))));//srt2
                 }
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.qTrafficData.getMaxPoint()))); //qMaxData
@@ -389,8 +389,8 @@ public class SRTEAlgorithm extends Thread{
                     sheet.addCell(new Number(colIdx++, idx+rows, 0));
                 }
                 else{
-                    sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srt.get(0)));
                     sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srt.get(1)));
+                    sheet.addCell(new Number(colIdx++, idx+rows, 0));
                 }
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.qTrafficData.getMaxPoint())); //qMaxData
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.kTrafficData.getMaxPoint())); //kMaxData

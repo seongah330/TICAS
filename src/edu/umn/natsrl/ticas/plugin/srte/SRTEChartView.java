@@ -24,10 +24,12 @@ import java.awt.BorderLayout;
 import java.awt.Panel;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.WindowConstants;
 
@@ -44,9 +46,17 @@ public class SRTEChartView extends javax.swing.JFrame {
 //    StringOutputStream debugWriter;
     
     enum DataType{
-        Speed_Origin,
-        Speed_Smooth,
-        Speed_Quan;
+        Speed_Origin("speed"),
+        Speed_Smooth("speed"),
+        Speed_Quan("speed"),
+        Density_Origin("Density"),
+        Density_Smooth("Density"),
+        Density_Quan("Density");
+        
+        String name;
+        DataType(String name){
+            this.name = name;
+        }
     }
     /**
      * Creates new form SRTEChartView
@@ -86,6 +96,8 @@ public class SRTEChartView extends javax.swing.JFrame {
         tbxDebug = new javax.swing.JTextArea();
         jPanel3 = new javax.swing.JPanel();
         cbxPoint = new javax.swing.JCheckBox();
+        cbxAccPoint = new javax.swing.JCheckBox();
+        tbxACCPointThreshHold = new javax.swing.JTextField();
         PanelChart = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -170,20 +182,40 @@ public class SRTEChartView extends javax.swing.JFrame {
             }
         });
 
+        cbxAccPoint.setText("Show Acc Point");
+        cbxAccPoint.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxAccPointActionPerformed(evt);
+            }
+        });
+
+        tbxACCPointThreshHold.setText("1");
+        tbxACCPointThreshHold.setName("1");
+        tbxACCPointThreshHold.setPreferredSize(new java.awt.Dimension(50, 20));
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(cbxPoint)
-                .addGap(0, 190, Short.MAX_VALUE))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cbxPoint)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(cbxAccPoint)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tbxACCPointThreshHold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(0, 117, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(cbxPoint)
-                .addContainerGap(56, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cbxAccPoint)
+                    .addComponent(tbxACCPointThreshHold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(30, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -383,10 +415,16 @@ public class SRTEChartView extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_cbxStationMouseWheelMoved
 
+    private void cbxAccPointActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxAccPointActionPerformed
+        // TODO add your handling code here:
+        UpdateAccPointList();
+    }//GEN-LAST:event_cbxAccPointActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel PanelChart;
     private javax.swing.JPanel PanelMenu;
     private javax.swing.JButton bntDuplicate;
+    private javax.swing.JCheckBox cbxAccPoint;
     private javax.swing.JComboBox cbxDataType;
     private javax.swing.JComboBox cbxEventList;
     private javax.swing.JCheckBox cbxPoint;
@@ -399,6 +437,7 @@ public class SRTEChartView extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lInformation;
     private javax.swing.JLabel lTimeInformation;
+    private javax.swing.JTextField tbxACCPointThreshHold;
     private javax.swing.JTextArea tbxDebug;
     // End of variables declaration//GEN-END:variables
 
@@ -427,6 +466,7 @@ public class SRTEChartView extends javax.swing.JFrame {
         currentStationResult = srteResult;
         updateGraph((DataType)this.cbxDataType.getSelectedItem());
         UpdatePointList();
+        UpdateAccPointList();
     }
     
     private void updateGraph(DataType dataType) {
@@ -439,7 +479,14 @@ public class SRTEChartView extends javax.swing.JFrame {
             data = currentStationResult.u_Avg_smoothed;
         }else if(dataType == DataType.Speed_Quan){
             data = currentStationResult.u_Avg_quant;
+        }else if(dataType == DataType.Density_Origin){
+            data = currentStationResult.k_origin;
+        }else if(dataType == DataType.Density_Smooth){
+            data = currentStationResult.k_smoothed;
+        }else if(dataType == DataType.Density_Quan){
+            data = currentStationResult.k_quant;
         }
+        
         if(data == null)
             return;
         
@@ -458,7 +505,7 @@ public class SRTEChartView extends javax.swing.JFrame {
         
         PanelChart.removeAll();
         SRTEChartLine cl = new SRTEChartLine();
-        cl.setSpeedData(point, timestep,bare, data, dataType.toString());
+        cl.setSpeedData(point, timestep,bare, data, dataType);
         ChartPanel cpn = new ChartPanel(cl.getChart());
         cpn.setSize(PanelChart.getSize());
         PanelChart.add(cpn);
@@ -500,10 +547,34 @@ public class SRTEChartView extends javax.swing.JFrame {
             if(currentStationResult == null)
                 return;
             ClearDebugList();
+            ClearAnotherCBX(this.cbxPoint);
             int cnt = 1;
             for(ResultPoint rp: currentStationResult.getPoint()){
                 AddDebugList("["+cnt+"]"+rp.toString());
                 cnt++;
+            }
+        }
+        else
+            this.ClearDebugList();
+    }
+    
+    private void UpdateAccPointList() {
+        if(this.cbxAccPoint.isSelected()){
+            if(currentStationResult == null)
+                return;
+            String thr = this.tbxACCPointThreshHold.getText();
+            int thd = 0;
+            try{
+                thd = Integer.parseInt(thr);
+            }catch(Exception e){
+                return;
+            }
+            
+            ClearAnotherCBX(this.cbxAccPoint);
+            ClearDebugList();
+            for(SRTEResult.ResultRCRAccPoint rp: currentStationResult.getRCRAccPointList()){
+                if(rp.data > thd)
+                    AddDebugList("["+rp.point+"]"+rp.data);
             }
         }
         else
@@ -519,5 +590,12 @@ public class SRTEChartView extends javax.swing.JFrame {
         if(!data.equals(""))
             data += "\n";
         this.tbxDebug.setText(data+toString);
+    }
+    
+    private void ClearAnotherCBX(JCheckBox cbxAccPoint) {
+        if(!this.cbxAccPoint.equals(cbxAccPoint))
+            this.cbxAccPoint.setSelected(false);
+        if(!this.cbxPoint.equals(cbxAccPoint))
+            this.cbxPoint.setSelected(false);
     }
 }
