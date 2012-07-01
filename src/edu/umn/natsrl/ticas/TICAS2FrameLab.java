@@ -60,6 +60,7 @@ import edu.umn.natsrl.ticas.plugin.cumulative.CumulativeRamp;
 import edu.umn.natsrl.ticas.plugin.datareader.DataReader;
 import edu.umn.natsrl.ticas.plugin.detecterdatareader.DetecterDataReader;
 import edu.umn.natsrl.ticas.plugin.srte.TICASPluginSRTE;
+import edu.umn.natsrl.ticas.plugin.srte.TestFrame;
 import edu.umn.natsrl.ticas.plugin.vissimcalibration2.VissimCalibration2;
 import edu.umn.natsrl.ticas.plugin.traveltimeIndexer.TTIndexterPlugin;
 import java.awt.BorderLayout;

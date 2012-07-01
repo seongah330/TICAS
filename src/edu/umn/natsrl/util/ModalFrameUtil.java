@@ -72,8 +72,11 @@ public class ModalFrameUtil {
         frame.setVisible(true);
         try {
             new EventPump(frame).start();
-        } catch (Throwable throwable) {
-            throw new RuntimeException(throwable);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+//        } catch (Throwable throwable) {
+//            throw new RuntimeException(throwable);
+//        }
     }
 }

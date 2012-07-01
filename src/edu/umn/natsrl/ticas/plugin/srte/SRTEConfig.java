@@ -36,10 +36,11 @@ public class SRTEConfig {
     public static int DATA_READ_EXTENSION_BEFORE_SNOW = 2;
     /**
      * new Algorithm
-     * Modify - Time 6 -> 7
+     * Modify - Time 6 -> 7 -> 5
      */
-    public static int DATA_READ_EXTENSION_AFTER_SNOW = 7;
+    public static int DATA_READ_EXTENSION_AFTER_SNOW = 5;
     
+    public static final double Rk = 5; //Reliable Density
     public static double RCR_Q = 0;
     public static double RCR_K = 0;
     public static double RCR_U = 0;
@@ -47,6 +48,11 @@ public class SRTEConfig {
     public static double TPR_hour = 0;
     public static double SDC_K = 0;
     
+    public static String TIMEINTERVAL = "TIMEINTERVAL";
+    public static String SMOOTHINGOPTION = "SMOOTHINGOPTION";
+    public static int TimeInterval = 0;
+    public static int isSmoothing = 0;
+
     private SRTEConfig() {   }
 
     public static SRTEConfig getInstance() {

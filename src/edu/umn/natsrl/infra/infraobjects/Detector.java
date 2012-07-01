@@ -169,6 +169,8 @@ public class Detector extends InfraObject implements Comparable {
             }
             else if (k <= 0) {
                 o = k = u = InfraConstants.MISSING_DATA;
+            } else if(scan_data[i] > InfraConstants.MAX_SCANS){
+                o = k = u = InfraConstants.MISSING_DATA;
             } else {
                 validCount++;
             }

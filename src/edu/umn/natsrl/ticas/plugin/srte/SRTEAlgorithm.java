@@ -21,6 +21,7 @@ import edu.umn.natsrl.evaluation.Interval;
 import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.Station;
+import edu.umn.natsrl.ticas.plugin.srte.SRTEProcess.SMOOTHING;
 import java.io.File;
 import java.util.Calendar;
 import java.util.Date;
@@ -42,24 +43,28 @@ import jxl.write.WritableWorkbook;
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
 public class SRTEAlgorithm extends Thread{
-
+    
+    private boolean isSave = true;
     private Section section;
     private Period period;
     private SRTEConfig config;
     private TimeEventLists eventlist;
     
-    private int TimeInterval = Interval.I20MIN.second;
-    
+    private int TimeInterval = Interval.I15MIN.second;
+    private Vector<SRTEResultSection> rData = new Vector<SRTEResultSection>();
     public static interface AlogorithmEndListener{
         public void onEndMessage(boolean msg);
     }
     
     private AlogorithmEndListener endListener;
-    
+    public SRTEAlgorithm(){;}
+    public SRTEAlgorithm(boolean isSave){
+        this();
+        this.isSave = isSave;
+    }
     @Override
     public void run()
     {
-        Vector<SRTEResult[]> rData = new Vector<SRTEResult[]>();
         String projectName = null;
 
         if(eventlist == null){
@@ -70,20 +75,23 @@ public class SRTEAlgorithm extends Thread{
         }
         
         for(TimeEvent te : eventlist.getTimeEvents()){
+            System.out.println("\n-------------------------------------------");
+            System.out.println("set Event : " + te.toString());
+            System.out.println("-------------------------------------------");
             Calendar cs,ce;
             cs = te.getStartTime();
             ce = te.getEndTime();
             Period p = new Period(cs.getTime(),ce.getTime(),TimeInterval);
             Section s = te.getSection();
             this.setSection(s, p);
-            SRTEResult[] result = process(s,p,config,te);
+            SRTEResultSection result = process(s,p,config,te);
             rData.add(result);
-            System.out.println("result : "+result.length);
         }
         projectName = eventlist.getName();
         
         // print out result
-        presentResult(rData,projectName);
+        if(this.isSave)
+            presentResult(rData,projectName);
 
         System.out.println("SRTE Algorithm for Station has been done!!");
         
@@ -92,25 +100,25 @@ public class SRTEAlgorithm extends Thread{
         }
     }
     
-    private SRTEResult[] process(Section sec, Period p, SRTEConfig config, TimeEvent te) {
+    private SRTEResultSection process(Section sec, Period p, SRTEConfig config, TimeEvent te) {
         Station[] stations = sec.getStations();                
         //read data
-        System.out.print("Loading Data"+te.getSectionName()+".............");
+        System.out.print("Loading Data....."+te.getSectionName()+".............");
         long st = new Date().getTime();
         sec.loadData(p);
         long et = new Date().getTime();
         System.out.println(" (OK : " + (et-st) + "ms)");
-
+        
         SRTEResult[] result = new SRTEResult[stations.length];
         for(int i=0;i<stations.length;i++){
             System.out.println("\nCalculate Station..."+stations[i].getLabel()+"("+stations[i].getStationId()+")");
-            SRTEProcess proc = new SRTEProcess(sec, p,stations[i],config);
+            SRTEProcess proc = new SRTEProcess(sec, p,stations[i],config,te);
             result[i] = proc.stateDecision();
-            result[i].setTime(te.getStartTime(), te.getEndTime(), te.getBareLaneRegainTime());
-            result[i].setPeriod(p);
+            
             System.out.println("End Station..."+stations[i].getLabel()+"("+stations[i].getStationId()+")");
         }
-        return result;
+        SRTEResultSection rSection = new SRTEResultSection(result,te,p);
+        return rSection;
     }
 
     public void extractData() throws Exception
@@ -136,13 +144,20 @@ public class SRTEAlgorithm extends Thread{
     
     public void setSRTEMODE(TimeEventLists el){
         eventlist = el;
+        
+        this.TimeInterval = SRTEConfig.TimeInterval;
+        System.out.println("set Time Interval : " +TimeInterval+"("+(TimeInterval/60)+"min)");
+        System.out.println("set Smoothing Option : "+SMOOTHING.getSmooth(SRTEConfig.isSmoothing).toString());
+    }
+    public Vector<SRTEResultSection> getResults(){
+        return this.rData;
     }
     
     public void setEndListener(AlogorithmEndListener listener){
         this.endListener = listener;
     }
     
-    private void presentEachDataResult(Vector<SRTEResult[]> rData, String name) {
+    private void presentEachDataResult(Vector<SRTEResultSection> rData, String name) {
         String fname = name;
         String sectionName=null;
         if(fname == null)
@@ -150,14 +165,14 @@ public class SRTEAlgorithm extends Thread{
         else
             fname = fname+"-";
         try{
-            for(SRTEResult[] result : rData){
-                sectionName = result[0].sectionName;
-                String workbookFile = getFileName("SRTEResult ("+fname+sectionName+"-"+result[0].getPeriodtoString()+")", "xls");
+            for(SRTEResultSection result : rData){
+                sectionName = result.getSectionName();
+                String workbookFile = getFileName("SRTEResult ("+fname+sectionName+"-"+result.getPeriodtoString()+")", "xls");
                 System.out.println(workbookFile);
                 WritableWorkbook workbook = Workbook.createWorkbook(new File(workbookFile));
                 WritableSheet sheet = workbook.createSheet("Summary", 0);
                 getSummaryResult(result,sheet,0);
-                getDataResult(result,workbook,sheet);
+                getDataResult(result.getResultData(),workbook,sheet);
                 workbook.write();
                 workbook.close();
             }
@@ -167,14 +182,14 @@ public class SRTEAlgorithm extends Thread{
         }
     }
     
-    private void presentResult(Vector<SRTEResult[]> rData,String name){
+    private void presentResult(Vector<SRTEResultSection> rData,String name){
         int sheet_count = 0;  
         int idx = 0;
         try{
             String workbookFile = getFileName("SRTEResult ("+name+")", "xls");
             WritableWorkbook workbook = Workbook.createWorkbook(new File(workbookFile));
             WritableSheet sheet = workbook.createSheet("Summary", sheet_count++);
-            for(SRTEResult[] result : rData){
+            for(SRTEResultSection result : rData){
                 idx = getSummaryResult(result,sheet,idx);
             }
             workbook.write();
@@ -185,22 +200,24 @@ public class SRTEAlgorithm extends Thread{
             e.printStackTrace();
         }
     }
-    private int getSummaryResult(SRTEResult[] result, WritableSheet sheet,int idx){
+    private int getSummaryResult(SRTEResultSection res, WritableSheet sheet,int idx){
+        SRTEResult[] result = null;
         try {
             int colIdx = 0;
-            
+            int[] speedKeylist = {45,50,55,60,65};
             // summary sheet //////////////////////////////////////////////////////
-            sheet.addCell(new Label(colIdx++, idx, result[0].sectionName));
+            sheet.addCell(new Label(colIdx++, idx, res.getSectionName()));
             colIdx+=2;
             sheet.addCell(new Label(colIdx++, idx, "Start Time"));
-            sheet.addCell(new Label(colIdx++, idx, result[0].getStartTimetoString()));
+            sheet.addCell(new Label(colIdx++, idx, res.getStartTimetoString()));
             colIdx+=3;
             sheet.addCell(new Label(colIdx++, idx, "End Time"));
-            sheet.addCell(new Label(colIdx++, idx, result[0].getEndTimetoString()));
+            sheet.addCell(new Label(colIdx++, idx, res.getEndTimetoString()));
             colIdx+=3;
             sheet.addCell(new Label(colIdx++, idx, "BareLane Time"));
-            sheet.addCell(new Label(colIdx++, idx, result[0].getBareLaneTimetoString()));
+            sheet.addCell(new Label(colIdx++, idx, res.getBareLaneTimetoString()));
             
+            result = res.getResultData();
             /**
             * Time result
             */
@@ -220,6 +237,9 @@ public class SRTEAlgorithm extends Thread{
             sheet.addCell(new Label(colIdx++, idx, "Kmax"));
             sheet.addCell(new Label(colIdx++, idx, "Umax"));
             sheet.addCell(new Label(colIdx++, idx, "Umin"));
+            for(int key : speedKeylist){
+                sheet.addCell(new Number(colIdx++, idx, key));
+            }
 //            sheet.addCell(new Label(colIdx++, 0, "SST"));
             
             /**
@@ -238,7 +258,9 @@ public class SRTEAlgorithm extends Thread{
             sheet.addCell(new Label(colIdx++, idx, "Kmax"));
             sheet.addCell(new Label(colIdx++, idx, "Umax"));
             sheet.addCell(new Label(colIdx++, idx, "Ummin"));
-            
+            for(int key : speedKeylist){
+                sheet.addCell(new Number(colIdx++, idx, key));
+            }
             /**
              * each point data
              */
@@ -322,23 +344,30 @@ public class SRTEAlgorithm extends Thread{
                  * Time result
                  */
                 Period p = result[i].period;
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].srst))); //srst
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getPoint(result[i].lst)))); //lst
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].rst))); //rst
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srst))); //srst
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getPoint(result[i].getcurrentPoint().lst)))); //lst
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().rst))); //rst
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.getRecoveryPoint()))); //rxr
                 double sst = 0;
-                if(result[i].srt.size() < 2){
-                    sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].srt.get(0)))); //srt1
+                if(result[i].getcurrentPoint().srt.size() < 2){
+                    sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srt.get(0)))); //srt1
                     sheet.addCell(new Label(colIdx++, idx+rows, "0"));//srt2
                 }
                 else{
-                    sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].srt.get(0)))); //srt1
-                    sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].srt.get(1))));//srt2
+                    sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srt.get(0)))); //srt1
+                    sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srt.get(1))));//srt2
                 }
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.qTrafficData.getMaxPoint()))); //qMaxData
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.kTrafficData.getMaxPoint()))); //kMaxData
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.uTrafficData.getMaxPoint()))); //uMaxData
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.uTrafficData.getMinPoint()))); //uMaxData
+                for(int key : speedKeylist){
+                    SRTEResult.SpeedMap smap = result[i].getSpeedList().get(key);
+                    if(smap != null)
+                        sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,smap.getKeyTimeMin(),true))); //uMaxData
+                    else
+                        sheet.addCell(new Label(colIdx++, idx+rows, "")); //uMaxData
+                }
 
                 /**
                  * Type
@@ -350,47 +379,55 @@ public class SRTEAlgorithm extends Thread{
                  * Point result
                  */
                 colIdx += 1;
-                sheet.addCell(new Number(colIdx++, idx+rows, result[i].srst));
-                sheet.addCell(new Number(colIdx++, idx+rows, getPoint(result[i].lst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, result[i].rst));
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srst));
+                sheet.addCell(new Number(colIdx++, idx+rows, getPoint(result[i].getcurrentPoint().lst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().rst));
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.getRecoveryPoint()));
-                if(result[i].srt.size() < 2){
-                    sheet.addCell(new Number(colIdx++, idx+rows, result[i].srt.get(0)));
+                if(result[i].getcurrentPoint().srt.size() < 2){
+//                    sheet.addCell(new Number(colIdx++, idx+rows, 0));
+                    sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srt.get(0)));
                     sheet.addCell(new Number(colIdx++, idx+rows, 0));
                 }
                 else{
-                    sheet.addCell(new Number(colIdx++, idx+rows, result[i].srt.get(0)));
-                    sheet.addCell(new Number(colIdx++, idx+rows, result[i].srt.get(1)));
+                    sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srt.get(0)));
+                    sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srt.get(1)));
                 }
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.qTrafficData.getMaxPoint())); //qMaxData
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.kTrafficData.getMaxPoint())); //kMaxData
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.uTrafficData.getMaxPoint())); //uMaxData
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.uTrafficData.getMinPoint())); //uminData
+                for(int key : speedKeylist){
+                    SRTEResult.SpeedMap smap = result[i].getSpeedList().get(key);
+                    if(smap != null)
+                        sheet.addCell(new Number(colIdx++, idx+rows, smap.getKeyTimeStep())); //uMaxData
+                    else
+                        sheet.addCell(new Label(colIdx++, idx+rows, "")); //uMaxData
+                }
                 
                 /**
                  * each point data
                  */
                 //srst
                 colIdx += 1;
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].srst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, result[i].srst));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].srst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].srst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].srst)));
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srst));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().srst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().srst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].getcurrentPoint().srst)));
                 //lst
                 colIdx += 1;
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getPoint(result[i].lst))));
-                sheet.addCell(new Number(colIdx++, idx+rows, getPoint(result[i].lst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].lst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].lst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].lst)));
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getPoint(result[i].getcurrentPoint().lst))));
+                sheet.addCell(new Number(colIdx++, idx+rows, getPoint(result[i].getcurrentPoint().lst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().lst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().lst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].getcurrentPoint().lst)));
                 //rst
                 colIdx += 1;
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].rst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, result[i].rst));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].rst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].rst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].rst)));
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().rst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().rst));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().rst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().rst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].getcurrentPoint().rst)));
                 //RCR
                 colIdx += 1;
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.getRecoveryPoint())));
@@ -401,19 +438,25 @@ public class SRTEAlgorithm extends Thread{
                 
                 //SRT1
                 colIdx += 1;
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].srt.get(0))));
-                sheet.addCell(new Number(colIdx++, idx+rows, result[i].srt.get(0)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].srt.get(0))));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].srt.get(0))));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].srt.get(0))));
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srt.get(0))));
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srt.get(0)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().srt.get(0))));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().srt.get(0))));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].getcurrentPoint().srt.get(0))));
+//                colIdx += 1;
+//                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
+//                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
+//                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
+//                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
+//                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
                 
-                if(result[i].srt.size() > 1){
+                if(result[i].getcurrentPoint().srt.size() > 1){
                     colIdx += 1;
-                    sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].srt.get(1))));
-                    sheet.addCell(new Number(colIdx++, idx+rows, result[i].srt.get(1)));
-                    sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].srt.get(1))));
-                    sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].srt.get(1))));
-                    sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].srt.get(1))));
+                    sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srt.get(1))));
+                    sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srt.get(1)));
+                    sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().srt.get(1))));
+                    sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().srt.get(1))));
+                    sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].getcurrentPoint().srt.get(1))));
                 }else{
                     colIdx += 1;
                     sheet.addCell(new Label(colIdx++, idx+rows, "0"));
@@ -691,17 +734,28 @@ public class SRTEAlgorithm extends Thread{
         }
     }     
     
-    private String getTime(Period p,int count)
-    {
+    private String getTime(Period p, int count, boolean isMin){
+        int tgap = 0;
+        if(isMin){
+            tgap = 1;
+            count = count -1;
+        }
+        else
+            tgap = TimeInterval/60;
+        
         Calendar c = Calendar.getInstance();
         
-        c.set(p.start_year, p.start_month, p.start_date, p.start_hour, p.start_min);
-        for(int i=0; i<=count; i++) c.add(Calendar.MINUTE, (TimeInterval/60));
+        c.set(p.start_year, p.start_month-1, p.start_date, p.start_hour, p.start_min);
+        for(int i=0; i<=count; i++) c.add(Calendar.MINUTE, tgap);
 
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int min = c.get(Calendar.MINUTE);
         
         return String.format("%02d:%02d", hour, min);
+    }
+    private String getTime(Period p,int count)
+    {
+        return getTime(p,count,false);
     }
     
     private String getFileName(String name, String ext) {

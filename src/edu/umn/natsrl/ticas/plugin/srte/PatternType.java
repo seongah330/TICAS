@@ -129,12 +129,15 @@ public class PatternType {
 //            double deltaQ = q[i] - q[i-1];
 //            double deltaK = k[i] - k[i-1];
 //            double deltaU = u[i] - u[i-1];
-            
+//            System.out.print("P["+i+"]"+"deltaQ :" + deltaQ + " deltaK :" +deltaK+" k "+k[i]+" slope : "+slope+ " deltaU :" + deltaU);
             if(slope > dQ
                     && deltaU > dU){
-//                RCRPoint = i;
+//                    && k[i] > SRTEConfig.Rk){
+//                System.out.println(" Select");
                 return i;
             }
+//            }else
+////                System.out.println();
         }
         
         return -1;

@@ -333,7 +333,7 @@ public class RNode extends InfraObject {
                  * modify soobin Jeon 02/13/2012
                  */
                 if(ds[detIdx].isMissing()){
-                    //System.out.println("missing : " + ds[detIdx].getLabel() + "("+ds[detIdx].getConfidence());
+//                    System.out.println("missing : " + ds[detIdx].getLabel() + "("+ds[detIdx].getConfidence());
                     continue;
                 }
                 
