@@ -51,7 +51,10 @@ public class SRTEChartView extends javax.swing.JFrame {
         Speed_Quan("speed"),
         Density_Origin("Density"),
         Density_Smooth("Density"),
-        Density_Quan("Density");
+        Density_Quan("Density"),
+        Flow_Origin("Flow"),
+        Flow_Smooth("Flow"),
+        Flow_Quan("Flow");
         
         String name;
         DataType(String name){
@@ -86,10 +89,8 @@ public class SRTEChartView extends javax.swing.JFrame {
         cbxDataType = new javax.swing.JComboBox();
         cbxStation = new javax.swing.JComboBox();
         bntDuplicate = new javax.swing.JButton();
-        lInformation = new javax.swing.JLabel();
-        lTimeInformation = new javax.swing.JLabel();
         cbxShowDefault = new javax.swing.JCheckBox();
-        cbxShowAPoint = new javax.swing.JCheckBox();
+        cbxShowSRTC = new javax.swing.JCheckBox();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -98,6 +99,12 @@ public class SRTEChartView extends javax.swing.JFrame {
         cbxPoint = new javax.swing.JCheckBox();
         cbxAccPoint = new javax.swing.JCheckBox();
         tbxACCPointThreshHold = new javax.swing.JTextField();
+        jPanel4 = new javax.swing.JPanel();
+        lTimeInformation = new javax.swing.JLabel();
+        jPanel5 = new javax.swing.JPanel();
+        lInformation = new javax.swing.JLabel();
+        cbxShowSRTF = new javax.swing.JCheckBox();
+        cbxShowsrtcsrtf = new javax.swing.JCheckBox();
         PanelChart = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -148,16 +155,15 @@ public class SRTEChartView extends javax.swing.JFrame {
             }
         });
 
-        lInformation.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        lInformation.setText("Point Information");
-
-        lTimeInformation.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        lTimeInformation.setText("Time Information");
-
         cbxShowDefault.setSelected(true);
         cbxShowDefault.setText("Show Default");
 
-        cbxShowAPoint.setText("Show Acc Point");
+        cbxShowSRTC.setText("Show Only SRTC");
+        cbxShowSRTC.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxShowSRTCActionPerformed(evt);
+            }
+        });
 
         tbxDebug.setColumns(20);
         tbxDebug.setRows(5);
@@ -167,7 +173,7 @@ public class SRTEChartView extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 471, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -204,7 +210,7 @@ public class SRTEChartView extends javax.swing.JFrame {
                         .addComponent(cbxAccPoint)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(tbxACCPointThreshHold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 117, Short.MAX_VALUE))
+                .addGap(0, 17, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -218,6 +224,42 @@ public class SRTEChartView extends javax.swing.JFrame {
                 .addContainerGap(30, Short.MAX_VALUE))
         );
 
+        lTimeInformation.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        lTimeInformation.setText("Time Information\n");
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(lTimeInformation, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(lTimeInformation)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
+        lInformation.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        lInformation.setText("Point Information");
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addComponent(lInformation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addComponent(lInformation)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -226,7 +268,10 @@ public class SRTEChartView extends javax.swing.JFrame {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -234,8 +279,24 @@ public class SRTEChartView extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(22, 51, Short.MAX_VALUE))
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
+
+        cbxShowSRTF.setText("Show Only SRTF");
+        cbxShowSRTF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxShowSRTFActionPerformed(evt);
+            }
+        });
+
+        cbxShowsrtcsrtf.setText("Show Selected SRTC & SRTF");
+        cbxShowsrtcsrtf.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxShowsrtcsrtfActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout PanelMenuLayout = new javax.swing.GroupLayout(PanelMenu);
         PanelMenu.setLayout(PanelMenuLayout);
@@ -260,13 +321,13 @@ public class SRTEChartView extends javax.swing.JFrame {
                                 .addComponent(bntDuplicate))))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, PanelMenuLayout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(PanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(PanelMenuLayout.createSequentialGroup()
-                                .addComponent(cbxShowDefault)
-                                .addGap(0, 0, 0)
-                                .addComponent(cbxShowAPoint))
-                            .addComponent(lInformation)
-                            .addComponent(lTimeInformation))
+                        .addComponent(cbxShowDefault)
+                        .addGap(0, 0, 0)
+                        .addComponent(cbxShowSRTC)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbxShowSRTF)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbxShowsrtcsrtf)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -282,15 +343,14 @@ public class SRTEChartView extends javax.swing.JFrame {
                     .addComponent(cbxStation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbxDataType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(5, 5, 5)
-                .addComponent(lInformation)
-                .addGap(6, 6, 6)
-                .addComponent(lTimeInformation)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(PanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(cbxShowDefault)
-                    .addComponent(cbxShowAPoint))
+                    .addGroup(PanelMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(cbxShowSRTC)
+                        .addComponent(cbxShowSRTF)
+                        .addComponent(cbxShowsrtcsrtf)))
                 .addContainerGap())
         );
 
@@ -420,6 +480,27 @@ public class SRTEChartView extends javax.swing.JFrame {
         UpdateAccPointList();
     }//GEN-LAST:event_cbxAccPointActionPerformed
 
+    private void cbxShowSRTCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxShowSRTCActionPerformed
+        // TODO add your handling code here:
+        this.cbxShowSRTF.setSelected(false);
+        this.cbxShowsrtcsrtf.setSelected(false);
+        updateGraph((DataType)this.cbxDataType.getSelectedItem()); 
+    }//GEN-LAST:event_cbxShowSRTCActionPerformed
+
+    private void cbxShowSRTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxShowSRTFActionPerformed
+        // TODO add your handling code here:
+        this.cbxShowSRTC.setSelected(false);
+        this.cbxShowsrtcsrtf.setSelected(false);
+        updateGraph((DataType)this.cbxDataType.getSelectedItem()); 
+    }//GEN-LAST:event_cbxShowSRTFActionPerformed
+
+    private void cbxShowsrtcsrtfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxShowsrtcsrtfActionPerformed
+        // TODO add your handling code here:
+        this.cbxShowSRTF.setSelected(false);
+        this.cbxShowSRTC.setSelected(false);
+        updateGraph((DataType)this.cbxDataType.getSelectedItem()); 
+    }//GEN-LAST:event_cbxShowsrtcsrtfActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel PanelChart;
     private javax.swing.JPanel PanelMenu;
@@ -428,12 +509,16 @@ public class SRTEChartView extends javax.swing.JFrame {
     private javax.swing.JComboBox cbxDataType;
     private javax.swing.JComboBox cbxEventList;
     private javax.swing.JCheckBox cbxPoint;
-    private javax.swing.JCheckBox cbxShowAPoint;
     private javax.swing.JCheckBox cbxShowDefault;
+    private javax.swing.JCheckBox cbxShowSRTC;
+    private javax.swing.JCheckBox cbxShowSRTF;
+    private javax.swing.JCheckBox cbxShowsrtcsrtf;
     private javax.swing.JComboBox cbxStation;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lInformation;
     private javax.swing.JLabel lTimeInformation;
@@ -474,38 +559,85 @@ public class SRTEChartView extends javax.swing.JFrame {
             return;
         double[] data = null;
         if(dataType == DataType.Speed_Origin){
-            data = currentStationResult.u_Avg_origin;
+            data = currentStationResult.data_origin;
         }else if(dataType == DataType.Speed_Smooth){
-            data = currentStationResult.u_Avg_smoothed;
+            data = currentStationResult.data_smoothed;
         }else if(dataType == DataType.Speed_Quan){
-            data = currentStationResult.u_Avg_quant;
+            data = currentStationResult.data_quant;
         }else if(dataType == DataType.Density_Origin){
             data = currentStationResult.k_origin;
         }else if(dataType == DataType.Density_Smooth){
             data = currentStationResult.k_smoothed;
         }else if(dataType == DataType.Density_Quan){
             data = currentStationResult.k_quant;
+        }else if(dataType == DataType.Flow_Origin){
+            data = currentStationResult.q_origin;
+        }else if(dataType == DataType.Flow_Smooth){
+            data = currentStationResult.q_smoothed;
+        }else if(dataType == DataType.Flow_Quan){
+            data = currentStationResult.q_quant;
         }
         
         if(data == null)
             return;
         
+        /**
+         * Each Point
+         */
         HashMap<Integer,Boolean> point = new HashMap<Integer,Boolean>();
         point.put(currentStationResult.getcurrentPoint().srst,true);
         point.put(currentStationResult.getcurrentPoint().lst,true);
         point.put(currentStationResult.getcurrentPoint().rst,true);
-        for(int srt :currentStationResult.getcurrentPoint().srt)
-            point.put(srt,true);
+        point.put(currentStationResult.getcurrentPoint().csrt,true);
         
+        /**
+         * Each SRT Point
+         */
+        int cnt = 0;
+        HashMap<Integer,Boolean> srtPoint = new HashMap<Integer,Boolean>();
+        if(this.cbxShowsrtcsrtf.isSelected()){
+            for(int srt :currentStationResult.getcurrentPoint().srt){
+                srtPoint.put(srt,true);
+            }
+        }else if(this.cbxShowSRTC.isSelected()){
+            for(int srtc : currentStationResult.getcurrentPoint().srtc){
+                srtPoint.put(srtc, true);
+            }
+        }else if(this.cbxShowSRTF.isSelected()){
+            int srtf = 0;
+            try{
+                srtf = currentStationResult.getcurrentPoint().srt.get(0);
+            }catch(Exception e){
+            }
+            
+            srtPoint.put(srtf,true);
+            
+        }else{
+            srtPoint.put(0,true);
+        }
+        
+        /**
+         * RCRPoint
+         */
+        HashMap<Integer,Boolean> RCRPoint = new HashMap<Integer,Boolean>();
+        int RCRp = currentStationResult.getcurrentPoint().RCR == -1 ? 0 : currentStationResult.getcurrentPoint().RCR;
+        RCRPoint.put(RCRp,true);
+        
+        /**
+         * Time Step
+         */
         HashMap<Integer,Boolean> timestep = new HashMap<Integer,Boolean>();
         HashMap<Integer,Boolean> bare = new HashMap<Integer,Boolean>();
         timestep.put(currentStationResult.getStartTimeStep(),true);
         timestep.put(currentStationResult.getEndTimeStep(),true);
+        /**
+         * BareLane
+         */
         bare.put(currentStationResult.getBareLaneTimeStep(),true);
         
         PanelChart.removeAll();
         SRTEChartLine cl = new SRTEChartLine();
-        cl.setSpeedData(point, timestep,bare, data, dataType);
+        cl.setSpeedData(point, timestep,bare,srtPoint,RCRPoint, data, dataType);
         ChartPanel cpn = new ChartPanel(cl.getChart());
         cpn.setSize(PanelChart.getSize());
         PanelChart.add(cpn);
@@ -527,18 +659,29 @@ public class SRTEChartView extends javax.swing.JFrame {
     }
     private void updatePointInformation(ResultPoint currentPoint) {
         String str = null;
-        str = "Point Information   -SRST:"+currentPoint.srst+"    -LST:"+currentPoint.lst+"    -RST:"+currentPoint.rst;
+        str = "<html>Point Information<br>   <b>-SRST</b>&nbsp: "+currentPoint.srst+"<br>    <b>-LST</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.lst+"<br>    <b>-RST</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.rst;
+        str += "<br>    <b>-SRT</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.csrt;
+        str += "<br>    <b>-RCR</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.RCR;
         int cnt = 1;
         for(int srt : currentPoint.srt){
-            str += "    -SRT("+cnt+"):"+srt;
+            switch(cnt){
+                case 1:
+                    str += "<br>    -SRTF&nbsp&nbsp&nbsp: "+srt;
+                    break;
+                case 2:
+                    str += "<br>    -SRTC&nbsp&nbsp&nbsp: "+srt;
+                    break;
+            }
             cnt++;
         }
+        str += "</html>";
         this.lInformation.setText(str);
     }
     private void updateTimeInformation(SRTEResult cr) {
-        String str = "Time Information   -StartTime:"+cr.getStartTimetoString()+"("+cr.getStartTimeStep()+")"
-                +"    -EndTime:"+cr.getEndTimetoString()+"("+cr.getEndTimeStep()+")"
-                +"    -BareLane:"+cr.getBareLaneTimetoString()+"("+cr.getBareLaneTimeStep()+")";
+        String str = "<html>Time Information<br> -StartTime :"+cr.getStartTimetoString()+"("+cr.getStartTimeStep()+")"
+                +"<br>    -EndTime   :"+cr.getEndTimetoString()+"("+cr.getEndTimeStep()+")"
+                +"<br>    -BareLane  :"+cr.getBareLaneTimetoString()+"("+cr.getBareLaneTimeStep()+")";
+        str += "</html>";
         this.lTimeInformation.setText(str);
     }
     

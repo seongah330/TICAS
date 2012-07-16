@@ -130,7 +130,7 @@ public class SRTEChartLine {
             chart.enablePointHighlighting(true);
         }
         
-        if(point == null)
+        if(point == null || point.size() == 0)
             intputTraceData(datas,trace);
         else
             intputTraceData(point,datas,trace);
@@ -157,7 +157,8 @@ public class SRTEChartLine {
         chart.removeAllTraces();
     }
     
-    public void setSpeedData(HashMap<Integer,Boolean> point, HashMap<Integer,Boolean> time, HashMap<Integer,Boolean> bare, double[] datas, DataType datatype){
+    public void setSpeedData(HashMap<Integer,Boolean> point, HashMap<Integer,Boolean> time, HashMap<Integer,Boolean> bare, 
+            HashMap<Integer,Boolean> srt, HashMap<Integer,Boolean> RCRp, double[] datas, DataType datatype){
         double Maxdata = 0;
         for(double d : datas){
             if(Maxdata < d)
@@ -168,9 +169,11 @@ public class SRTEChartLine {
         setAxisTitle("Time Interval",datatype.name);
         
         this.AddDataTrace(datas,datatype.toString());
-        this.AddPointDataTrace(point, datas, "Point", true, new TracePainterVerticalBar(2, chart),Color.BLUE);
+        this.AddPointDataTrace(point, datas, "Points", true, new TracePainterVerticalBar(2, chart),Color.BLUE);
         this.AddPointDataTrace(time, datas, "Time Information", true, new TracePainterVerticalBar(3, chart),Color.GRAY);
         this.AddPointDataTrace(bare, datas, "BareLane Point", true, new TracePainterVerticalBar(3, chart),Color.GREEN);
+        this.AddPointDataTrace(srt, datas, "SRT Points", true, new TracePainterVerticalBar(3, chart),Color.MAGENTA);
+        this.AddPointDataTrace(RCRp, datas, "RCR Points", true, new TracePainterVerticalBar(3, chart),Color.RED);
     }
 
     private void setStickSpacing(IAxis axis, int i) {

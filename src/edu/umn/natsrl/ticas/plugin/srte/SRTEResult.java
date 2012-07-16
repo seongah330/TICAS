@@ -84,9 +84,24 @@ public class SRTEResult {
     /**
      * 
      */
-    public static class ResultRCRAccPoint{
-        int point;
-        double data;
+    public static class ResultRCRAccPoint implements Comparable{
+        int point = -1;
+        double data = -1;
+        
+        public double getData(){
+            return data;
+        }
+
+        @Override
+        public int compareTo(Object o) {
+            ResultRCRAccPoint cdata = (ResultRCRAccPoint)o;
+            if(data == cdata.getData())
+                return 0;
+            else if(data < cdata.getData())
+                return 1;
+            else 
+                return -1;
+        }
     }
     public static class SpeedMap{
         public int time = -1;
@@ -232,15 +247,34 @@ public class SRTEResult {
 
     void addPoint(ResultPoint rp) {
         point.add(rp);
-        
+        if(currentPoint.isEmpty()){
+            System.out.println("clst :"+currentPoint.lst+" plst:"+rp.lst+"-Emplty");
+            currentPoint = rp.clone();
+            return;
+        }
         for(ResultPoint pn : point){
             System.out.println("clst :"+currentPoint.lst+" plst:"+pn.lst);
-            if(currentPoint.isEmpty())
-                currentPoint = pn.clone();
-            else if(this.u_Avg_smoothed[this.currentPoint.lst] >= this.u_Avg_smoothed[pn.lst]){
-                currentPoint = pn.getMovingPoint(currentPoint);
+
+            /**
+             * reset LST Location
+             * Most Low Speed during LST's
+             */
+            if(this.data_smoothed[this.currentPoint.lst] >= this.data_smoothed[pn.lst]){
+                currentPoint.setLST(pn.lst);
                 System.out.println("clst :"+currentPoint.lst+" plst:"+pn.lst + "gotit");
             }
+            
+            /**
+             * reset RST Location
+             * The closest Point that End Time
+             */
+            int dCurrentRST = this.currentPoint.rst - this.getEndTimeStep();
+            int dPnRST = pn.rst - getEndTimeStep();
+            if(dCurrentRST > dPnRST)
+                currentPoint.setRST(currentPoint.rst);
+            else
+                currentPoint.setRST(pn.rst);
+            
         }
     }
     

@@ -62,6 +62,14 @@ public class SRTEAlgorithm extends Thread{
         this();
         this.isSave = isSave;
     }
+    public void reset(){
+        section = null;
+        period = null;
+        config = null;
+        eventlist = null;
+        rData.clear();
+    }
+    
     @Override
     public void run()
     {
@@ -106,6 +114,7 @@ public class SRTEAlgorithm extends Thread{
         System.out.print("Loading Data....."+te.getSectionName()+".............");
         long st = new Date().getTime();
         sec.loadData(p);
+        
         long et = new Date().getTime();
         System.out.println(" (OK : " + (et-st) + "ms)");
         

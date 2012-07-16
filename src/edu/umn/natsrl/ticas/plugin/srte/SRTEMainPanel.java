@@ -134,7 +134,8 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         if(el == null)
             listmode = false;
         
-        this.srte = null;
+        clearMemory();
+        srte = null;
         graphButtonAction();
         
         
@@ -405,7 +406,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         this.tbxFilterSize.setEnabled(false);
         
         this.cbxisDebug.setSelected(true);
-        this.cbxisSave.setSelected(true);
+        this.cbxisSave.setSelected(false);
     }
     
     /**
@@ -449,6 +450,11 @@ public class SRTEMainPanel extends javax.swing.JPanel {
             btnShowGraph.setEnabled(false);
         else
             btnShowGraph.setEnabled(true);
+    }
+
+    private void clearMemory() {
+        if(srte != null)
+            srte.getResults().clear();
     }
     
     /**
@@ -540,6 +546,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         btnShowGraph = new javax.swing.JButton();
         cbxisSave = new javax.swing.JCheckBox();
         cbxisDebug = new javax.swing.JCheckBox();
+        jButton1 = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -900,6 +907,13 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         cbxisDebug.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         cbxisDebug.setText("Debug");
 
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -908,18 +922,24 @@ public class SRTEMainPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(cbxeventlists, 0, 173, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnEventEditor))
-                    .addComponent(jScrollPane4)
-                    .addComponent(btnListStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnShowGraph, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cbxisDebug)
-                            .addComponent(cbxisSave))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(cbxeventlists, 0, 173, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnEventEditor))
+                            .addComponent(jScrollPane4)
+                            .addComponent(btnListStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnShowGraph, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(cbxisDebug)
+                                    .addComponent(cbxisSave))
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jButton1)
+                        .addGap(108, 108, 108))))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -938,7 +958,9 @@ public class SRTEMainPanel extends javax.swing.JPanel {
                 .addComponent(cbxisSave)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbxisDebug)
-                .addContainerGap(153, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jButton1)
+                .addContainerGap(112, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Event Lists", jPanel3);
@@ -1346,6 +1368,13 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         else tf.setVisible(true);
     }//GEN-LAST:event_btnShowGraphActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        if(srte != null){
+            srte.reset();
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEventEditor;
@@ -1367,6 +1396,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox cbxisDebug;
     private javax.swing.JCheckBox cbxisSave;
     private javax.swing.JComboBox cbxsmoothing;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;

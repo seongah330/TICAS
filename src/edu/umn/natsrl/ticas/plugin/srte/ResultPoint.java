@@ -27,7 +27,11 @@ public class ResultPoint {
     public int srst=-1; // speed decline point for 5 min data
     public int lst=0; // low speed point for 5 min data
     public int rst=0; // speed recovery point for 5 min data
+    public int csrt=Integer.MAX_VALUE; // SRT
+    public int RCR=-1;
     public ArrayList<Integer> srt = new ArrayList<Integer>(); // stable speed point for 5 min data
+    public ArrayList<Integer> srtc = new ArrayList<Integer>();
+    public ArrayList<Integer> srtf = new ArrayList<Integer>();
     
     ResultPoint(){;}
     
@@ -75,7 +79,7 @@ public class ResultPoint {
         ResultPoint temp = new ResultPoint();
         temp.srst = current.srst;
         temp.lst = lst;
-        temp.rst = rst;
+        temp.rst = current.rst;
         
         return temp;
     }
