@@ -263,10 +263,10 @@ public class SRTEAlgorithm extends Thread{
             sheet.addCell(new Label(colIdx++, idx, "RCR"));
             sheet.addCell(new Label(colIdx++, idx, "SRT1"));
             sheet.addCell(new Label(colIdx++, idx, "SRT2"));
-            sheet.addCell(new Label(colIdx++, idx, "Qmax"));
-            sheet.addCell(new Label(colIdx++, idx, "Kmax"));
-            sheet.addCell(new Label(colIdx++, idx, "Umax"));
-            sheet.addCell(new Label(colIdx++, idx, "Ummin"));
+//            sheet.addCell(new Label(colIdx++, idx, "Qmax"));
+//            sheet.addCell(new Label(colIdx++, idx, "Kmax"));
+//            sheet.addCell(new Label(colIdx++, idx, "Umax"));
+//            sheet.addCell(new Label(colIdx++, idx, "Ummin"));
             for(int key : speedKeylist){
                 sheet.addCell(new Number(colIdx++, idx, key));
             }
@@ -313,33 +313,33 @@ public class SRTEAlgorithm extends Thread{
             sheet.addCell(new Label(colIdx++, idx, "K(SST2)"));
             sheet.addCell(new Label(colIdx++, idx, "U(SST2)"));
             
-            colIdx += 1;
-            sheet.addCell(new Label(colIdx++, idx, "QMAX(T)"));
-            sheet.addCell(new Label(colIdx++, idx, "QMAX"));
-            sheet.addCell(new Label(colIdx++, idx, "Q(QMAX)"));
-            sheet.addCell(new Label(colIdx++, idx, "K(QMAX)"));
-            sheet.addCell(new Label(colIdx++, idx, "U(QMAX)"));
-            
-            colIdx += 1;
-            sheet.addCell(new Label(colIdx++, idx, "KMAX(T)"));
-            sheet.addCell(new Label(colIdx++, idx, "KMAX"));
-            sheet.addCell(new Label(colIdx++, idx, "Q(KMAX)"));
-            sheet.addCell(new Label(colIdx++, idx, "K(KMAX)"));
-            sheet.addCell(new Label(colIdx++, idx, "U(KMAX)"));
-            
-            colIdx += 1;
-            sheet.addCell(new Label(colIdx++, idx, "UMAX(T)"));
-            sheet.addCell(new Label(colIdx++, idx, "UMAX"));
-            sheet.addCell(new Label(colIdx++, idx, "Q(UMAX)"));
-            sheet.addCell(new Label(colIdx++, idx, "K(UMAX)"));
-            sheet.addCell(new Label(colIdx++, idx, "U(UMAX)"));
-            
-            colIdx += 1;
-            sheet.addCell(new Label(colIdx++, idx, "UMIN(T)"));
-            sheet.addCell(new Label(colIdx++, idx, "UMIN"));
-            sheet.addCell(new Label(colIdx++, idx, "Q(UMIN)"));
-            sheet.addCell(new Label(colIdx++, idx, "K(UMIN)"));
-            sheet.addCell(new Label(colIdx++, idx, "U(UMIN)"));
+//            colIdx += 1;
+//            sheet.addCell(new Label(colIdx++, idx, "QMAX(T)"));
+//            sheet.addCell(new Label(colIdx++, idx, "QMAX"));
+//            sheet.addCell(new Label(colIdx++, idx, "Q(QMAX)"));
+//            sheet.addCell(new Label(colIdx++, idx, "K(QMAX)"));
+//            sheet.addCell(new Label(colIdx++, idx, "U(QMAX)"));
+//            
+//            colIdx += 1;
+//            sheet.addCell(new Label(colIdx++, idx, "KMAX(T)"));
+//            sheet.addCell(new Label(colIdx++, idx, "KMAX"));
+//            sheet.addCell(new Label(colIdx++, idx, "Q(KMAX)"));
+//            sheet.addCell(new Label(colIdx++, idx, "K(KMAX)"));
+//            sheet.addCell(new Label(colIdx++, idx, "U(KMAX)"));
+//            
+//            colIdx += 1;
+//            sheet.addCell(new Label(colIdx++, idx, "UMAX(T)"));
+//            sheet.addCell(new Label(colIdx++, idx, "UMAX"));
+//            sheet.addCell(new Label(colIdx++, idx, "Q(UMAX)"));
+//            sheet.addCell(new Label(colIdx++, idx, "K(UMAX)"));
+//            sheet.addCell(new Label(colIdx++, idx, "U(UMAX)"));
+//            
+//            colIdx += 1;
+//            sheet.addCell(new Label(colIdx++, idx, "UMIN(T)"));
+//            sheet.addCell(new Label(colIdx++, idx, "UMIN"));
+//            sheet.addCell(new Label(colIdx++, idx, "Q(UMIN)"));
+//            sheet.addCell(new Label(colIdx++, idx, "K(UMIN)"));
+//            sheet.addCell(new Label(colIdx++, idx, "U(UMIN)"));
             
             idx++;
             for(int i=0;i<result.length;i++){
@@ -366,10 +366,10 @@ public class SRTEAlgorithm extends Thread{
                     sheet.addCell(new Label(colIdx++, idx+rows, "0"));//srt2
                     sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srt.get(1))));//srt2
                 }
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.qTrafficData.getMaxPoint()))); //qMaxData
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.kTrafficData.getMaxPoint()))); //kMaxData
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.uTrafficData.getMaxPoint()))); //uMaxData
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.uTrafficData.getMinPoint()))); //uMaxData
+//                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.qTrafficData.getMaxPoint()))); //qMaxData
+//                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.kTrafficData.getMaxPoint()))); //kMaxData
+//                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.uTrafficData.getMaxPoint()))); //uMaxData
+//                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.uTrafficData.getMinPoint()))); //uMaxData
                 for(int key : speedKeylist){
                     SRTEResult.SpeedMap smap = result[i].getSpeedList().get(key);
                     if(smap != null)
@@ -401,10 +401,10 @@ public class SRTEAlgorithm extends Thread{
                     sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srt.get(1)));
                     sheet.addCell(new Number(colIdx++, idx+rows, 0));
                 }
-                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.qTrafficData.getMaxPoint())); //qMaxData
-                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.kTrafficData.getMaxPoint())); //kMaxData
-                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.uTrafficData.getMaxPoint())); //uMaxData
-                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.uTrafficData.getMinPoint())); //uminData
+//                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.qTrafficData.getMaxPoint())); //qMaxData
+//                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.kTrafficData.getMaxPoint())); //kMaxData
+//                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.uTrafficData.getMaxPoint())); //uMaxData
+//                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.uTrafficData.getMinPoint())); //uminData
                 for(int key : speedKeylist){
                     SRTEResult.SpeedMap smap = result[i].getSpeedList().get(key);
                     if(smap != null)
@@ -476,36 +476,36 @@ public class SRTEAlgorithm extends Thread{
                 }
                 
                 //Qmax
-                colIdx += 1;
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.qTrafficData.getMaxPoint())));
-                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.qTrafficData.getMaxPoint()));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].pType.qTrafficData.getMaxPoint())));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].pType.qTrafficData.getMaxPoint())));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].pType.qTrafficData.getMaxPoint())));
-                
-                //Kmax
-                colIdx += 1;
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.kTrafficData.getMaxPoint())));
-                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.kTrafficData.getMaxPoint()));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].pType.kTrafficData.getMaxPoint())));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].pType.kTrafficData.getMaxPoint())));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].pType.kTrafficData.getMaxPoint())));
-                
-                //Umax
-                colIdx += 1;
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.uTrafficData.getMaxPoint())));
-                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.uTrafficData.getMaxPoint()));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].pType.uTrafficData.getMaxPoint())));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].pType.uTrafficData.getMaxPoint())));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].pType.uTrafficData.getMaxPoint())));
-                
-                //Umin
-                colIdx += 1;
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.uTrafficData.getMinPoint())));
-                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.uTrafficData.getMinPoint()));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].pType.uTrafficData.getMinPoint())));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].pType.uTrafficData.getMinPoint())));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].pType.uTrafficData.getMinPoint())));
+//                colIdx += 1;
+//                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.qTrafficData.getMaxPoint())));
+//                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.qTrafficData.getMaxPoint()));
+//                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].pType.qTrafficData.getMaxPoint())));
+//                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].pType.qTrafficData.getMaxPoint())));
+//                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].pType.qTrafficData.getMaxPoint())));
+//                
+//                //Kmax
+//                colIdx += 1;
+//                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.kTrafficData.getMaxPoint())));
+//                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.kTrafficData.getMaxPoint()));
+//                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].pType.kTrafficData.getMaxPoint())));
+//                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].pType.kTrafficData.getMaxPoint())));
+//                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].pType.kTrafficData.getMaxPoint())));
+//                
+//                //Umax
+//                colIdx += 1;
+//                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.uTrafficData.getMaxPoint())));
+//                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.uTrafficData.getMaxPoint()));
+//                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].pType.uTrafficData.getMaxPoint())));
+//                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].pType.uTrafficData.getMaxPoint())));
+//                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].pType.uTrafficData.getMaxPoint())));
+//                
+//                //Umin
+//                colIdx += 1;
+//                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.uTrafficData.getMinPoint())));
+//                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.uTrafficData.getMinPoint()));
+//                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].pType.uTrafficData.getMinPoint())));
+//                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].pType.uTrafficData.getMinPoint())));
+//                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].pType.uTrafficData.getMinPoint())));
             }
         }catch(Exception e){
             e.printStackTrace();

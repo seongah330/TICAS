@@ -56,7 +56,6 @@ import edu.umn.natsrl.map.TMCProvider;
 import edu.umn.natsrl.ticas.error.ErrorMessage;
 import edu.umn.natsrl.ticas.error.StringErrorStream;
 import edu.umn.natsrl.ticas.plugin.VideoChecker.VideoChecker;
-import edu.umn.natsrl.ticas.plugin.cumulative.CumulativeRamp;
 import edu.umn.natsrl.ticas.plugin.datareader.DataReader;
 import edu.umn.natsrl.ticas.plugin.detecterdatareader.DetecterDataReader;
 import edu.umn.natsrl.ticas.plugin.srte.TICASPluginSRTE;
@@ -457,8 +456,8 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             addTools(dataReader);
         }
         
-        PluginInfo cum = new PluginInfo("Ramp Cumulative Input/Output", PluginType.TOOL, CumulativeRamp.class);       
-        addTools(cum);
+//        PluginInfo cum = new PluginInfo("Ramp Cumulative Input/Output", PluginType.TOOL, CumulativeRamp.class);       
+//        addTools(cum);
         
         /*PluginInfo rampwtime = new PluginInfo("Ramp Cumulative Input/Output", PluginType.TOOL, RampWaitingTime.class);       
         addTools(rampwtime);*/
