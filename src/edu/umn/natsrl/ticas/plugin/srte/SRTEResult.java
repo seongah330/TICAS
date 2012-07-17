@@ -81,7 +81,6 @@ public class SRTEResult {
     public int[] phases;
     public List<String> msgs = new ArrayList<String>();
     
-    public double SpeedLimit = 0;
     /**
      * 
      */
