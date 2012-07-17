@@ -680,7 +680,8 @@ public class SRTEChartView extends javax.swing.JFrame {
     private void updateTimeInformation(SRTEResult cr) {
         String str = "<html>Time Information<br> -StartTime :"+cr.getStartTimetoString()+"("+cr.getStartTimeStep()+")"
                 +"<br>    -EndTime   :"+cr.getEndTimetoString()+"("+cr.getEndTimeStep()+")"
-                +"<br>    -BareLane  :"+cr.getBareLaneTimetoString()+"("+cr.getBareLaneTimeStep()+")";
+                +"<br>    -BareLane  :"+cr.getBareLaneTimetoString()+"("+cr.getBareLaneTimeStep()+")"
+                +"<br>    -Speedlimit  :"+cr.SpeedLimit;
         str += "</html>";
         this.lTimeInformation.setText(str);
     }
