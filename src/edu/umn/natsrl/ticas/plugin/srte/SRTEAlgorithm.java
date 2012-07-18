@@ -241,11 +241,10 @@ public class SRTEAlgorithm extends Thread{
 //            sheet.addCell(new Label(colIdx++, 0, "U(RST)"));                
             sheet.addCell(new Label(colIdx++, idx, "RCR"));
             sheet.addCell(new Label(colIdx++, idx, "SRT1"));
-            sheet.addCell(new Label(colIdx++, idx, "SRT2"));
-            sheet.addCell(new Label(colIdx++, idx, "Qmax"));
-            sheet.addCell(new Label(colIdx++, idx, "Kmax"));
-            sheet.addCell(new Label(colIdx++, idx, "Umax"));
-            sheet.addCell(new Label(colIdx++, idx, "Umin"));
+//            sheet.addCell(new Label(colIdx++, idx, "Qmax"));
+//            sheet.addCell(new Label(colIdx++, idx, "Kmax"));
+//            sheet.addCell(new Label(colIdx++, idx, "Umax"));
+//            sheet.addCell(new Label(colIdx++, idx, "Umin"));
             for(int key : speedKeylist){
                 sheet.addCell(new Number(colIdx++, idx, key));
             }
@@ -254,15 +253,14 @@ public class SRTEAlgorithm extends Thread{
             /**
             * Point result
             */
-            colIdx += 1;
-            sheet.addCell(new Label(colIdx++, idx, "TYPE"));
+//            colIdx += 1;
+//            sheet.addCell(new Label(colIdx++, idx, "TYPE"));
             colIdx += 1;
             sheet.addCell(new Label(colIdx++, idx, "SRST"));
             sheet.addCell(new Label(colIdx++, idx, "LST"));
             sheet.addCell(new Label(colIdx++, idx, "RST"));
             sheet.addCell(new Label(colIdx++, idx, "RCR"));
             sheet.addCell(new Label(colIdx++, idx, "SRT1"));
-            sheet.addCell(new Label(colIdx++, idx, "SRT2"));
 //            sheet.addCell(new Label(colIdx++, idx, "Qmax"));
 //            sheet.addCell(new Label(colIdx++, idx, "Kmax"));
 //            sheet.addCell(new Label(colIdx++, idx, "Umax"));
@@ -306,12 +304,6 @@ public class SRTEAlgorithm extends Thread{
             sheet.addCell(new Label(colIdx++, idx, "K(SST)"));
             sheet.addCell(new Label(colIdx++, idx, "U(SST)"));
             
-            colIdx += 1;
-            sheet.addCell(new Label(colIdx++, idx, "SST2(T)"));
-            sheet.addCell(new Label(colIdx++, idx, "SST2"));
-            sheet.addCell(new Label(colIdx++, idx, "Q(SST2)"));
-            sheet.addCell(new Label(colIdx++, idx, "K(SST2)"));
-            sheet.addCell(new Label(colIdx++, idx, "U(SST2)"));
             
 //            colIdx += 1;
 //            sheet.addCell(new Label(colIdx++, idx, "QMAX(T)"));
@@ -356,16 +348,8 @@ public class SRTEAlgorithm extends Thread{
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srst))); //srst
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getPoint(result[i].getcurrentPoint().lst)))); //lst
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().rst))); //rst
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.getRecoveryPoint()))); //rxr
-                double sst = 0;
-                if(result[i].getcurrentPoint().srt.size() < 2){
-                    sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srt.get(0)))); //srt1
-                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));//srt2
-                }
-                else{
-                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));//srt2
-                    sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srt.get(1))));//srt2
-                }
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().RCR))); //rxr
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().csrt))); //srt1
 //                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.qTrafficData.getMaxPoint()))); //qMaxData
 //                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.kTrafficData.getMaxPoint()))); //kMaxData
 //                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.uTrafficData.getMaxPoint()))); //uMaxData
@@ -381,8 +365,8 @@ public class SRTEAlgorithm extends Thread{
                 /**
                  * Type
                  */
-                colIdx += 1;
-                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.getTypeNumber()));
+//                colIdx += 1;
+//                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.getTypeNumber()));
                 
                 /**
                  * Point result
@@ -391,16 +375,8 @@ public class SRTEAlgorithm extends Thread{
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srst));
                 sheet.addCell(new Number(colIdx++, idx+rows, getPoint(result[i].getcurrentPoint().lst)));
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().rst));
-                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.getRecoveryPoint()));
-                if(result[i].getcurrentPoint().srt.size() < 2){
-//                    sheet.addCell(new Number(colIdx++, idx+rows, 0));
-                    sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srt.get(0)));
-                    sheet.addCell(new Number(colIdx++, idx+rows, 0));
-                }
-                else{
-                    sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srt.get(1)));
-                    sheet.addCell(new Number(colIdx++, idx+rows, 0));
-                }
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().RCR));
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().csrt));
 //                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.qTrafficData.getMaxPoint())); //qMaxData
 //                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.kTrafficData.getMaxPoint())); //kMaxData
 //                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.uTrafficData.getMaxPoint())); //uMaxData
@@ -439,41 +415,25 @@ public class SRTEAlgorithm extends Thread{
                 sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].getcurrentPoint().rst)));
                 //RCR
                 colIdx += 1;
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.getRecoveryPoint())));
-                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.getRecoveryPoint()));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].pType.getRecoveryPoint())));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].pType.getRecoveryPoint())));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].pType.getRecoveryPoint())));
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().RCR)));
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().RCR));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().RCR)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().RCR)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].getcurrentPoint().RCR)));
                 
                 //SRT1
                 colIdx += 1;
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srt.get(0))));
-                sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srt.get(0)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().srt.get(0))));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().srt.get(0))));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].getcurrentPoint().srt.get(0))));
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().csrt)));
+                sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().csrt));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().csrt)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().csrt)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].getcurrentPoint().csrt)));
 //                colIdx += 1;
 //                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
 //                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
 //                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
 //                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
 //                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
-                
-                if(result[i].getcurrentPoint().srt.size() > 1){
-                    colIdx += 1;
-                    sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srt.get(1))));
-                    sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srt.get(1)));
-                    sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().srt.get(1))));
-                    sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().srt.get(1))));
-                    sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].getcurrentPoint().srt.get(1))));
-                }else{
-                    colIdx += 1;
-                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
-                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
-                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
-                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
-                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
-                }
                 
                 //Qmax
 //                colIdx += 1;
