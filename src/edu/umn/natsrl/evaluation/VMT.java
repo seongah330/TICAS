@@ -43,7 +43,6 @@ public class VMT extends Evaluation {
         
         Period[] periods = this.opts.getPeriods();
         int idx = 0;        
-        
         // for all results, calculate VMT
         for(EvaluationResult result : stationFlows)
         {

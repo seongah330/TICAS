@@ -158,7 +158,8 @@ public class SRTEChartLine {
     }
     
     public void setSpeedData(HashMap<Integer,Boolean> point, HashMap<Integer,Boolean> time, HashMap<Integer,Boolean> bare, 
-            HashMap<Integer,Boolean> srt, HashMap<Integer,Boolean> RCRp, double[] datas, DataType datatype){
+            HashMap<Integer,Boolean> srt, HashMap<Integer,Boolean> RCRp, HashMap<Integer,Boolean> Keyp, 
+            double[] datas, DataType datatype){
         double Maxdata = 0;
         for(double d : datas){
             if(Maxdata < d)
@@ -174,6 +175,7 @@ public class SRTEChartLine {
         this.AddPointDataTrace(bare, datas, "BareLane Point", true, new TracePainterVerticalBar(3, chart),Color.GREEN);
         this.AddPointDataTrace(srt, datas, "SRT Points", true, new TracePainterVerticalBar(3, chart),Color.MAGENTA);
         this.AddPointDataTrace(RCRp, datas, "RCR Points", true, new TracePainterVerticalBar(3, chart),Color.RED);
+        this.AddPointDataTrace(Keyp, datas, "Key Points", true, new TracePainterVerticalBar(3, chart),Color.yellow);
     }
 
     private void setStickSpacing(IAxis axis, int i) {

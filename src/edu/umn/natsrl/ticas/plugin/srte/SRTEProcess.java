@@ -20,6 +20,7 @@ package edu.umn.natsrl.ticas.plugin.srte;
 import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.Station;
+import edu.umn.natsrl.ticas.plugin.srte.SRTEResult.ResultRCRAccPoint;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -53,11 +54,11 @@ public class SRTEProcess {
     private TimeEvent timeevent;
     private final Section section;
     private Period period;
-    private Station selectedStation;
+    private SRTEStation selectedStation;
     private SMOOTHING sfilter;
-    
+    private SRTEConfig config;
 
-    public SRTEProcess(Section section, Period period,Station station, SRTEConfig config,TimeEvent te) {
+    public SRTEProcess(Section section, Period period,SRTEStation station, SRTEConfig config,TimeEvent te) {
         // config setting
         this.SMOOTHING_FILTERSIZE = config.getInt("SMOOTHING_FILTERSIZE");
         this.QUANTIZATION_THRESHOLD = config.getInt("QUANTIZATION_THRESHOLD");
@@ -66,11 +67,15 @@ public class SRTEProcess {
         this.section = section;
         this.period = period;
         timeevent = te;
+        this.config = config;
         
         //result base sett
         result.station = selectedStation;
         result.sectionName = this.section.getName();
 
+        //set SpeedLimit
+        result.SpeedLimit = station.getSpeedLimit();
+        
         //Speed Setting
         result.data_origin = selectedStation.getSpeed();
         result.data_smoothed = smoothing(result.data_origin);
@@ -84,11 +89,11 @@ public class SRTEProcess {
         // density setting
         result.k_origin = selectedStation.getDensity();
         result.k_smoothed = smoothing(result.k_origin);
-        result.k_quant = quantization(result.k_smoothed);
+        result.k_quant = quantization(result.k_smoothed,config.K_quan);
         
         //Average u Data
-        result.u_Avg_origin = PatternType.CalculateSmoothedSpeed(result.q_origin, result.k_origin);
-        result.u_Avg_smoothed = PatternType.CalculateSmoothedSpeed(result.q_smoothed, result.k_smoothed);
+        result.u_Avg_origin = SRTEUtil.CalculateSmoothedSpeed(result.q_origin, result.k_origin);
+        result.u_Avg_smoothed = SRTEUtil.CalculateSmoothedSpeed(result.q_smoothed, result.k_smoothed);
         result.u_Avg_quant = quantization(result.u_Avg_smoothed);
         
         result.setTime(te.getStartTime(), te.getEndTime(), te.getBareLaneRegainTime());
@@ -128,7 +133,7 @@ public class SRTEProcess {
             /**
              * find LST Point
              */
-            rp.setLST(findLST_NEW(qData, sPoint,EndLength));
+            rp.setLST(findLST(qData,filteredData, sPoint,EndLength));
             System.out.println("..lst : "+rp.lst);
             if(rp.lst == -1 || rp.lst >= endPoint)
                 break;
@@ -147,7 +152,7 @@ public class SRTEProcess {
 //                    break;
 //                }
 //            }
-            rp.setRST(findRST_NEW(qData,rp.lst,filteredData,EndLength));
+            rp.setRST(findRST(qData,rp.lst,filteredData,EndLength));
             System.out.println("..rst : "+rp.rst);
             System.out.println();
             
@@ -165,7 +170,7 @@ public class SRTEProcess {
          * find SRT Point
          */
 //        findSRT(qData, result);
-        findSRTNEW(qData,qK,result);
+        findSRT(qData,qK,result);
         System.out.println("SRT :" + result.getcurrentPoint().csrt);
         for (int i = 0; i < result.getcurrentPoint().srt.size(); i++) {
             System.err.println("SRT : " + result.getcurrentPoint().srt.get(i));
@@ -206,23 +211,6 @@ public class SRTEProcess {
             SRTEResult.SpeedMap sm = result.getSpeedList().get(key);
             System.out.println(sm.time + " speed : "+sm.speed+ " bf :" + sm.beforeSpeed + " interpol min : "+sm.getKeyTimeMin()+"("+sm.getKeyTimeStep()+")");
         } 
-    
-//    Collection<Station> stations = this.getInfraObjects(InfraType.STATION);
-//        Iterator<Station> itr = stations.iterator();
-//        while (itr.hasNext()) {
-//            Station station = itr.next();
-//            if (station_id.equals(station.getStationId())) {
-//                return station;
-//            }
-//        }
-        
-//         result.addLog("calculate New Algorithm");
-////        result.pType = new PatternType(result.q_origin,result.k_origin,result.lst); //Start point : lst
-//        int backstep = period.interval == 0 ? 0 : (SRTEConfig.DATA_READ_EXTENSION_AFTER_SNOW+2) * 3600 / period.interval;
-//        int RCRSpoint = qData.length - backstep - 1;
-//        System.out.println("Fullstep : "+qData.length+" backstep :" + backstep + " RCRSPoint : "+RCRSpoint);
-//        result.pType = new PatternType(result.q_smoothed,result.k_smoothed,RCRSpoint);
-//        result.pType.Process();
 
         return result;
     }
@@ -287,7 +275,7 @@ public class SRTEProcess {
      * @param filteredData 45min route-wide average data
      * @return
      */
-    private double[] quantization(double[] filteredData) {
+    private double[] quantization(double[] filteredData, Integer TH) {
         int stick = 0;
         double[] qData = new double[filteredData.length];
         for (int i = 0; i < 3; ++i) {
@@ -296,14 +284,16 @@ public class SRTEProcess {
         stick = stick / 3;
 
         for (int i = 0; i <= filteredData.length - 1; i++) {
-            if ((Math.abs(stick - filteredData[i]) > QUANTIZATION_THRESHOLD)) {
+            if ((Math.abs(stick - filteredData[i]) > TH)) {
                 stick = (int) Math.round(filteredData[i]);
             }
             qData[i] = stick;
         }
         return qData;
     }
-
+    private double[] quantization(double[] filteredData) {
+        return quantization(filteredData,QUANTIZATION_THRESHOLD);
+    }
     /**
      * Find SRST
      *  - the first point of speed continuously decreases
@@ -351,6 +341,7 @@ public class SRTEProcess {
     }
 
     /**
+     * @deprecated 
      *Find LST
      *  - speed reaches the low speed level
      *      -case 1: find the last decline point when speed starts to increases 2 times
@@ -359,7 +350,7 @@ public class SRTEProcess {
      * @param srst
      * @return
      */
-    private int findLST(double[] qData, int srst, int ePoint) {
+    private int findLST_Old(double[] qData, int srst, int ePoint) {
         int lst = 0;
         int increaseCount = 0;
         int increaseCountB = 0;
@@ -420,7 +411,10 @@ public class SRTEProcess {
      * @param ePoint
      * @return 
      */
-    private int findLST_NEW(double[] qData, int sPoint, int ePoint) {
+    private int findLST(double[] qData,double[] sData, int sPoint, int ePoint) {
+        if(qData == null)
+            return sPoint;
+        
         int lst = sPoint;
         for(int i=sPoint;i<ePoint;i++){
             if(i == sPoint)
@@ -429,35 +423,41 @@ public class SRTEProcess {
             if(qData[i-1] > qData[i]){
                 lst = i;
             }else if(qData[i-1] < qData[i]){
+                //Search Foword
+                System.out.println("lst -> "+lst);
+                lst = findLST(sData,null,lst,ePoint);
                 return lst;
             }
         }
         return -1;
     }
     
-    private int findRST_NEW(double[] qData, int sPoint, double[] filteredData, int ePoint) {
-        int rst = caculateRST(qData,filteredData,sPoint,ePoint);
-        if(rst == -1){
-            ePoint = qData.length;
-            rst = caculateRST(qData,filteredData,sPoint,ePoint);
-        }
-        return rst;
-    }
-    
-    private int caculateRST(double[] qData, double[] filteredData, int sPoint, int ePoint) {
+    private int findRST(double[] qData, int sPoint, double[] filteredData, int ePoint) {
         int rst = -1;
         for(int i=sPoint;i<ePoint;i++){
             if(i==sPoint)
                 continue;
             if(qData[i-1] < qData[i]){
                 rst = i-1;
+                //Search Back
+                int tempRST = rst;
+                for(int j=rst;j>=sPoint;j--){
+                    if(filteredData[j] < filteredData[tempRST])
+                        tempRST = j;
+                    
+                    if(filteredData[j-1] >= filteredData[j]){
+                        rst = tempRST;
+                        break;
+                    }
+                    
+                }
                 return rst;
             }
         }
         return rst;
     }
-
     /**
+     * @deprecated 
      * Find RST when speed starts to continuously increase
      * @param qData
      * @param lst
@@ -466,7 +466,7 @@ public class SRTEProcess {
      *  - increasing speed change point from LST
      * @return
      */
-    private int findRST(double[] qData, int lst, double[] filteredData, int targetIncreaseCount, int ePoint) {
+    private int findRST_old(double[] qData, int lst, double[] filteredData, int targetIncreaseCount, int ePoint) {
         lst = lst <= 0 ? 1 : lst;
         int rst = lst;
         int increaseCount = 0;
@@ -511,6 +511,7 @@ public class SRTEProcess {
     }
 
     /**
+     * @deprecated 
      *Find SRT
      * Speed Recovery Time(s) are identified as the expected flow pattern recovered time (EFPRT)
      * and the speed stabilization time (SST) when speed satisfies condition A,
@@ -541,7 +542,7 @@ public class SRTEProcess {
      * @param result 
 
      */
-    private void findSRT(double[] qData, SRTEResult result) {
+    private void findSRT_Old(double[] qData, SRTEResult result) {
 
         result.addLog("Finding SRT.............");
         // create pattern search instance
@@ -750,15 +751,19 @@ public class SRTEProcess {
         
         
         if(lSpeed > sdata[LST]){ // if There is many snow
-            if(SRTF != -1){ //if SRTF
-                RCR = calculateRCRusingSRTF(sdata,sPoint,uLimitPoint);
-            }else if(SRTF == -1 && SRTC != -1){ //else !SRTF && SRTC
-                System.out.println("RCR Selected : A-2");
+            if(SRTC != -1 && SRTC == result.getcurrentPoint().csrt && SRTC < uLimitPoint)
                 RCR = findUpperPattern(result.q_smoothed, result.k_smoothed, result.u_Avg_smoothed, sPoint, SRTC);
-            }else{} //!SRTF && !SRTC
+            else
+                RCR = calculateRCRusingSRTF(sdata,result.data_quant,sPoint,uLimitPoint);
+//            if(SRTF != -1){ //if SRTF
+//                RCR = calculateRCRusingSRTF(sdata,sPoint,uLimitPoint);
+//            }else if(SRTF == -1 && SRTC != -1){ //else !SRTF && SRTC
+//                System.out.println("RCR Selected : A-2");
+//                RCR = findUpperPattern(result.q_smoothed, result.k_smoothed, result.u_Avg_smoothed, sPoint, SRTC);
+//            }else{} //!SRTF && !SRTC
         }else{ //else small snow
             if(SRTF != -1)
-                RCR = calculateRCRusingSRTF(sdata,sPoint,SRTF);
+                RCR = calculateRCRusingSRTF(sdata, result.k_smoothed,sPoint,SRTF);
         }
         
         result.getcurrentPoint().RCR = RCR;
@@ -783,7 +788,6 @@ public class SRTEProcess {
      */
     private int findUpperPattern(double[] q, double[] k, double[] u, int sPoint, int ePoint) {
         double dQ = SRTEConfig.RCR_Q;
-        double dK = SRTEConfig.RCR_K;
         double dU = SRTEConfig.RCR_U;
         for(int i=sPoint;i<=ePoint;i++){
             if(i == sPoint)
@@ -802,17 +806,349 @@ public class SRTEProcess {
         return -1;
     }
     
-    private int calculateRCRusingSRTF(double[] sdata, int sPoint, int ePoint) {
-        ArrayList<SRTEResult.ResultRCRAccPoint> point = new ArrayList<SRTEResult.ResultRCRAccPoint>();
+    /**
+     * New Algorithm
+     * K-based RCR Searching Algorithm
+     * @param sdata
+     * @param sPoint
+     * @param ePoint
+     * @return 
+     */
+    private int calculateRCRusingSRTF(double[] sdata, double[] u_data, int sPoint, int ePoint) {
         int RCR = -1;
+
+        /**
+         * Find AccPoint ASC
+         */
+        ArrayList<SRTEResult.ResultRCRAccPoint> point = calculatePoint(u_data,sPoint,ePoint,false,false);
         
-        int eTime = 2;
-        int g = ePoint - sPoint;
-        if(g < eTime){
-            if(ePoint + (eTime - g) > sdata.length)
-                ePoint = sdata.length;
-            else ePoint += (eTime - g);
+        System.out.println("RCR Key : sPoint :" + sPoint + " - ePoint : "+ ePoint);
+        for(int i=0;i<point.size();i++){
+            System.out.println("RCRPoint -> " + point.get(i).data + "("+point.get(i).point+")");
         }
+        
+        
+        if(point.size() <= 0)
+            return sPoint;
+        
+        /**
+         * Research Point from ResetPoint
+         * Find 2 continuously subtraction Point 
+         */
+        int resetPoint = sPoint; //reset Point
+        
+        int findPoint = 0;
+        int ZeroTh = (int)config.RCRNofM;
+        int MinusCount = 0; //MinusCount
+        int beforeMCount = 0;
+        for(int i = 0;i<point.size();i++){
+            if(point.get(i).data < 0 && i != point.size()-1){
+                MinusCount = 0;
+                for(int z=i+1;z<point.size();z++){
+                    if(u_data[point.get(i).point] == u_data[point.get(z).point])
+                        MinusCount ++;
+                    else
+                        break;
+                }
+                
+                if(MinusCount >= ZeroTh && beforeMCount < MinusCount){
+                    resetPoint = point.get(i).point;
+                    findPoint = i;
+                    beforeMCount = MinusCount;
+                }
+            }
+//            if(point.get(i).data < 0)
+//                MinusCount ++;
+//            else
+//                MinusCount = 0;
+//            
+//            
+//            if(MinusCount > (config.RCRNofM - 1)){
+//                int tp = i;
+//                if(i == 0)
+//                    tp = i;
+//                else
+//                    tp = i-((int)config.RCRNofM-1);
+//                
+//                /**
+//                * add ResetPoint
+//                */
+//                resetPoint = point.get(tp).point;
+//                result.AddRCRAccPoint(point.get(tp));
+//                break;
+//            }    
+        }
+        if(findPoint > 0)
+            result.AddRCRAccPoint(point.get(findPoint));
+        else
+            result.AddRCRAccPoint(new SRTEResult.ResultRCRAccPoint(-1,-1));
+        
+//        if(result.getRCRAccPointList().size() <= 0)
+//            result.AddRCRAccPoint(new SRTEResult.ResultRCRAccPoint(sPoint,-1));
+        
+        
+        point = calculatePoint(sdata,resetPoint,ePoint,true,true);
+        
+        
+        System.out.println("RCR : sPoint :" + resetPoint + " - ePoint : "+ ePoint);
+        for(int i=0;i<point.size();i++){
+            result.AddRCRAccPoint(point.get(i));
+            System.out.println("RCRPoint -> " + point.get(i).data + "("+point.get(i).point+")");
+        }
+        
+        /**
+         * Find RCR Point to Top 2 Point
+         */
+        int TopBandwith = 2;
+        for(int i=0;i<point.size();i++){
+            if(i == TopBandwith)
+                break;
+            
+            if(RCR < point.get(i).point && point.get(i).data > 0)
+                RCR = point.get(i).point;
+        }
+        
+        if(RCR < 0)
+            RCR = resetPoint;
+        
+        return RCR;
+    }
+    
+    /**
+     * @deprecated 
+     * Last Update 07_22_2012
+     * New Algorithm
+     * K-based RCR Searching Algorithm
+     * @param sdata
+     * @param sPoint
+     * @param ePoint
+     * @return 
+     */
+    private int calculateRCRusingSRTF_default(double[] sdata, double[] k_data, int sPoint, int ePoint) {
+        int RCR = -1;
+        /**
+         * Searching K
+         */
+        sPoint = searchingsPoint(sdata,k_data,sPoint,ePoint);
+        System.out.println("K Con Point : "+sPoint);
+        
+        result.AddRCRAccPoint(new SRTEResult.ResultRCRAccPoint(sPoint,k_data[sPoint]));
+        
+        ArrayList<SRTEResult.ResultRCRAccPoint> point = calculatePoint(sdata,sPoint,ePoint,true,true);
+            
+            
+        System.out.println("RCR : sPoint :" + sPoint + " - ePoint : "+ ePoint);
+        for(int i=0;i<point.size();i++){
+            result.AddRCRAccPoint(point.get(i));
+            System.out.println("RCRPoint -> " + point.get(i).data + "("+point.get(i).point+")");
+        }
+        
+        /**
+         * Find RCR Point to Top 2 Point
+         */
+        int TopBandwith = config.RCRTopBandwith;
+        for(int i=0;i<point.size();i++){
+            if(i == TopBandwith)
+                break;
+            
+            if(RCR < point.get(i).point && point.get(i).data > 0)
+                RCR = point.get(i).point;
+        }
+        
+        if(RCR < 0)
+            RCR = sPoint;
+        
+        return RCR;
+    }
+    
+    /**
+     * @deprecated 
+     * @param sdata
+     * @param sPoint
+     * @param ePoint
+     * @return 
+     */
+    private int calculateRCRusingSRTF_justfindkeyPoint(double[] sdata, int sPoint, int ePoint) {
+        int RCR = -1;
+
+        /**
+         * Find AccPoint ASC
+         */
+        ArrayList<SRTEResult.ResultRCRAccPoint> point = calculatePoint(sdata,sPoint,ePoint,false,true);
+        
+        System.out.println("RCR Key : sPoint :" + sPoint + " - ePoint : "+ ePoint);
+        for(int i=0;i<point.size();i++){
+            System.out.println("RCRPoint -> " + point.get(i).data + "("+point.get(i).point+")");
+        }
+        
+        
+        if(point.size() <= 0)
+            return sPoint;
+        
+        /**
+         * Research Point from ResetPoint
+         */
+        int resetPoint = sPoint;
+        if(point.get(0).data < 0){
+            resetPoint = point.get(0).point;
+                /**
+                * add ResetPoint
+                */
+            result.AddRCRAccPoint(point.get(0));
+        }else{
+            result.AddRCRAccPoint(new SRTEResult.ResultRCRAccPoint(sPoint,-1));
+        }
+        point = calculatePoint(sdata,resetPoint,ePoint,true,true);
+            
+            
+        System.out.println("RCR : sPoint :" + resetPoint + " - ePoint : "+ ePoint);
+        for(int i=0;i<point.size();i++){
+            result.AddRCRAccPoint(point.get(i));
+            System.out.println("RCRPoint -> " + point.get(i).data + "("+point.get(i).point+")");
+        }
+        
+        /**
+         * Find RCR Point to Top 2 Point
+         */
+        int TopBandwith = 2;
+        for(int i=0;i<point.size();i++){
+            if(i == TopBandwith)
+                break;
+            
+            if(RCR < point.get(i).point && point.get(i).data > 0)
+                RCR = point.get(i).point;
+        }
+        
+        if(RCR < 0)
+            RCR = resetPoint;
+        
+        return RCR;
+    }
+    
+    /**
+     * @deprecated 
+     * @param sdata
+     * @param sPoint
+     * @param ePoint
+     * @return 
+     */
+    private int calculateRCRusingSRTF_old_findKeyPointandResearch(double[] sdata, int sPoint, int ePoint) {
+        int RCR = -1;
+
+        /**
+         * Find AccPoint ASC
+         */
+        ArrayList<SRTEResult.ResultRCRAccPoint> point = calculatePoint(sdata,sPoint,ePoint,false,false);
+        
+        System.out.println("RCR Key : sPoint :" + sPoint + " - ePoint : "+ ePoint);
+        for(int i=0;i<point.size();i++){
+            System.out.println("RCRPoint -> " + point.get(i).data + "("+point.get(i).point+")");
+        }
+        
+        
+        if(point.size() <= 0)
+            return sPoint;
+        
+        /**
+         * Research Point from ResetPoint
+         * Find 2 continuously subtraction Point 
+         */
+        int resetPoint = sPoint; //reset Point
+        
+        int MinusCount = 0; //MinusCount
+        for(int i = 0;i<point.size();i++){
+            if(point.get(i).data < 0)
+                MinusCount ++;
+            else
+                MinusCount = 0;
+            
+            
+            if(MinusCount > (config.RCRNofM - 1)){
+                int tp = i;
+                if(i == 0)
+                    tp = i;
+                else
+                    tp = i-((int)config.RCRNofM-1);
+                
+                /**
+                * add ResetPoint
+                */
+                resetPoint = point.get(tp).point;
+                result.AddRCRAccPoint(point.get(tp));
+                break;
+            }
+            
+            
+        }
+        
+        if(result.getRCRAccPointList().size() <= 0)
+            result.AddRCRAccPoint(new SRTEResult.ResultRCRAccPoint(sPoint,-1));
+//        if(point.get(0).data < 0){
+//                resetPoint = point.get(0).point;
+//                /**
+//                * add ResetPoint
+//                */
+//                result.AddRCRAccPoint(point.get(0));
+//            }else{
+//                result.AddRCRAccPoint(new SRTEResult.ResultRCRAccPoint(sPoint,-1));
+//            }
+        
+        point = calculatePoint(sdata,resetPoint,ePoint,true,true);
+        
+        
+        System.out.println("RCR : sPoint :" + resetPoint + " - ePoint : "+ ePoint);
+        for(int i=0;i<point.size();i++){
+            result.AddRCRAccPoint(point.get(i));
+            System.out.println("RCRPoint -> " + point.get(i).data + "("+point.get(i).point+")");
+        }
+        
+        /**
+         * Find RCR Point to Top 2 Point
+         */
+        int TopBandwith = 2;
+        for(int i=0;i<point.size();i++){
+            if(i == TopBandwith)
+                break;
+            
+            if(RCR < point.get(i).point && point.get(i).data > 0)
+                RCR = point.get(i).point;
+        }
+        
+        if(RCR < 0)
+            RCR = resetPoint;
+        
+        return RCR;
+    }
+    
+    /**
+     * 
+     * @param sdata
+     * @param sPoint
+     * @param ePoint
+     * @param b true : DESC, false : ASC
+     * @param isSort true : Sort, false : unSort
+     * @return 
+     */
+    private ArrayList<ResultRCRAccPoint> calculatePoint(double[] sdata, int sPoint, int ePoint, boolean b, boolean isSort) {
+        ArrayList<SRTEResult.ResultRCRAccPoint> point = new ArrayList<SRTEResult.ResultRCRAccPoint>();
+        
+        /**
+         * if sPoint <--not 2point--> ePoint
+         */
+//        int eTime = 1;
+//        int g = ePoint - sPoint;
+//        if(g < eTime){
+//            if(ePoint + (eTime - g) > sdata.length)
+//                ePoint = sdata.length;
+//            else ePoint += (eTime - g);
+//        }
+        
+        int eTime = 1;
+        /**
+         * Caculate Last Point
+         */
+        if(ePoint + eTime <= sdata.length)
+            ePoint += eTime;
         
         for(int i=sPoint; i<=ePoint;i++){
             if(i < sPoint + 2)
@@ -821,32 +1157,30 @@ public class SRTEProcess {
             SRTEResult.ResultRCRAccPoint p = new SRTEResult.ResultRCRAccPoint();
             p.data = (Math.abs(sdata[i]-sdata[i-1]) - Math.abs(sdata[i-1]-sdata[i-2]));
             p.point = i-1;
+            if(b)
+                p.setDesc();
+            else
+                p.setASC();
+            
             point.add(p);
         }
         
         /**
          * sort Points
          */
-        Collections.sort(point);
+        if(isSort)
+            Collections.sort(point);
         
-        System.out.println("RCR : sPoint :" + sPoint + " - ePoint : "+ ePoint);
-        for(int i=0;i<point.size();i++){
-            System.out.println("RCRPoint -> " + point.get(i).data + "("+point.get(i).point+")");
-        }
-        
-        int TopBandwith = 2;
-        for(int i=0;i<point.size();i++){
-            if(i == TopBandwith)
-                break;
-            
-            if(RCR < point.get(i).point)
-                RCR = point.get(i).point;
-        }
-        
-        return RCR;
+        return point;
     }
 
-    private void findSRTNEW(double[] qData, double[] qK, SRTEResult result) {
+    /**
+     * find SRT
+     * @param qData
+     * @param qK
+     * @param result 
+     */
+    private void findSRT(double[] qData, double[] qK, SRTEResult result) {
         int sPoint = result.getcurrentPoint().rst;
         int ePoint = qData.length;
         int[] srt = new int[2];
@@ -882,6 +1216,15 @@ public class SRTEProcess {
         return timestemp;
     }
 
+    /**
+     * Find SRTF
+     * @param sPoint
+     * @param ePoint
+     * @param timestemp
+     * @param qData
+     * @param result
+     * @return 
+     */
     private int findSRTF(int sPoint, int ePoint, int timestemp, double[] qData, SRTEResult result) {
         
         double lSpeed = getLimitSpeed(qData,result,false);
@@ -892,7 +1235,7 @@ public class SRTEProcess {
         double CstSpeed = 0;
         
         double MaxSpeedHistory = 0;
-        
+        System.out.println("speed :" + lSpeed);
         //Find SRTF
         for(int i=sPoint;i<ePoint;i++){
             if(CstSpeed != qData[i] || i == (ePoint-1)){
@@ -917,68 +1260,15 @@ public class SRTEProcess {
         else return -1;
     }
 
-    private int findSRTC(int sPoint, int ePoint, int timestemp, double[] qData, double[] qK, ResultPoint currentPoint) {
-        int stempCnt = 0;
-        int currentSrt = 0;
-        int srt = sPoint;
-        //Find SRTC
-        for(int i=sPoint;i<ePoint;i++){
-            if(i == sPoint)
-                continue;
-            System.out.println("srtc check["+i+"]");
-            /**
-             * if delta U <= 0 and deltaK >= 0 -> continues during timestemp
-             * select srt
-             */
-            double deltaU = (qData[i] - qData[i-1]);
-            double deltaK = (qK[i] - qK[i-1]);
-            
-            if(deltaU <= 0 && deltaK >= 0)
-                stempCnt ++;
-            else{
-                if(stempCnt >= timestemp){
-                    currentPoint.srtc.add(currentSrt);
-                    if(qData[currentSrt] > qData[srt] || srt == sPoint){
-                        boolean stopflag = false;
-                        /**
-                        * if there is srtc point, Calculate Speed interval Value current srtc point's speed(CSPS) and current time speed(CTS).
-                        * if CSPS - CTS > MaximumSpeedInterval,
-                        * Next SRTC Point was not selected.
-                        * 
-                        */
-                        if(currentPoint.srtc.size() > 1){
-                            int csrt = currentPoint.srtc.get(currentPoint.srtc.size()-1);
-                            int beforesrt = currentPoint.srtc.get(currentPoint.srtc.size()-2);
-                            
-                            if(findPit(beforesrt,csrt,qData)){
-                                stopflag = true;
-                                break;
-                            }
-                            
-//                            System.out.println();
-//                            System.out.println("["+i+"]current srtc : " + csrt);
-//                            
-//                            System.out.print("current speedinterval : " + speedinterval);
-//                            
-//                            System.out.println();
-                        }
-                        if(stopflag){
-                            currentPoint.srtc.remove(currentPoint.srtc.size()-1);
-                            break;
-                        }
-                        else
-                            srt = currentSrt;
-                    }
-                }
-                currentSrt = i;
-                stempCnt = 0;
-            }
-        }
-        if(srt != sPoint)
-            return srt;
-        else return -1;
-    }
-
+    /**
+     * Find SRTC
+     * @param sPoint
+     * @param ePoint
+     * @param qData
+     * @param qK
+     * @param currentPoint
+     * @return 
+     */
     private int findSRTC(int sPoint, int ePoint, double[] qData, double[] qK, ResultPoint currentPoint) {
         boolean isDetect = false;
         int currentSrt = 0;
@@ -996,26 +1286,9 @@ public class SRTEProcess {
                     double deltaK = (qK[aftersrt] -qK[currentSrt]);
                     if(deltaK > 0){
                         currentPoint.srtc.add(currentSrt);
-                        
-                        if(qData[srt] < qData[currentSrt] || srt == sPoint){
-                            srt = currentSrt;
-//                            boolean stopflag = false;
-//                            if(currentPoint.srtc.size() > 1){
-//                                int csrt = currentPoint.srtc.get(currentPoint.srtc.size()-1);
-//                                int beforesrt = currentPoint.srtc.get(currentPoint.srtc.size()-2);
-//
-//                                if(findPit(beforesrt,csrt,qData)){
-//                                    stopflag = true;
-//                                    break;
-//                                }
-//                            }
-//                            if(stopflag){
-//                                currentPoint.srtc.remove(currentPoint.srtc.size()-1);
-//                                break;
-//                            }
-//                            else
-//                                srt = currentSrt;
-                        }
+//                        if(qData[srt] < qData[currentSrt] || srt == sPoint){
+//                            srt = currentSrt;
+//                        }
                     }
                     
                     isDetect = false;
@@ -1028,21 +1301,29 @@ public class SRTEProcess {
                 }
             }
         }
-        if(srt != sPoint)
-            return srt;
-        else return -1;
+        
+        if(currentPoint.srtc.size() > 0){
+            srt = AdjustSRTC(currentPoint.srtc,qData,selectedStation.getSpeedLimit());
+            if(srt != -1)
+                return srt;
+            else
+                return AdjustSRTC(currentPoint.srtc,qData,Double.MAX_VALUE);
+        }else{
+            return -1;
+        }
+            
+        
     }
     
-    private boolean findPit(int before, int last, double[] qData) {
-        for(int si = before; si<=last;si++){
-            double speedinterval = qData[before] - qData[si];
-            if(speedinterval > MaximumSpeedInterval && speedinterval > 0){
-                return true;
-            }
+    private int AdjustSRTC(ArrayList<Integer> srtc,double[] data, double speedLimit){
+        int csrtc = -1;
+        for(int tsrt : srtc){
+                if(csrtc < tsrt && data[tsrt] < speedLimit)
+                    csrtc = tsrt;
         }
-        return false;
+        return csrtc;
     }
-
+    
     /**
      * get Limit Speed
      * @param qData
@@ -1066,11 +1347,46 @@ public class SRTEProcess {
         * Minimum SRTF Value
         */
         double dSpeed = 3;
-        result.SpeedLimit = selectedStation.getSpeedLimit();
-        if(!useOrigin)
+        LSpeed = selectedStation.getSpeedLimit();
+        if(!useOrigin && LSpeed >= 60)
             LSpeed = selectedStation.getSpeedLimit()-dSpeed;
         return LSpeed;
     }
+
+    private int searchingsPoint(double[] sdata, double[] k_data, int sPoint, int ePoint) {
+        int timestemp = (int)config.RCRNofM-1;
+        int stempCnt = 0;
+        int currentPoint = 0;
+        double CstK = 0;
+        int point = sPoint;
+        ePoint = k_data.length;
+        System.out.println("RCR timestemp -> "+timestemp);
+        //Find K continously point
+        for(int i=sPoint;i<ePoint;i++){
+            if(CstK != k_data[i] || i == (ePoint-1)){
+                if(stempCnt >= timestemp){
+//                    if(qData[currentSrt] > qData[srt]){
+                    point = currentPoint;
+                    System.out.println("get!!! : "+stempCnt + " " + point + "-"+currentPoint);
+                    
+                    if(point > ePoint)
+                        return sPoint;
+                    else
+                        return point;
+                }
+                CstK = k_data[i];
+                currentPoint = i;
+                stempCnt = 0;
+            }
+            else
+                stempCnt ++;
+            System.out.println("RCR K -> ["+i+"]"+k_data[i]+" "+stempCnt );
+        }
+        
+        return point;
+    }
+
+    
 
     
 

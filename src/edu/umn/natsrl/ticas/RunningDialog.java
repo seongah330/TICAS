@@ -51,8 +51,8 @@ public class RunningDialog extends javax.swing.JDialog {
         Point loc = this.getLocation();
         loc.y -= 200;
         this.setLocation(loc);
-        System.setOut(new PrintStream(sos));
-        System.setErr(new PrintStream(sos));
+//        System.setOut(new PrintStream(sos));
+//        System.setErr(new PrintStream(sos));
         
         if(!RunningDialog.expanded) {
             hideLog();

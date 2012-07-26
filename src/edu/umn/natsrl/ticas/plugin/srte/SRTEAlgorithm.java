@@ -23,10 +23,7 @@ import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.ticas.plugin.srte.SRTEProcess.SMOOTHING;
 import java.io.File;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jxl.Workbook;
@@ -50,8 +47,12 @@ public class SRTEAlgorithm extends Thread{
     private SRTEConfig config;
     private TimeEventLists eventlist;
     
+    private SRTEStationGroup groupData = new SRTEStationGroup();
+    
     private int TimeInterval = Interval.I15MIN.second;
     private Vector<SRTEResultSection> rData = new Vector<SRTEResultSection>();
+
+    
     public static interface AlogorithmEndListener{
         public void onEndMessage(boolean msg);
     }
@@ -81,6 +82,11 @@ public class SRTEAlgorithm extends Thread{
             }
             return;
         }
+        
+        /**
+         * Load Group Data from XML
+         */
+        groupData.loadfromXML();
         
         for(TimeEvent te : eventlist.getTimeEvents()){
             System.out.println("\n-------------------------------------------");
@@ -118,16 +124,76 @@ public class SRTEAlgorithm extends Thread{
         long et = new Date().getTime();
         System.out.println(" (OK : " + (et-st) + "ms)");
         
-        SRTEResult[] result = new SRTEResult[stations.length];
-        for(int i=0;i<stations.length;i++){
-            System.out.println("\nCalculate Station..."+stations[i].getLabel()+"("+stations[i].getStationId()+")");
-            SRTEProcess proc = new SRTEProcess(sec, p,stations[i],config,te);
-            result[i] = proc.stateDecision();
-            
-            System.out.println("End Station..."+stations[i].getLabel()+"("+stations[i].getStationId()+")");
+        /**
+         * Set Grouping
+         */
+        ArrayList<SRTEStation> srteStations = new ArrayList<SRTEStation>();
+        for(Station s : stations){
+            AddStation(srteStations,s);
+        }
+        
+        /**
+         * set Average each groups
+         */
+        for(SRTEStation sgroup : srteStations){
+            sgroup.SyncAverage();
+//            sgroup.printAllData();
+        }
+        
+        SRTEResult[] result = new SRTEResult[srteStations.size()];
+        int cnt = 0;
+        for(SRTEStation sgroup : srteStations){
+//            System.out.println("\nCalculate Station..."+stations[i].getLabel()+"("+stations[i].getStationId()+")");
+            System.out.println("Group Name : "+sgroup.id + " - Group ID :" +sgroup.groupid + " - avgCount : "+sgroup.getAvgCount());
+
+            SRTEProcess proc = new SRTEProcess(sec, p,sgroup,config,te);
+            result[cnt] = proc.stateDecision();
+            cnt++;
+            System.out.println("End Station..."+sgroup.getLabel()+"("+sgroup.getStationId()+")");
         }
         SRTEResultSection rSection = new SRTEResultSection(result,te,p);
         return rSection;
+        
+//        SRTEStationGroup sg = new SRTEStationGroup();
+//        sg.loadfromXML();
+//        System.out.println(sg.getGroupID("S1457"));
+    }
+    
+    /**
+     * Add each station in group
+     * @param srteStations
+     * @param s 
+     */
+    private void AddStation(ArrayList<SRTEStation> srteStations, Station s) {
+        if(groupData.getGroupID(s.getStationId()) == null){
+            SRTEStation newstation = new SRTEStation(s.getStationId(),-1,s);
+            srteStations.add(newstation);
+            return;
+        }
+        
+        int groupIdx = hasGroup(srteStations,s.getStationId());
+        if(groupIdx == -1){
+            SRTEStation newstation = new SRTEStation(groupData.getGroupName(s.getStationId()),groupData.getGroupID(s.getStationId()),s);
+            srteStations.add(newstation);
+        }else{
+            srteStations.get(groupIdx).AddData(s);
+        }
+    }
+    
+    /**
+     * has Station Group
+     * @param srteStations
+     * @param stationId
+     * @return 
+     */
+    private int hasGroup(ArrayList<SRTEStation> srteStations, String stationId) {
+        int cnt = 0;
+        for(SRTEStation s : srteStations){
+            if(s.groupid == groupData.getGroupID(stationId))
+                return cnt;
+            cnt ++;
+        }
+        return -1;
     }
 
     public void extractData() throws Exception
@@ -241,6 +307,7 @@ public class SRTEAlgorithm extends Thread{
 //            sheet.addCell(new Label(colIdx++, 0, "U(RST)"));                
             sheet.addCell(new Label(colIdx++, idx, "RCR"));
             sheet.addCell(new Label(colIdx++, idx, "SRT1"));
+            sheet.addCell(new Label(colIdx++, idx, "RCR_Df"));
 //            sheet.addCell(new Label(colIdx++, idx, "Qmax"));
 //            sheet.addCell(new Label(colIdx++, idx, "Kmax"));
 //            sheet.addCell(new Label(colIdx++, idx, "Umax"));
@@ -261,6 +328,7 @@ public class SRTEAlgorithm extends Thread{
             sheet.addCell(new Label(colIdx++, idx, "RST"));
             sheet.addCell(new Label(colIdx++, idx, "RCR"));
             sheet.addCell(new Label(colIdx++, idx, "SRT1"));
+            sheet.addCell(new Label(colIdx++, idx, "RCR_Df"));
 //            sheet.addCell(new Label(colIdx++, idx, "Qmax"));
 //            sheet.addCell(new Label(colIdx++, idx, "Kmax"));
 //            sheet.addCell(new Label(colIdx++, idx, "Umax"));
@@ -344,12 +412,29 @@ public class SRTEAlgorithm extends Thread{
                 /**
                  * Time result
                  */
+                int error = -99999;
+                int RCRdeference = error;
+                String direction = "";
+                int RCRP = result[i].getcurrentPoint().RCR;
+                int BLTS = result[i].getBareLaneTimeStep();
+                
+                if(RCRP >= 0 && BLTS >= 0)
+                    RCRdeference = RCRP - BLTS;
+                
+                if(RCRdeference < 0){
+                    if(RCRdeference == error)
+                        direction += "ffffff";
+                    else
+                        direction += "-";
+                }
+                
                 Period p = result[i].period;
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srst))); //srst
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getPoint(result[i].getcurrentPoint().lst)))); //lst
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().rst))); //rst
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().RCR))); //rxr
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().csrt))); //srt1
+                sheet.addCell(new Label(colIdx++, idx+rows, direction+getTime(p,Math.abs(RCRdeference)-1,false,true))); //RCR deference
 //                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.qTrafficData.getMaxPoint()))); //qMaxData
 //                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.kTrafficData.getMaxPoint()))); //kMaxData
 //                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.uTrafficData.getMaxPoint()))); //uMaxData
@@ -377,6 +462,7 @@ public class SRTEAlgorithm extends Thread{
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().rst));
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().RCR));
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().csrt));
+                sheet.addCell(new Number(colIdx++, idx+rows, RCRdeference));
 //                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.qTrafficData.getMaxPoint())); //qMaxData
 //                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.kTrafficData.getMaxPoint())); //kMaxData
 //                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.uTrafficData.getMaxPoint())); //uMaxData
@@ -704,6 +790,9 @@ public class SRTEAlgorithm extends Thread{
     }     
     
     private String getTime(Period p, int count, boolean isMin){
+        return getTime(p,count,isMin,false);
+    }
+    private String getTime(Period p, int count, boolean isMin, boolean isZeroStart){
         int tgap = 0;
         if(isMin){
             tgap = 1;
@@ -713,8 +802,10 @@ public class SRTEAlgorithm extends Thread{
             tgap = TimeInterval/60;
         
         Calendar c = Calendar.getInstance();
-        
-        c.set(p.start_year, p.start_month-1, p.start_date, p.start_hour, p.start_min);
+        if(isZeroStart)
+            c.set(p.start_year, p.start_month-1, p.start_date, 0, 0);
+        else
+            c.set(p.start_year, p.start_month-1, p.start_date, p.start_hour, p.start_min);
         for(int i=0; i<=count; i++) c.add(Calendar.MINUTE, tgap);
 
         int hour = c.get(Calendar.HOUR_OF_DAY);

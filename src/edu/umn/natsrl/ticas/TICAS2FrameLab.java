@@ -58,6 +58,7 @@ import edu.umn.natsrl.ticas.error.StringErrorStream;
 import edu.umn.natsrl.ticas.plugin.VideoChecker.VideoChecker;
 import edu.umn.natsrl.ticas.plugin.datareader.DataReader;
 import edu.umn.natsrl.ticas.plugin.detecterdatareader.DetecterDataReader;
+import edu.umn.natsrl.ticas.plugin.rampmeterevaluator.RampMeterEvaluatorPlugin;
 import edu.umn.natsrl.ticas.plugin.srte.TICASPluginSRTE;
 import edu.umn.natsrl.ticas.plugin.srte.TestFrame;
 import edu.umn.natsrl.ticas.plugin.vissimcalibration2.VissimCalibration2;
@@ -456,8 +457,8 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             addTools(dataReader);
         }
         
-//        PluginInfo cum = new PluginInfo("Ramp Cumulative Input/Output", PluginType.TOOL, CumulativeRamp.class);       
-//        addTools(cum);
+        PluginInfo ramp = new PluginInfo("Ramp Meter Evaluator", PluginType.TOOL, RampMeterEvaluatorPlugin.class);       
+        addTools(ramp);
         
         /*PluginInfo rampwtime = new PluginInfo("Ramp Cumulative Input/Output", PluginType.TOOL, RampWaitingTime.class);       
         addTools(rampwtime);*/
@@ -1966,7 +1967,6 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
 
         cbxStartHour.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         cbxStartHour.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" }));
-        cbxStartHour.setSelectedIndex(7);
         cbxStartHour.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbxStartHourActionPerformed(evt);

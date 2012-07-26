@@ -40,9 +40,11 @@ public class SRTEConfig {
      */
     public static int DATA_READ_EXTENSION_AFTER_SNOW = 5;
     
+    public static int K_quan = 0;
     public static final double Rk = 5; //Reliable Density
     public static double RCR_Q = 0;
-    public static double RCR_K = 0;
+    public static double RCRNofM = 0;
+    public static int RCRTopBandwith = 0;
     public static double RCR_U = 0;
     public static double TPR_U = 0;
     public static double TPR_hour = 0;

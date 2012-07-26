@@ -147,9 +147,15 @@ public class TravelTimeIndexer {
             Evaluation dvh = Evaluation.createEvaluate(OptionType.EVAL_DVH, opt);
             dvh.setPrintDebug(false);
             dvh.doEvaluate();
-
+            
+            Evaluation lvmt = Evaluation.createEvaluate(OptionType.EVAL_LVMT, opt);
+            lvmt.setPrintDebug(true);
+            lvmt.doEvaluate();
+            
             processTotal(vmt);
+            processTotal(lvmt);
             processTotal(dvh);
+//            processTotal()
             processTravelTimeIndex(tt, vmt);
             
            // volume

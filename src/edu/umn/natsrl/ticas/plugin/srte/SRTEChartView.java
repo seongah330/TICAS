@@ -177,7 +177,7 @@ public class SRTEChartView extends javax.swing.JFrame {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(jScrollPane1)
         );
 
         cbxPoint.setSelected(true);
@@ -276,12 +276,11 @@ public class SRTEChartView extends javax.swing.JFrame {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(22, 51, Short.MAX_VALUE))
             .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         cbxShowSRTF.setText("Show Only SRTF");
@@ -623,6 +622,11 @@ public class SRTEChartView extends javax.swing.JFrame {
         int RCRp = currentStationResult.getcurrentPoint().RCR == -1 ? 0 : currentStationResult.getcurrentPoint().RCR;
         RCRPoint.put(RCRp,true);
         
+        HashMap<Integer,Boolean> KeyPoint = new HashMap<Integer,Boolean>();
+        int keyp = 0;
+        if(currentStationResult.getRCRAccPointList().size() > 0)
+            keyp = currentStationResult.getRCRAccPointList().get(0).point == -1 ? 0 : currentStationResult.getRCRAccPointList().get(0).point;
+        KeyPoint.put(keyp,true);
         /**
          * Time Step
          */
@@ -637,7 +641,7 @@ public class SRTEChartView extends javax.swing.JFrame {
         
         PanelChart.removeAll();
         SRTEChartLine cl = new SRTEChartLine();
-        cl.setSpeedData(point, timestep,bare,srtPoint,RCRPoint, data, dataType);
+        cl.setSpeedData(point, timestep,bare,srtPoint,RCRPoint,KeyPoint, data, dataType);
         ChartPanel cpn = new ChartPanel(cl.getChart());
         cpn.setSize(PanelChart.getSize());
         PanelChart.add(cpn);
@@ -681,7 +685,7 @@ public class SRTEChartView extends javax.swing.JFrame {
         String str = "<html>Time Information<br> -StartTime :"+cr.getStartTimetoString()+"("+cr.getStartTimeStep()+")"
                 +"<br>    -EndTime   :"+cr.getEndTimetoString()+"("+cr.getEndTimeStep()+")"
                 +"<br>    -BareLane  :"+cr.getBareLaneTimetoString()+"("+cr.getBareLaneTimeStep()+")"
-                +"<br>    -Speed Limit : "+cr.SpeedLimit;
+                +"<br>    -Speed Limit : "+cr.station.getSpeedLimit();
         str += "</html>";
         this.lTimeInformation.setText(str);
     }
@@ -706,18 +710,23 @@ public class SRTEChartView extends javax.swing.JFrame {
         if(this.cbxAccPoint.isSelected()){
             if(currentStationResult == null)
                 return;
-            String thr = this.tbxACCPointThreshHold.getText();
-            double thd = 0;
-            try{
-                thd = Double.parseDouble(thr);
-            }catch(Exception e){
-                return;
-            }
+//            String thr = this.tbxACCPointThreshHold.getText();
+//            double thd = 0;
+//            try{
+//                thd = Double.parseDouble(thr);
+//            }catch(Exception e){
+//                return;
+//            }
             
             ClearAnotherCBX(this.cbxAccPoint);
             ClearDebugList();
+            int cnt = 0;
             for(SRTEResult.ResultRCRAccPoint rp: currentStationResult.getRCRAccPointList()){
-                if(rp.data > thd)
+                if(cnt == 0){
+                    AddDebugList("K Cntn Point -> ["+rp.point+"] - K : "+rp.data);
+                    AddDebugList("--Point List--");
+                    cnt++;
+                }else
                     AddDebugList("["+rp.point+"]"+rp.data);
             }
         }

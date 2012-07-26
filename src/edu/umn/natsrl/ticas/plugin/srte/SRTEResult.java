@@ -51,11 +51,10 @@ public class SRTEResult {
     /**
      * new Algorithm
      */
-    public Station station;
+    public SRTEStation station;
     /**
      * PatternType
      */
-    public PatternType pType;
     private ArrayList<ResultPoint> point = new ArrayList<ResultPoint>();
     private ResultPoint currentPoint = new ResultPoint();
     private HashMap<Integer,SpeedMap> speedStempList = new HashMap<Integer,SpeedMap>();
@@ -87,20 +86,41 @@ public class SRTEResult {
     public static class ResultRCRAccPoint implements Comparable{
         int point = -1;
         double data = -1;
-        
+        boolean isdesc = true;
+        public ResultRCRAccPoint(){;}
+        public ResultRCRAccPoint(int p, double d){
+            point = p;
+            data = d;
+        }
         public double getData(){
             return data;
+        }
+        
+        public void setDesc(){
+            isdesc = true;
+        }
+        public void setASC(){
+            isdesc = false;
         }
 
         @Override
         public int compareTo(Object o) {
             ResultRCRAccPoint cdata = (ResultRCRAccPoint)o;
-            if(data == cdata.getData())
-                return 0;
-            else if(data < cdata.getData())
-                return 1;
-            else 
-                return -1;
+            if(isdesc){
+                if(data == cdata.getData())
+                    return 0;
+                else if(data < cdata.getData())
+                    return 1;
+                else 
+                    return -1;
+            }else{
+                if(data == cdata.getData())
+                    return 0;
+                else if(data > cdata.getData())
+                    return 1;
+                else 
+                    return -1;
+            }
         }
     }
     public static class SpeedMap{
@@ -157,6 +177,7 @@ public class SRTEResult {
         cs = CS;
         ce = CE;
         cb = CB;
+        cb.set(Calendar.SECOND, 0);
     }
     public Calendar getStartTime(){
         return cs;

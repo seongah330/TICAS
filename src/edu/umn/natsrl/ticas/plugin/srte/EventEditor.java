@@ -914,6 +914,7 @@ public class EventEditor extends javax.swing.JFrame {
         hour = Integer.parseInt(this.cbxBareHour.getSelectedItem().toString());
         cb.set(Calendar.HOUR_OF_DAY, hour);
         cb.set(Calendar.MINUTE, Integer.parseInt(this.cbxBareMin.getSelectedItem().toString()));
+        cb.set(Calendar.SECOND, 0);
         
         
         

@@ -147,6 +147,11 @@ public class Period implements Serializable {
                 this.start_year, this.start_month, this.start_date);
     }
     
+    public String getPeriodStringHWithoutTime(){
+        return String.format("%4d-%02d-%02d", 
+                this.start_year, this.start_month, this.start_date);
+    }
+    
     public String getPeriodString()
     {
         return String.format("%4d%02d%02d%02d%02d-%4d%02d%02d%02d%02d", 

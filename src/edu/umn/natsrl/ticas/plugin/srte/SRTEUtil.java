@@ -29,4 +29,13 @@ public class SRTEUtil {
         int division = origin / step;
         return step * division;
     }
+    
+    public static double[] CalculateSmoothedSpeed(double[] q, double[] k) {
+        double[] u = new double[q.length];
+        
+        for(int i = 0; i < q.length; i++)
+            u[i] = (k[i] == 0) ? 0 : q[i] / k[i];
+        
+        return u;
+    }
 }

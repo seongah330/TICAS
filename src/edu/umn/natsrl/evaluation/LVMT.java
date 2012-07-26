@@ -46,21 +46,23 @@ public class LVMT extends Evaluation {
         // caching, (if cached alread, just return)
         if(!caching()) return;
         
-        // get station density
-        Vector<EvaluationResult> stationDensities = Evaluation.getResult(StationDensity.class, this.opts);
-        
         // get station total flow
         Vector<EvaluationResult> stationFlows = Evaluation.getResult(StationTotalFlow.class, this.opts);
         
+        // get station density
+        Vector<EvaluationResult> stationDensities = Evaluation.getResult(StationDensity.class, this.opts);
+        
         Period[] periods = this.opts.getPeriods();
         int idx = 0;
-        
+        int densityidx = 0;
+        if(stationDensities.size() > 1)
+            densityidx = 1;
         // for all results, calculate VMT
-        for(int i=0; i<stationDensities.size(); i++)
+        for(int i=0; i<stationFlows.size(); i++)
         {
             if(printDebug && idx < periods.length) System.out.println("      - " + periods[idx++].getPeriodString());
             
-            EvaluationResult res = EvaluationResult.copy(stationDensities.get(i)) ;
+            EvaluationResult res = EvaluationResult.copy(stationDensities.get(i+densityidx)) ;
             EvaluationResult flowResult = EvaluationResult.copy(stationFlows.get(i));            
             
             // skip average
@@ -72,7 +74,6 @@ public class LVMT extends Evaluation {
                         
             // calculate LVMT
             res = calculateLVMT(res, flowResult);
-            
             // add result to result list
             this.results.add(res);                                    
         }

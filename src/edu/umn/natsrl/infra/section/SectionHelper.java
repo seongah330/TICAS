@@ -528,6 +528,14 @@ public class SectionHelper {
          * @return 
          */
         public double[] getRampDemandOld() {                                   
+            return getRampDemandOld(TrafficType.FLOW);
+        }
+        /**
+         * @deprecated 
+         * Return ramp demand
+         * @return 
+         */
+        public double[] getRampDemandOld(TrafficType tType) {                                   
            
             // queue detector is ok
             if(!queue.isEmpty()) {                
@@ -535,7 +543,7 @@ public class SectionHelper {
                 int idx = 0;
                 for(Detector d : queue)
                 {
-                    data[idx++] = d.getData(TrafficType.FLOW);
+                    data[idx++] = d.getData(tType);
                 }                    
 
                 double[] demands = new double[data[0].length];
@@ -569,6 +577,7 @@ public class SectionHelper {
             }
         }
         
+        
          /**
          * Return ramp flow before given period intervals
          * @return ramp flow
@@ -577,8 +586,6 @@ public class SectionHelper {
             
             double[] p_flow = null;           
 
-            
-            
             // passage detector is ok
             if(merge != null) {
                 p_flow = merge.getData(TrafficType.FLOW);
@@ -626,6 +633,34 @@ public class SectionHelper {
             }    
             
             return p_flow;
+        }
+        
+        /**
+         * Return ramp flow before given period intervals
+         * @return ramp flow
+         */
+        public double[] getRampVolume() {
+            
+            double[] p_v = null;           
+
+            // passage detector is ok
+            if(merge != null) {
+                p_v = merge.getData(TrafficType.VOLUME);
+            } else {
+                // merge detector is ok
+                if(passage != null) {
+                    p_v = passage.getData(TrafficType.VOLUME);
+                    // bypass detector is ok
+                    if(bypass != null) {
+                        double[] bypassV = bypass.getData(TrafficType.VOLUME);
+                        for(int i=0; i<bypassV.length; i++) {
+                            if(bypassV[i]>0) p_v[i] = Math.max(p_v[i]-bypassV[i], 0);
+                        }
+                    }                                      
+                }   
+            }    
+            
+            return p_v;
         }
         
         

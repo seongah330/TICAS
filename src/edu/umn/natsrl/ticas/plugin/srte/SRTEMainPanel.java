@@ -103,7 +103,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
 //            this.cbxEndMin.setSelectedIndex(config.getInt("END_MIN"));
 //            
             this.tbxRCRPIP_Q.setText(config.getString("RCR_Q"));
-            this.tbxRCRPIP_K.setText(config.getString("RCR_K"));
+            this.tbxRCRNofM.setText(config.getString("RCR_K"));
             this.tbxRCRPIP_U.setText(config.getString("RCR_U"));
             this.tbxTPR_U.setText(config.getString("TPR_U"));
             this.tbxTPR_hour.setText(config.getString("TPR_HOUR"));
@@ -173,6 +173,8 @@ public class SRTEMainPanel extends javax.swing.JPanel {
 
         // run algorithm
         srte.start();
+        
+        
     }
     
     private void setEndMessage(boolean msg){
@@ -277,7 +279,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         
         //new Algorithm
         config.set("RCR_Q",this.tbxRCRPIP_Q.getText());
-        config.set("RCR_K",this.tbxRCRPIP_K.getText());
+        config.set("RCR_K",this.tbxRCRNofM.getText());
         config.set("RCR_U",this.tbxRCRPIP_U.getText());
         config.set("TPR_U",this.tbxTPR_U.getText());
         config.set("TPR_HOUR",this.tbxTPR_hour.getText());
@@ -291,13 +293,15 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         
         //set Parameter
         SRTEConfig.RCR_Q = Double.parseDouble(this.tbxRCRPIP_Q.getText());
-        SRTEConfig.RCR_K = Double.parseDouble(this.tbxRCRPIP_K.getText());
+        SRTEConfig.RCRNofM = Double.parseDouble(this.tbxRCRNofM.getText());
+        SRTEConfig.RCRTopBandwith = Integer.parseInt(this.tbxRCRtopBandwith.getText());
         SRTEConfig.RCR_U = Double.parseDouble(this.tbxRCRPIP_U.getText());
         SRTEConfig.TPR_U = Double.parseDouble(this.tbxTPR_U.getText());
         SRTEConfig.TPR_hour = Double.parseDouble(this.tbxTPR_hour.getText());
         SRTEConfig.SDC_K = Double.parseDouble(this.tbxSDC_k.getText());
         SRTEConfig.TimeInterval = (((Interval)this.cbxTimeInverval.getSelectedItem()).second);
         SRTEConfig.isSmoothing = ((SMOOTHING)this.cbxsmoothing.getSelectedItem()).getIndex();
+        SRTEConfig.K_quan = Integer.parseInt(this.tbxKThreshold.getText());
         System.out.println(" (OK)");
     }
 
@@ -339,6 +343,8 @@ public class SRTEMainPanel extends javax.swing.JPanel {
     public void redirectOutput() {
         backupOut = System.out;
         backupErr = System.err;
+        //reset Area
+        jTextArea1.setText("");
         // redirect System.out and System.err to log textbox
         StringOutputStream sos = new StringOutputStream(this.jTextArea1);
         System.setOut(new PrintStream(sos));
@@ -508,15 +514,19 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         tbxFilterSize = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
         cbxsmoothing = new javax.swing.JComboBox();
+        tbxRCRNofM = new javax.swing.JTextField();
+        jLabel18 = new javax.swing.JLabel();
+        jLabel19 = new javax.swing.JLabel();
+        tbxRCRtopBandwith = new javax.swing.JTextField();
         jPanel7 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         tbxQThreshold = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        tbxKThreshold = new javax.swing.JTextField();
         jPanel10 = new javax.swing.JPanel();
         jLabel17 = new javax.swing.JLabel();
         tbxSteadyTime = new javax.swing.JTextField();
-        tbxRCRPIP_K = new javax.swing.JTextField();
-        jLabel18 = new javax.swing.JLabel();
         jLabel21 = new javax.swing.JLabel();
         jLabel22 = new javax.swing.JLabel();
         tbxRCRPIP_Q = new javax.swing.JTextField();
@@ -599,19 +609,52 @@ public class SRTEMainPanel extends javax.swing.JPanel {
             }
         });
 
+        tbxRCRNofM.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        tbxRCRNofM.setText("2");
+        tbxRCRNofM.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tbxRCRNofMActionPerformed(evt);
+            }
+        });
+
+        jLabel18.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        jLabel18.setText("RCR Number of Minus :");
+
+        jLabel19.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        jLabel19.setText("Top Threshold :");
+
+        tbxRCRtopBandwith.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        tbxRCRtopBandwith.setText("2");
+        tbxRCRtopBandwith.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tbxRCRtopBandwithActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(cbxsmoothing, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(tbxFilterSize, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel13)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(cbxsmoothing, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(tbxFilterSize, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel13))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addComponent(jLabel18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tbxRCRNofM, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel19)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tbxRCRtopBandwith, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
@@ -624,8 +667,18 @@ public class SRTEMainPanel extends javax.swing.JPanel {
                         .addComponent(tbxFilterSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel13))
                     .addComponent(cbxsmoothing, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(33, 33, 33))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel19)
+                        .addComponent(tbxRCRtopBandwith, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel18)
+                        .addComponent(tbxRCRNofM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(14, 14, 14))
         );
+
+        jLabel18.getAccessibleContext().setAccessibleName("RCR Number of Minus");
 
         jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Quantization", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 0, 12))); // NOI18N
 
@@ -638,6 +691,12 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         jLabel9.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel9.setText("mph");
 
+        jLabel10.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        jLabel10.setText("K Threshold : ");
+
+        tbxKThreshold.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        tbxKThreshold.setText("2");
+
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
@@ -649,6 +708,10 @@ public class SRTEMainPanel extends javax.swing.JPanel {
                 .addComponent(tbxQThreshold, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel9)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel10)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tbxKThreshold, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
@@ -658,7 +721,9 @@ public class SRTEMainPanel extends javax.swing.JPanel {
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8)
                     .addComponent(tbxQThreshold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9))
+                    .addComponent(jLabel9)
+                    .addComponent(jLabel10)
+                    .addComponent(tbxKThreshold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(23, Short.MAX_VALUE))
         );
 
@@ -669,13 +734,6 @@ public class SRTEMainPanel extends javax.swing.JPanel {
 
         tbxSteadyTime.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxSteadyTime.setText("8");
-
-        tbxRCRPIP_K.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        tbxRCRPIP_K.setText("0");
-        tbxRCRPIP_K.setEnabled(false);
-
-        jLabel18.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel18.setText("ΔK < ");
 
         jLabel21.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel21.setText("Road Condition Recovery Pattern Identification Parameters");
@@ -742,10 +800,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(tbxTPR_U, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel10Layout.createSequentialGroup()
-                                .addComponent(jLabel18)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(tbxRCRPIP_K, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGap(81, 81, 81)
                                 .addComponent(jLabel22)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(tbxRCRPIP_Q, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -770,8 +825,6 @@ public class SRTEMainPanel extends javax.swing.JPanel {
                 .addComponent(jLabel21)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel18)
-                    .addComponent(tbxRCRPIP_K, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel22)
                     .addComponent(tbxRCRPIP_Q, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel23)
@@ -853,7 +906,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
                 .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 75, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnSaveOption)
@@ -944,7 +997,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
                 .addComponent(cbxisSave)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbxisDebug)
-                .addContainerGap(233, Short.MAX_VALUE))
+                .addContainerGap(173, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Event Lists", jPanel3);
@@ -1180,7 +1233,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(natsrlCalendar, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1338,6 +1391,14 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         else tf.setVisible(true);
     }//GEN-LAST:event_btnShowGraphActionPerformed
 
+    private void tbxRCRNofMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbxRCRNofMActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tbxRCRNofMActionPerformed
+
+    private void tbxRCRtopBandwithActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbxRCRtopBandwithActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tbxRCRtopBandwithActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEventEditor;
@@ -1360,10 +1421,12 @@ public class SRTEMainPanel extends javax.swing.JPanel {
     private javax.swing.JCheckBox cbxisSave;
     private javax.swing.JComboBox cbxsmoothing;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
@@ -1404,10 +1467,12 @@ public class SRTEMainPanel extends javax.swing.JPanel {
     private edu.umn.natsrl.gadget.calendar.NATSRLCalendar natsrlCalendar;
     private javax.swing.JTextArea tbxDesc;
     private javax.swing.JTextField tbxFilterSize;
+    private javax.swing.JTextField tbxKThreshold;
     private javax.swing.JTextField tbxQThreshold;
-    private javax.swing.JTextField tbxRCRPIP_K;
+    private javax.swing.JTextField tbxRCRNofM;
     private javax.swing.JTextField tbxRCRPIP_Q;
     private javax.swing.JTextField tbxRCRPIP_U;
+    private javax.swing.JTextField tbxRCRtopBandwith;
     private javax.swing.JTextArea tbxRoutes;
     private javax.swing.JTextField tbxSDC_k;
     private javax.swing.JTextField tbxSteadyTime;
