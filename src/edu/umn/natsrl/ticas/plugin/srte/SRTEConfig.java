@@ -40,15 +40,17 @@ public class SRTEConfig {
      */
     public static int DATA_READ_EXTENSION_AFTER_SNOW = 5;
     
-    public static int K_quan = 0;
     public static final double Rk = 5; //Reliable Density
-    public static double RCR_Q = 0;
     public static double RCRNofM = 0;
     public static int RCRTopBandwith = 0;
-    public static double RCR_U = 0;
     public static double TPR_U = 0;
     public static double TPR_hour = 0;
     public static double SDC_K = 0;
+    public static double KEYSpeedLimit = 0;
+    public static double SRTFSpeedLimit = 0;
+    static double RCRBoundary = 0; // RCR boundary
+    public static boolean isGroup = false;
+    static double RSTDelta = 0;
     
     public static String TIMEINTERVAL = "TIMEINTERVAL";
     public static String SMOOTHINGOPTION = "SMOOTHINGOPTION";

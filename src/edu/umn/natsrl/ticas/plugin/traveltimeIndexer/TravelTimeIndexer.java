@@ -54,7 +54,6 @@ import jxl.write.Number;
  * @author Chongmyung Park
  */
 public class TravelTimeIndexer {
-    
     private List<Period> periods;
     private Interval dataInterval;
     private Interval evalInterval;
@@ -114,7 +113,6 @@ public class TravelTimeIndexer {
         opt.addOption(OptionType.FIXING_MISSING_DATA);
 
         try {
-            
             // speed / accel
             opt.setInterval(this.dataInterval);
             Evaluation speed = Evaluation.createEvaluate(OptionType.STATION_SPEED, opt);   
@@ -149,7 +147,7 @@ public class TravelTimeIndexer {
             dvh.doEvaluate();
             
             Evaluation lvmt = Evaluation.createEvaluate(OptionType.EVAL_LVMT, opt);
-            lvmt.setPrintDebug(true);
+            lvmt.setPrintDebug(false);
             lvmt.doEvaluate();
             
             processTotal(vmt);
@@ -777,23 +775,29 @@ public class TravelTimeIndexer {
             WritableSheet sheet = workbook.createSheet("data", 0);
             col = 0;            
             row = 0;
+            System.out.println(evaluationResults.size());
             for(EvalData ed : evaluationResults) {
                 int colIdx = 0;
                 
                 // print evaluation name
                 sheet.addCell(new Label(colIdx++, row, ed.name));
-                
+//                System.out.print(ed.name+" : "+ed.dates.size());
                 // print dates
                 for(int i=0; i<ed.dates.size(); i++) {
                     String date = ed.dates.get(i);
-                    double data = ed.data.get(i); 
-                    if(this.toExceptDate.contains(date)) continue;
+                    double data = 0;
+                    if(ed.data.size() == ed.dates.size())
+                        data = ed.data.get(i); 
+                    
+//                    System.out.print(" ,"+data+"("+date+")");
+//                    if(this.toExceptDate.contains(date)) continue;
                     sheet.addCell(new Label(colIdx, row, date));
                     sheet.addCell(new Number(colIdx++, row+1, NumUtil.roundUp(data, 2)));                                        
                 }                
                 row += 2;
+//                System.out.println();
+
             }
-                        
             workbook.write();
             workbook.close();
             

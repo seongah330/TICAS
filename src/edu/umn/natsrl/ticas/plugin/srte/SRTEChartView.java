@@ -54,7 +54,8 @@ public class SRTEChartView extends javax.swing.JFrame {
         Density_Quan("Density"),
         Flow_Origin("Flow"),
         Flow_Smooth("Flow"),
-        Flow_Quan("Flow");
+        Flow_Quan("Flow"),
+        QK("Q-K Graph");
         
         String name;
         DataType(String name){
@@ -537,7 +538,8 @@ public class SRTEChartView extends javax.swing.JFrame {
         currentSection = selectedItem;
         this.cbxStation.removeAllItems();
         for(SRTEResult re : currentSection.getResultData()){
-            this.cbxStation.addItem(re);
+            if(re.hasData)
+                this.cbxStation.addItem(re);
         }
         updateCurrentStation((SRTEResult)this.cbxStation.getSelectedItem());
     }
@@ -554,7 +556,7 @@ public class SRTEChartView extends javax.swing.JFrame {
     }
     
     private void updateGraph(DataType dataType) {
-        if(currentStationResult == null)
+        if(currentStationResult == null || !currentStationResult.hasData)
             return;
         double[] data = null;
         if(dataType == DataType.Speed_Origin){
@@ -577,7 +579,7 @@ public class SRTEChartView extends javax.swing.JFrame {
             data = currentStationResult.q_quant;
         }
         
-        if(data == null)
+        if(dataType != DataType.QK && data == null)
             return;
         
         /**
@@ -640,9 +642,19 @@ public class SRTEChartView extends javax.swing.JFrame {
         bare.put(currentStationResult.getBareLaneTimeStep(),true);
         
         PanelChart.removeAll();
-        SRTEChartLine cl = new SRTEChartLine();
-        cl.setSpeedData(point, timestep,bare,srtPoint,RCRPoint,KeyPoint, data, dataType);
-        ChartPanel cpn = new ChartPanel(cl.getChart());
+        SRTEChart srtechart = null;
+        
+        if(dataType == DataType.QK){
+            SRTEChartXY xy = new SRTEChartXY();
+            xy.setXYGraph(currentStationResult.k_smoothed, currentStationResult.q_smoothed, dataType);
+            srtechart = xy;
+        }else{
+            SRTEChartLine c = new SRTEChartLine();
+            c.setSpeedData(point, timestep,bare,srtPoint,RCRPoint,KeyPoint, data, dataType);
+            srtechart = c;
+        }
+        
+        ChartPanel cpn = new ChartPanel(srtechart.getChart());
         cpn.setSize(PanelChart.getSize());
         PanelChart.add(cpn);
         PanelChart.getParent().validate();

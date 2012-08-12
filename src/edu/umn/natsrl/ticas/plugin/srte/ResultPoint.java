@@ -37,7 +37,7 @@ public class ResultPoint {
     
     public boolean isEmpty(){
 //        System.out.println(toString());
-        if(srst <=0 ||
+        if(srst < 0 ||
                 lst <=0 ||
                 rst <=0)
             return true;

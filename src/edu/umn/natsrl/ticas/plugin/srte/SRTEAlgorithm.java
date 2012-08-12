@@ -165,7 +165,12 @@ public class SRTEAlgorithm extends Thread{
      * @param s 
      */
     private void AddStation(ArrayList<SRTEStation> srteStations, Station s) {
-        if(groupData.getGroupID(s.getStationId()) == null){
+        /**
+         * Set individual Station
+         * if There is not Station id or
+         * individual Station mode
+         */
+        if(groupData.getGroupID(s.getStationId()) == null || !config.isGroup){
             SRTEStation newstation = new SRTEStation(s.getStationId(),-1,s);
             srteStations.add(newstation);
             return;
@@ -402,10 +407,13 @@ public class SRTEAlgorithm extends Thread{
 //            sheet.addCell(new Label(colIdx++, idx, "U(UMIN)"));
             
             idx++;
+//            System.out.println("total Length : "+result.length);
             for(int i=0;i<result.length;i++){
+                if(!result[i].hasData)
+                    continue;
                 colIdx = 0;
                 int rows = i;
-                
+//                System.out.println(result[i].station.getLabel()+"("+result[i].station.getStationId()+")"+"["+i+"]");
                 sheet.addCell(new Label(colIdx++, idx+rows, result[i].station.getLabel()+"("+result[i].station.getStationId()+")"));
                 colIdx += 1;
                 
@@ -567,6 +575,8 @@ public class SRTEAlgorithm extends Thread{
             
             // summary sheet //////////////////////////////////////////////////////
             for(int i=0;i<result.length;i++){
+                if(!result[i].hasData)
+                    continue;
                 // data sheet //////////////////////////////////////////////////////
                 colIdx = 0;
                 sheet = workbook.createSheet(result[i].station.getLabel()+"("+result[i].station.getStationId()+")", sheet_count++);

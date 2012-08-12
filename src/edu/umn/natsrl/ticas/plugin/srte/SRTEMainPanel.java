@@ -88,7 +88,6 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         
         if(config.isLoaded()) {
             this.tbxFilterSize.setText(config.getString("SMOOTHING_FILTERSIZE"));
-            this.tbxSteadyTime.setText(config.getString("STEADY_TIME"));
             this.tbxQThreshold.setText(config.getString("QUANTIZATION_THRESHOLD"));
 
 //            Calendar c = Calendar.getInstance();
@@ -102,12 +101,15 @@ public class SRTEMainPanel extends javax.swing.JPanel {
 //            this.cbxStartMin.setSelectedIndex(config.getInt("START_MIN"));
 //            this.cbxEndMin.setSelectedIndex(config.getInt("END_MIN"));
 //            
-            this.tbxRCRPIP_Q.setText(config.getString("RCR_Q"));
             this.tbxRCRNofM.setText(config.getString("RCR_K"));
-            this.tbxRCRPIP_U.setText(config.getString("RCR_U"));
-            this.tbxTPR_U.setText(config.getString("TPR_U"));
-            this.tbxTPR_hour.setText(config.getString("TPR_HOUR"));
-            this.tbxSDC_k.setText(config.getString("SDC_K"));
+            this.tbxKEYSpeedLimit.setText(config.getString("KEYSPEED"));
+            this.tbxSRTFSpeedLimit.setText(config.getString("SRTFSPEED"));
+            this.tbxRCRboundary.setText(config.getString("RCRBoundary"));
+            this.tbxRSTDelta.setText(config.getString("RSTDELTA"));
+            
+//            this.tbxTPR_U.setText(config.getString("TPR_U"));
+//            this.tbxTPR_hour.setText(config.getString("TPR_HOUR"));
+//            this.tbxSDC_k.setText(config.getString("SDC_K"));
             
             this.cbxTimeInverval.setSelectedItem(Interval.get(config.getInt(SRTEConfig.TIMEINTERVAL)));
             this.cbxsmoothing.setSelectedIndex(config.getInt(SRTEConfig.SMOOTHINGOPTION));
@@ -262,7 +264,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
     {
         System.out.print("Update Option ........");
         config.set("SMOOTHING_FILTERSIZE", this.tbxFilterSize.getText());
-        config.set("STEADY_TIME", this.tbxSteadyTime.getText());
+//        config.set("STEADY_TIME", this.tbxSteadyTime.getText());
         config.set("QUANTIZATION_THRESHOLD", this.tbxQThreshold.getText());
 //        Calendar c = this.calStartDate.getSelectedDate();
 //        config.set("START_YEAR", c.get(Calendar.YEAR));
@@ -278,13 +280,11 @@ public class SRTEMainPanel extends javax.swing.JPanel {
 //        config.set("END_MIN", this.cbxEndMin.getSelectedIndex());
         
         //new Algorithm
-        config.set("RCR_Q",this.tbxRCRPIP_Q.getText());
         config.set("RCR_K",this.tbxRCRNofM.getText());
-        config.set("RCR_U",this.tbxRCRPIP_U.getText());
-        config.set("TPR_U",this.tbxTPR_U.getText());
-        config.set("TPR_HOUR",this.tbxTPR_hour.getText());
-        config.set("SDC_K",this.tbxSDC_k.getText());
-        
+        config.set("KEYSPEED",this.tbxKEYSpeedLimit.getText());
+        config.set("SRTFSPEED",this.tbxSRTFSpeedLimit.getText());
+        config.set("RCRBoundary",this.tbxRCRboundary.getText());
+        config.set("RSTDELTA",this.tbxRSTDelta.getText());
         //option
         config.set(SRTEConfig.TIMEINTERVAL,((Interval)this.cbxTimeInverval.getSelectedItem()).second);
         config.set(SRTEConfig.SMOOTHINGOPTION,((SMOOTHING)this.cbxsmoothing.getSelectedItem()).getIndex());
@@ -292,16 +292,19 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         
         
         //set Parameter
-        SRTEConfig.RCR_Q = Double.parseDouble(this.tbxRCRPIP_Q.getText());
         SRTEConfig.RCRNofM = Double.parseDouble(this.tbxRCRNofM.getText());
         SRTEConfig.RCRTopBandwith = Integer.parseInt(this.tbxRCRtopBandwith.getText());
-        SRTEConfig.RCR_U = Double.parseDouble(this.tbxRCRPIP_U.getText());
-        SRTEConfig.TPR_U = Double.parseDouble(this.tbxTPR_U.getText());
-        SRTEConfig.TPR_hour = Double.parseDouble(this.tbxTPR_hour.getText());
-        SRTEConfig.SDC_K = Double.parseDouble(this.tbxSDC_k.getText());
+        SRTEConfig.SRTFSpeedLimit = Double.parseDouble(this.tbxSRTFSpeedLimit.getText());
+        SRTEConfig.KEYSpeedLimit = Double.parseDouble(this.tbxKEYSpeedLimit.getText());
+        SRTEConfig.RCRBoundary = Double.parseDouble(this.tbxRCRboundary.getText());
+//        SRTEConfig.TPR_U = Double.parseDouble(this.tbxTPR_U.getText());
+//        SRTEConfig.TPR_hour = Double.parseDouble(this.tbxTPR_hour.getText());
+//        SRTEConfig.SDC_K = Double.parseDouble(this.tbxSDC_k.getText());
         SRTEConfig.TimeInterval = (((Interval)this.cbxTimeInverval.getSelectedItem()).second);
         SRTEConfig.isSmoothing = ((SMOOTHING)this.cbxsmoothing.getSelectedItem()).getIndex();
-        SRTEConfig.K_quan = Integer.parseInt(this.tbxKThreshold.getText());
+        SRTEConfig.RSTDelta = Double.parseDouble(this.tbxRSTDelta.getText());
+        
+        SRTEConfig.isGroup = this.cbxgroup.isSelected();
         System.out.println(" (OK)");
     }
 
@@ -514,36 +517,28 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         tbxFilterSize = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
         cbxsmoothing = new javax.swing.JComboBox();
-        tbxRCRNofM = new javax.swing.JTextField();
-        jLabel18 = new javax.swing.JLabel();
-        jLabel19 = new javax.swing.JLabel();
-        tbxRCRtopBandwith = new javax.swing.JTextField();
         jPanel7 = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         tbxQThreshold = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
-        tbxKThreshold = new javax.swing.JTextField();
-        jPanel10 = new javax.swing.JPanel();
-        jLabel17 = new javax.swing.JLabel();
-        tbxSteadyTime = new javax.swing.JTextField();
-        jLabel21 = new javax.swing.JLabel();
-        jLabel22 = new javax.swing.JLabel();
-        tbxRCRPIP_Q = new javax.swing.JTextField();
-        tbxRCRPIP_U = new javax.swing.JTextField();
-        jLabel23 = new javax.swing.JLabel();
-        jLabel24 = new javax.swing.JLabel();
-        jLabel25 = new javax.swing.JLabel();
-        tbxTPR_U = new javax.swing.JTextField();
-        jLabel26 = new javax.swing.JLabel();
-        jLabel27 = new javax.swing.JLabel();
-        tbxSDC_k = new javax.swing.JTextField();
-        jLabel30 = new javax.swing.JLabel();
-        tbxTPR_hour = new javax.swing.JTextField();
         btnSaveOption = new javax.swing.JButton();
         jPanel8 = new javax.swing.JPanel();
         cbxTimeInverval = new javax.swing.JComboBox();
         jLabel12 = new javax.swing.JLabel();
+        jPanel9 = new javax.swing.JPanel();
+        jLabel19 = new javax.swing.JLabel();
+        tbxRCRtopBandwith = new javax.swing.JTextField();
+        jLabel25 = new javax.swing.JLabel();
+        tbxSRTFSpeedLimit = new javax.swing.JTextField();
+        tbxRCRboundary = new javax.swing.JTextField();
+        jLabel26 = new javax.swing.JLabel();
+        jLabel27 = new javax.swing.JLabel();
+        tbxRSTDelta = new javax.swing.JTextField();
+        jPanel11 = new javax.swing.JPanel();
+        tbxKEYSpeedLimit = new javax.swing.JTextField();
+        jLabel24 = new javax.swing.JLabel();
+        jLabel18 = new javax.swing.JLabel();
+        tbxRCRNofM = new javax.swing.JTextField();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jTabbedPane1 = new javax.swing.JTabbedPane();
@@ -556,6 +551,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         btnShowGraph = new javax.swing.JButton();
         cbxisSave = new javax.swing.JCheckBox();
         cbxisDebug = new javax.swing.JCheckBox();
+        cbxgroup = new javax.swing.JCheckBox();
         jPanel6 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -609,52 +605,19 @@ public class SRTEMainPanel extends javax.swing.JPanel {
             }
         });
 
-        tbxRCRNofM.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        tbxRCRNofM.setText("2");
-        tbxRCRNofM.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tbxRCRNofMActionPerformed(evt);
-            }
-        });
-
-        jLabel18.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel18.setText("RCR Number of Minus :");
-
-        jLabel19.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel19.setText("Top Threshold :");
-
-        tbxRCRtopBandwith.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        tbxRCRtopBandwith.setText("2");
-        tbxRCRtopBandwith.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tbxRCRtopBandwithActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(cbxsmoothing, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(tbxFilterSize, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel13))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(jLabel18)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(tbxRCRNofM, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel19)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(tbxRCRtopBandwith, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addComponent(cbxsmoothing, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(tbxFilterSize, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+                .addComponent(jLabel13)
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
@@ -667,18 +630,8 @@ public class SRTEMainPanel extends javax.swing.JPanel {
                         .addComponent(tbxFilterSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel13))
                     .addComponent(cbxsmoothing, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel19)
-                        .addComponent(tbxRCRtopBandwith, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel18)
-                        .addComponent(tbxRCRNofM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(14, 14, 14))
+                .addGap(42, 42, 42))
         );
-
-        jLabel18.getAccessibleContext().setAccessibleName("RCR Number of Minus");
 
         jPanel7.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Quantization", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 0, 12))); // NOI18N
 
@@ -691,12 +644,6 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         jLabel9.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel9.setText("mph");
 
-        jLabel10.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel10.setText("K Threshold : ");
-
-        tbxKThreshold.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        tbxKThreshold.setText("2");
-
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
@@ -708,10 +655,6 @@ public class SRTEMainPanel extends javax.swing.JPanel {
                 .addComponent(tbxQThreshold, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel9)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel10)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tbxKThreshold, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
@@ -721,135 +664,13 @@ public class SRTEMainPanel extends javax.swing.JPanel {
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8)
                     .addComponent(tbxQThreshold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9)
-                    .addComponent(jLabel10)
-                    .addComponent(tbxKThreshold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel9))
                 .addContainerGap(23, Short.MAX_VALUE))
-        );
-
-        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "ETC", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 0, 12))); // NOI18N
-
-        jLabel17.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel17.setText("Steady Time Threshold for LSP and SRP : ");
-
-        tbxSteadyTime.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        tbxSteadyTime.setText("8");
-
-        jLabel21.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel21.setText("Road Condition Recovery Pattern Identification Parameters");
-
-        jLabel22.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel22.setText("ΔQ/ΔK > ");
-
-        tbxRCRPIP_Q.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        tbxRCRPIP_Q.setText("0");
-
-        tbxRCRPIP_U.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        tbxRCRPIP_U.setText("0");
-
-        jLabel23.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel23.setText("ΔU > ");
-
-        jLabel24.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel24.setText("Free Flow Identification Parameter");
-
-        jLabel25.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel25.setText("ΔU < ");
-
-        tbxTPR_U.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        tbxTPR_U.setText("1");
-
-        jLabel26.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel26.setText("Signification Density Change parameter");
-
-        jLabel27.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel27.setText("ΔK > ");
-
-        tbxSDC_k.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        tbxSDC_k.setText("1");
-
-        jLabel30.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel30.setText("Free Flow hour");
-
-        tbxTPR_hour.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        tbxTPR_hour.setText("1");
-
-        javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
-        jPanel10.setLayout(jPanel10Layout);
-        jPanel10Layout.setHorizontalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel10Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel10Layout.createSequentialGroup()
-                        .addComponent(jLabel17)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(tbxSteadyTime, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel21)
-                    .addComponent(jLabel24)
-                    .addComponent(jLabel26)
-                    .addGroup(jPanel10Layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel10Layout.createSequentialGroup()
-                                .addComponent(jLabel27)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(tbxSDC_k, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel10Layout.createSequentialGroup()
-                                .addComponent(jLabel25)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(tbxTPR_U, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel10Layout.createSequentialGroup()
-                                .addGap(81, 81, 81)
-                                .addComponent(jLabel22)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(tbxRCRPIP_Q, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel23)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(tbxRCRPIP_U, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel10Layout.createSequentialGroup()
-                                .addComponent(jLabel30)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(tbxTPR_hour, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel10Layout.setVerticalGroup(
-            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel10Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel17)
-                    .addComponent(tbxSteadyTime, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(12, 12, 12)
-                .addComponent(jLabel21)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel22)
-                    .addComponent(tbxRCRPIP_Q, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel23)
-                    .addComponent(tbxRCRPIP_U, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel24)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel25)
-                    .addComponent(tbxTPR_U, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(8, 8, 8)
-                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel30)
-                    .addComponent(tbxTPR_hour, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel26)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel27)
-                    .addComponent(tbxSDC_k, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         btnSaveOption.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnSaveOption.setText("Save Option");
+        btnSaveOption.setEnabled(false);
         btnSaveOption.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSaveOptionActionPerformed(evt);
@@ -884,18 +705,166 @@ public class SRTEMainPanel extends javax.swing.JPanel {
                 .addContainerGap(22, Short.MAX_VALUE))
         );
 
+        jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder("RCR Parameter"));
+
+        jLabel19.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        jLabel19.setText("Number of Candidate :");
+
+        tbxRCRtopBandwith.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        tbxRCRtopBandwith.setText("2");
+        tbxRCRtopBandwith.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tbxRCRtopBandwithActionPerformed(evt);
+            }
+        });
+
+        jLabel25.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        jLabel25.setText("Minimum SRTF Speed Limit :");
+
+        tbxSRTFSpeedLimit.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        tbxSRTFSpeedLimit.setText("2");
+        tbxSRTFSpeedLimit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tbxSRTFSpeedLimitActionPerformed(evt);
+            }
+        });
+
+        tbxRCRboundary.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        tbxRCRboundary.setText("2");
+        tbxRCRboundary.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tbxRCRboundaryActionPerformed(evt);
+            }
+        });
+
+        jLabel26.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        jLabel26.setText("RCR boundary :");
+
+        jLabel27.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        jLabel27.setText("RST Delta :");
+
+        tbxRSTDelta.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        tbxRSTDelta.setText("2");
+        tbxRSTDelta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tbxRSTDeltaActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
+        jPanel9.setLayout(jPanel9Layout);
+        jPanel9Layout.setHorizontalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jLabel19)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tbxRCRtopBandwith, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jLabel25)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tbxSRTFSpeedLimit, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jLabel26)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tbxRCRboundary, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel9Layout.createSequentialGroup()
+                        .addComponent(jLabel27)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tbxRSTDelta, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel9Layout.setVerticalGroup(
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel19)
+                    .addComponent(tbxRCRtopBandwith, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel26)
+                    .addComponent(tbxRCRboundary, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel27)
+                    .addComponent(tbxRSTDelta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel25)
+                    .addComponent(tbxSRTFSpeedLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
+        );
+
+        jPanel11.setBorder(javax.swing.BorderFactory.createTitledBorder("KeyPoint Parameter"));
+
+        tbxKEYSpeedLimit.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        tbxKEYSpeedLimit.setText("2");
+        tbxKEYSpeedLimit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tbxKEYSpeedLimitActionPerformed(evt);
+            }
+        });
+
+        jLabel24.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        jLabel24.setText("Maximum Key Point Speed Limit :");
+
+        jLabel18.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        jLabel18.setText("Cont'n Interval :");
+
+        tbxRCRNofM.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        tbxRCRNofM.setText("2");
+        tbxRCRNofM.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tbxRCRNofMActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
+        jPanel11.setLayout(jPanel11Layout);
+        jPanel11Layout.setHorizontalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel11Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel11Layout.createSequentialGroup()
+                        .addComponent(jLabel24)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tbxKEYSpeedLimit, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel11Layout.createSequentialGroup()
+                        .addComponent(jLabel18)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(tbxRCRNofM, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel11Layout.setVerticalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel11Layout.createSequentialGroup()
+                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel24)
+                    .addComponent(tbxKEYSpeedLimit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel18)
+                    .addComponent(tbxRCRNofM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
+
+        jLabel18.getAccessibleContext().setAccessibleName("RCR Number of Minus");
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btnSaveOption)
-                .addContainerGap())
             .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel8, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btnSaveOption)
+                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -906,9 +875,11 @@ public class SRTEMainPanel extends javax.swing.JPanel {
                 .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnSaveOption)
                 .addContainerGap())
         );
@@ -959,6 +930,9 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         cbxisDebug.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         cbxisDebug.setText("Debug");
 
+        cbxgroup.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        cbxgroup.setText("Result for Station Group");
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -970,11 +944,12 @@ public class SRTEMainPanel extends javax.swing.JPanel {
                         .addComponent(cbxeventlists, 0, 174, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnEventEditor))
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane4)
                     .addComponent(btnListStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnShowGraph, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(cbxgroup)
                             .addComponent(cbxisDebug)
                             .addComponent(cbxisSave))
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -994,10 +969,12 @@ public class SRTEMainPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnShowGraph, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
+                .addComponent(cbxgroup)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbxisSave)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbxisDebug)
-                .addContainerGap(173, Short.MAX_VALUE))
+                .addContainerGap(157, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Event Lists", jPanel3);
@@ -1233,7 +1210,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
                 .addComponent(natsrlCalendar, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1256,16 +1233,18 @@ public class SRTEMainPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 361, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 351, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING)
-            .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+            .addComponent(jScrollPane3)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -1399,6 +1378,22 @@ public class SRTEMainPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_tbxRCRtopBandwithActionPerformed
 
+    private void tbxKEYSpeedLimitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbxKEYSpeedLimitActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tbxKEYSpeedLimitActionPerformed
+
+    private void tbxSRTFSpeedLimitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbxSRTFSpeedLimitActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tbxSRTFSpeedLimitActionPerformed
+
+    private void tbxRCRboundaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbxRCRboundaryActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tbxRCRboundaryActionPerformed
+
+    private void tbxRSTDeltaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbxRSTDeltaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tbxRSTDeltaActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEventEditor;
@@ -1417,21 +1412,17 @@ public class SRTEMainPanel extends javax.swing.JPanel {
     private javax.swing.JComboBox cbxStartMin;
     private javax.swing.JComboBox cbxTimeInverval;
     private javax.swing.JComboBox cbxeventlists;
+    private javax.swing.JCheckBox cbxgroup;
     private javax.swing.JCheckBox cbxisDebug;
     private javax.swing.JCheckBox cbxisSave;
     private javax.swing.JComboBox cbxsmoothing;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
-    private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel26;
@@ -1439,7 +1430,6 @@ public class SRTEMainPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -1449,7 +1439,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel_ET;
     private javax.swing.JLabel jLabel_ST;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -1457,6 +1447,7 @@ public class SRTEMainPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -1467,17 +1458,14 @@ public class SRTEMainPanel extends javax.swing.JPanel {
     private edu.umn.natsrl.gadget.calendar.NATSRLCalendar natsrlCalendar;
     private javax.swing.JTextArea tbxDesc;
     private javax.swing.JTextField tbxFilterSize;
-    private javax.swing.JTextField tbxKThreshold;
+    private javax.swing.JTextField tbxKEYSpeedLimit;
     private javax.swing.JTextField tbxQThreshold;
     private javax.swing.JTextField tbxRCRNofM;
-    private javax.swing.JTextField tbxRCRPIP_Q;
-    private javax.swing.JTextField tbxRCRPIP_U;
+    private javax.swing.JTextField tbxRCRboundary;
     private javax.swing.JTextField tbxRCRtopBandwith;
+    private javax.swing.JTextField tbxRSTDelta;
     private javax.swing.JTextArea tbxRoutes;
-    private javax.swing.JTextField tbxSDC_k;
-    private javax.swing.JTextField tbxSteadyTime;
-    private javax.swing.JTextField tbxTPR_U;
-    private javax.swing.JTextField tbxTPR_hour;
+    private javax.swing.JTextField tbxSRTFSpeedLimit;
     // End of variables declaration//GEN-END:variables
 
 }

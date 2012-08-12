@@ -494,8 +494,9 @@ public class RampMeterNode {
         int i = 0;
         double R_data = 0;
         for(double d : temp){
-            if(d > 0)
+            if(d > 0){
                 R_data += d;
+            }
             if(cnt % (realinterval/period.interval) == 0){
                 double avg = R_data <= 0 ? 0 : R_data / (realinterval/period.interval);
                 data[i++] = avg;

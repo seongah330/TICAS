@@ -105,7 +105,7 @@ public class RampMeterWriter {
             for(RampMeterResult day : dayResult){
                 writeSheet(workbook,day.getPeriodtoString(),day,sheetnum++,type);
             }
-            writeAnalysis(workbook,analysis,type);
+            writeAnalysis(workbook,analysis,dayResult,type);
             workbook.write();
             workbook.close();
             System.out.println("Write Sucess :" + filename);
@@ -198,8 +198,8 @@ public class RampMeterWriter {
         System.out.println("Write Sucess :" + filename);
     }
     
-    private void writeAnalysis(WritableWorkbook workbook, ArrayList<RampMeterResult> dayResult, DataType type) {
-        if(dayResult.size() <= 0)
+    private void writeAnalysis(WritableWorkbook workbook, ArrayList<RampMeterResult> analysis, ArrayList<RampMeterResult> dayResult, DataType type) {
+        if(analysis.size() <= 0)
             return;
         
         int sheetnum = 1;
@@ -208,7 +208,7 @@ public class RampMeterWriter {
          */
         int column = 0;
         int row = 0;
-        RampMeterResult tempday = dayResult.get(0);
+        RampMeterResult tempday = analysis.get(0);
         WritableSheet sheet = workbook.createSheet("Analysis", 0);
         
         for(int i=0;i<tempday.getRamps().size();i++){
@@ -231,7 +231,9 @@ public class RampMeterWriter {
              * WRite Data
              */
             row-=4;
-            for(RampMeterResult day : dayResult){
+            int daycnt = 0;
+            for(RampMeterResult day : analysis){
+                currentRamp = dayResult.get(daycnt).getRamps().get(i);
                 int dayrow = row;
                 addData(sheet,column,dayrow++,new String[]{""+currentRamp.isRampMeteringActive()});
                 if(currentRamp.isRampMeteringActive()){
@@ -243,6 +245,8 @@ public class RampMeterWriter {
                 }
                 addData(sheet,column,dayrow++,new String[]{day.getPeriodtoHString()});
                 column = writeDatas(sheet,column,dayrow,day,i,type);
+                
+                daycnt ++;
             }
             row+= RowLength + 6;
         }
