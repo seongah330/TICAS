@@ -19,6 +19,7 @@ package edu.umn.natsrl.ticas.plugin.srte;
 
 import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.infraobjects.Station;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -142,9 +143,9 @@ public class SRTEResult {
             double minterval = interval / 60;
             
             if(minterval == 0)
-                return 0;
+                return -1;
             
-            double currentTime = time * minterval;
+            double currentTime = time * minterval + minterval;
             double beforeTime = (time-1) * minterval;
             double TimeGap = currentTime - beforeTime;
 //            System.out.println("\nCTime:"+currentTime+" bTime:"+beforeTime+" TGap:"+TimeGap);
@@ -153,16 +154,23 @@ public class SRTEResult {
             
             if((int)tempStep == (int)speed)
                 return (int)currentTime;
-            if(currentTime == 0 || SpeedGap <= 0)
+            if(currentTime == minterval || SpeedGap <= 0)
                 return (int)currentTime;
             
             double SplitTime = TimeGap / SpeedGap;
-//            System.out.println("SplitTime : " + SplitTime + " SpeedStep :" + SpeedStep);
-            return (int)(SplitTime * SpeedStep + beforeTime);
+            int total = (int)(SplitTime * SpeedStep + beforeTime);
+//            System.out.println("total : "+total);
+//            System.out.println("total : "+total);
+//            System.out.println("SplitTime : " + SplitTime + " SpeedStep :" + SpeedStep + " minterval : "+minterval);
+            return total;
         }
+        
         public double getKeyTimeStep(){
             int keyTime = this.getKeyTimeMin();
-            return keyTime * 60 / interval;
+            if(keyTime == -1)
+                return -1;
+            double keyT = keyTime*60-interval;
+            return keyT == 0 ? 0 : keyT / interval;
         }
     }
     

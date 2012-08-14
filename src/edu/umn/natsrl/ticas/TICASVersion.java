@@ -27,5 +27,5 @@ package edu.umn.natsrl.ticas;
  * @author Chongmyung Park
  */
 public class TICASVersion {
-    public static String version = " 3.12";            
+    public static String version = " 3.13";            
 }

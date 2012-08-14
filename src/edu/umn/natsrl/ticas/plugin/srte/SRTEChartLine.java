@@ -52,7 +52,7 @@ public class SRTEChartLine extends SRTEChart implements ImplSRTEChart{
     }
     
     public void setSpeedData(HashMap<Integer,Boolean> point, HashMap<Integer,Boolean> time, HashMap<Integer,Boolean> bare, 
-            HashMap<Integer,Boolean> srt, HashMap<Integer,Boolean> RCRp, HashMap<Integer,Boolean> Keyp, 
+            HashMap<Integer,Boolean> srt, HashMap<Integer,Boolean> RCRp, HashMap<Integer,Boolean> Keyp, HashMap<Integer,Boolean> SL,
             double[] datas, DataType datatype){
         double Maxdata = 0;
         for(double d : datas){
@@ -70,5 +70,6 @@ public class SRTEChartLine extends SRTEChart implements ImplSRTEChart{
         this.AddPointDataTrace(srt, datas, "SRT Points", true, new TracePainterVerticalBar(3, chart),Color.MAGENTA);
         this.AddPointDataTrace(RCRp, datas, "RCR Points", true, new TracePainterVerticalBar(3, chart),Color.RED);
         this.AddPointDataTrace(Keyp, datas, "Key Points", true, new TracePainterVerticalBar(3, chart),Color.yellow);
+        this.AddPointDataTrace(SL, datas, "Key Points", true, new TracePainterVerticalBar(3, chart),Color.orange);
     }
 }

@@ -52,6 +52,13 @@ public class SRTEAlgorithm extends Thread{
     private int TimeInterval = Interval.I15MIN.second;
     private Vector<SRTEResultSection> rData = new Vector<SRTEResultSection>();
 
+    private double getGap(double s1,double s2) {
+        if(s1 >= 0 && s2 >=0)
+            return Math.abs(s1-s2);
+        else
+            return -1;
+    }
+
     
     public static interface AlogorithmEndListener{
         public void onEndMessage(boolean msg);
@@ -284,7 +291,7 @@ public class SRTEAlgorithm extends Thread{
         SRTEResult[] result = null;
         try {
             int colIdx = 0;
-            int[] speedKeylist = {45,50,55,60,65};
+            int[] speedKeylist = {45,50,55,60,65,70,75};
             // summary sheet //////////////////////////////////////////////////////
             sheet.addCell(new Label(colIdx++, idx, res.getSectionName()));
             colIdx+=2;
@@ -312,7 +319,11 @@ public class SRTEAlgorithm extends Thread{
 //            sheet.addCell(new Label(colIdx++, 0, "U(RST)"));                
             sheet.addCell(new Label(colIdx++, idx, "RCR"));
             sheet.addCell(new Label(colIdx++, idx, "SRT1"));
-            sheet.addCell(new Label(colIdx++, idx, "RCR_Df"));
+            sheet.addCell(new Label(colIdx++, idx, "SL"));
+            sheet.addCell(new Label(colIdx++, idx, "SLT"));
+            sheet.addCell(new Label(colIdx++, idx, "Df_RCR_Barelane"));
+            sheet.addCell(new Label(colIdx++, idx, "Df_RCR_SpeedLimit"));
+            sheet.addCell(new Label(colIdx++, idx, "Df_BareLane_SpeedLimit"));
 //            sheet.addCell(new Label(colIdx++, idx, "Qmax"));
 //            sheet.addCell(new Label(colIdx++, idx, "Kmax"));
 //            sheet.addCell(new Label(colIdx++, idx, "Umax"));
@@ -321,6 +332,19 @@ public class SRTEAlgorithm extends Thread{
                 sheet.addCell(new Number(colIdx++, idx, key));
             }
 //            sheet.addCell(new Label(colIdx++, 0, "SST"));
+            
+            /**
+             * Duration
+             */
+            sheet.addCell(new Label(colIdx++, idx, "SRST-LST"));
+            sheet.addCell(new Label(colIdx++, idx, "LST-RST"));
+            sheet.addCell(new Label(colIdx++, idx, "RST-RCR"));
+            sheet.addCell(new Label(colIdx++, idx, "RST-SL"));
+            sheet.addCell(new Label(colIdx++, idx, "RST-SRT"));
+            sheet.addCell(new Label(colIdx++, idx, "EE-RST"));
+            sheet.addCell(new Label(colIdx++, idx, "EE-RCR"));
+            sheet.addCell(new Label(colIdx++, idx, "EE-SL"));
+            sheet.addCell(new Label(colIdx++, idx, "EE-SRT"));
             
             /**
             * Point result
@@ -333,7 +357,11 @@ public class SRTEAlgorithm extends Thread{
             sheet.addCell(new Label(colIdx++, idx, "RST"));
             sheet.addCell(new Label(colIdx++, idx, "RCR"));
             sheet.addCell(new Label(colIdx++, idx, "SRT1"));
-            sheet.addCell(new Label(colIdx++, idx, "RCR_Df"));
+            sheet.addCell(new Label(colIdx++, idx, "SL"));
+            sheet.addCell(new Label(colIdx++, idx, "SLT"));
+            sheet.addCell(new Label(colIdx++, idx, "Df_RCR_Barelane"));
+            sheet.addCell(new Label(colIdx++, idx, "Df_RCR_SpeedLimit"));
+            sheet.addCell(new Label(colIdx++, idx, "Df_BareLane_SpeedLimit"));
 //            sheet.addCell(new Label(colIdx++, idx, "Qmax"));
 //            sheet.addCell(new Label(colIdx++, idx, "Kmax"));
 //            sheet.addCell(new Label(colIdx++, idx, "Umax"));
@@ -341,6 +369,7 @@ public class SRTEAlgorithm extends Thread{
             for(int key : speedKeylist){
                 sheet.addCell(new Number(colIdx++, idx, key));
             }
+            
             /**
              * each point data
              */
@@ -377,6 +406,14 @@ public class SRTEAlgorithm extends Thread{
             sheet.addCell(new Label(colIdx++, idx, "K(SST)"));
             sheet.addCell(new Label(colIdx++, idx, "U(SST)"));
             
+            /**
+             * Difference in speed
+             */
+            colIdx += 1;
+            sheet.addCell(new Label(colIdx++, idx, "U(BareLane)"));
+            sheet.addCell(new Label(colIdx++, idx, "SDef_SRST_LST"));
+            sheet.addCell(new Label(colIdx++, idx, "SDef_SRST_SRT"));
+            sheet.addCell(new Label(colIdx++, idx, "SDef_SRT_RST"));
             
 //            colIdx += 1;
 //            sheet.addCell(new Label(colIdx++, idx, "QMAX(T)"));
@@ -417,32 +454,101 @@ public class SRTEAlgorithm extends Thread{
                 sheet.addCell(new Label(colIdx++, idx+rows, result[i].station.getLabel()+"("+result[i].station.getStationId()+")"));
                 colIdx += 1;
                 
-                /**
-                 * Time result
-                 */
-                int error = -99999;
-                int RCRdeference = error;
-                String direction = "";
-                int RCRP = result[i].getcurrentPoint().RCR;
-                int BLTS = result[i].getBareLaneTimeStep();
+                Period p = result[i].period;
                 
+                /**
+                 * Speed Limit Point
+                 */
+                String speedlimitTime = "";
+                int speedLimitMinute = 0;
+                double speedlimitpoint = -1;
+                
+//                System.out.println("ST : "+result[i].station.getStationId());
+                //Speed Limit Time
+                boolean isSpeedLimit = false;
+                for(int key : speedKeylist){
+                    SRTEResult.SpeedMap smap = result[i].getSpeedList().get(key);
+                    if(smap != null && key == (int)result[i].SpeedLimit){
+                        speedLimitMinute = smap.getKeyTimeMin();
+                        speedlimitTime = getTime(p,speedLimitMinute,true);
+                        speedlimitpoint = smap.getKeyTimeStep();
+                        isSpeedLimit = true;
+                    }
+                }
+//                System.out.println("totalre : "+speedLimitMinute);
+
+                /**
+                 * Time step result
+                 */
+                double error = -99999;
+                double RCRdeference = error;
+                double RCR_SL = error;
+                double SL_BARE = error;
+                String direction = "";
+                double SRSTP = result[i].getcurrentPoint().srst;
+                double LSTP = result[i].getcurrentPoint().lst;
+                double RSTP = result[i].getcurrentPoint().rst;
+                double SRTP = result[i].getcurrentPoint().csrt;
+                double RCRP = result[i].getcurrentPoint().RCR;
+                double ENDP = result[i].getEndTimeStep();
+                double BLTS = result[i].getBareLaneTimeStep();
+                
+                
+                /**
+                 * Calculate Time Step
+                 */
                 if(RCRP >= 0 && BLTS >= 0)
                     RCRdeference = RCRP - BLTS;
                 
+                if(RCRP >= 0 && speedlimitpoint >= 0)
+                    RCR_SL = RCRP - speedlimitpoint;
+                
+                if(speedlimitpoint > 0 && BLTS >= 0)
+                    SL_BARE = speedlimitpoint - BLTS;
+                
+                /**
+                 * Calculate Time
+                 */
+//                if(RCRMinute != -1 && speedLimitMinute > 0)
+                
+//                System.out.println("ST : "+result[i].station.getStationId() + "Bare : "+BLTS+ " RCR-bare : "+RCRdeference + " RCR-SL : "+ RCR_SL + " SL-BARE : "+SL_BARE);
+                
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srst))); //srst
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getPoint(result[i].getcurrentPoint().lst)))); //lst
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().rst))); //rst
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().RCR))); //rxr
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().csrt))); //srt1
+                sheet.addCell(new Label(colIdx++, idx+rows, result[i].SpeedLimit+"")); //Speed Limit
+                //Speed Limit Time
+                if(isSpeedLimit)
+                    sheet.addCell(new Label(colIdx++, idx+rows, speedlimitTime));
+                else
+                    sheet.addCell(new Label(colIdx++, idx+rows, ""));
+                
+                direction = "";
                 if(RCRdeference < 0){
                     if(RCRdeference == error)
                         direction += "ffffff";
                     else
                         direction += "-";
                 }
-                
-                Period p = result[i].period;
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srst))); //srst
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getPoint(result[i].getcurrentPoint().lst)))); //lst
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().rst))); //rst
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().RCR))); //rxr
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().csrt))); //srt1
-                sheet.addCell(new Label(colIdx++, idx+rows, direction+getTime(p,Math.abs(RCRdeference)-1,false,true))); //RCR deference
+                sheet.addCell(new Label(colIdx++, idx+rows, direction+getTime(p,Math.abs(RCRdeference),false,true))); //RCR deference
+                direction = "";
+                if(RCR_SL < 0){
+                    if(RCR_SL == error)
+                        direction += "ffffff";
+                    else
+                        direction += "-";
+                }
+                sheet.addCell(new Label(colIdx++, idx+rows, direction+getTime(p,Math.abs(RCR_SL),false,true))); //RCR - SL
+                direction = "";
+                if(SL_BARE < 0){
+                    if(SL_BARE == error)
+                        direction += "ffffff";
+                    else
+                        direction += "-";
+                }
+                sheet.addCell(new Label(colIdx++, idx+rows, direction+getTime(p,Math.abs(SL_BARE),false,true))); //SL - Bare
 //                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.qTrafficData.getMaxPoint()))); //qMaxData
 //                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.kTrafficData.getMaxPoint()))); //kMaxData
 //                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].pType.uTrafficData.getMaxPoint()))); //uMaxData
@@ -454,6 +560,19 @@ public class SRTEAlgorithm extends Thread{
                     else
                         sheet.addCell(new Label(colIdx++, idx+rows, "")); //uMaxData
                 }
+                
+                /**
+                 * Duration
+                 */
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getGap(SRSTP,LSTP),false,true))); //SRST-LST
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getGap(LSTP,RSTP),false,true))); //LST-RST
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getGap(RSTP,RCRP),false,true))); //RST-RCR
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getGap(RSTP,speedlimitpoint),false,true))); //RST-SL
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getGap(RSTP,SRTP),false,true))); //RST-SRT
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getGap(ENDP,RSTP),false,true))); //EE-RST
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getGap(ENDP,RCRP),false,true))); //EE-RCR
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getGap(ENDP,speedlimitpoint),false,true))); //EE-SL
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getGap(ENDP,SRTP),false,true))); //EE-SRT
 
                 /**
                  * Type
@@ -470,7 +589,16 @@ public class SRTEAlgorithm extends Thread{
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().rst));
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().RCR));
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().csrt));
+                sheet.addCell(new Label(colIdx++, idx+rows, result[i].SpeedLimit+"")); //Speed Limit
+                //Speed Limit Point
+                if(isSpeedLimit)
+                    sheet.addCell(new Number(colIdx++, idx+rows, speedlimitpoint)); //uMaxData
+                else
+                    sheet.addCell(new Label(colIdx++, idx+rows, ""));
+                
                 sheet.addCell(new Number(colIdx++, idx+rows, RCRdeference));
+                sheet.addCell(new Number(colIdx++, idx+rows, RCRdeference)); // RCR - SL
+                sheet.addCell(new Number(colIdx++, idx+rows, RCRdeference)); // SL - Bare
 //                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.qTrafficData.getMaxPoint())); //qMaxData
 //                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.kTrafficData.getMaxPoint())); //kMaxData
 //                sheet.addCell(new Number(colIdx++, idx+rows, result[i].pType.uTrafficData.getMaxPoint())); //uMaxData
@@ -492,28 +620,28 @@ public class SRTEAlgorithm extends Thread{
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srst));
                 sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().srst)));
                 sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().srst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].getcurrentPoint().srst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].data_smoothed,result[i].getcurrentPoint().srst)));
                 //lst
                 colIdx += 1;
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getPoint(result[i].getcurrentPoint().lst))));
                 sheet.addCell(new Number(colIdx++, idx+rows, getPoint(result[i].getcurrentPoint().lst)));
                 sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().lst)));
                 sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().lst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].getcurrentPoint().lst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].data_smoothed,result[i].getcurrentPoint().lst)));
                 //rst
                 colIdx += 1;
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().rst)));
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().rst));
                 sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().rst)));
                 sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().rst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].getcurrentPoint().rst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].data_smoothed,result[i].getcurrentPoint().rst)));
                 //RCR
                 colIdx += 1;
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().RCR)));
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().RCR));
                 sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().RCR)));
                 sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().RCR)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].getcurrentPoint().RCR)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].data_smoothed,result[i].getcurrentPoint().RCR)));
                 
                 //SRT1
                 colIdx += 1;
@@ -521,7 +649,16 @@ public class SRTEAlgorithm extends Thread{
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().csrt));
                 sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().csrt)));
                 sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().csrt)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].u_Avg_smoothed,result[i].getcurrentPoint().csrt)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].data_smoothed,result[i].getcurrentPoint().csrt)));
+                
+                /**
+                * Difference in speed
+                */
+                colIdx += 1;
+                sheet.addCell(new Number(colIdx++, idx+rows, Math.abs(getValue(result[i].data_smoothed,result[i].getBareLaneTimeStep()))));
+                sheet.addCell(new Number(colIdx++, idx+rows, Math.abs(getValue(result[i].data_smoothed,(int)SRSTP)-getValue(result[i].data_smoothed,(int)LSTP))));
+                sheet.addCell(new Number(colIdx++, idx+rows, Math.abs(getValue(result[i].data_smoothed,(int)SRSTP)-getValue(result[i].data_smoothed,(int)SRTP))));
+                sheet.addCell(new Number(colIdx++, idx+rows, Math.abs(getValue(result[i].data_smoothed,(int)SRTP)-getValue(result[i].data_smoothed,(int)RSTP))));
 //                colIdx += 1;
 //                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
 //                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
@@ -802,8 +939,13 @@ public class SRTEAlgorithm extends Thread{
     private String getTime(Period p, int count, boolean isMin){
         return getTime(p,count,isMin,false);
     }
-    private String getTime(Period p, int count, boolean isMin, boolean isZeroStart){
+    private String getTime(Period p, double count, boolean isMin, boolean isZeroStart){
         int tgap = 0;
+        double originCount = count;
+        
+        if(count == -1)
+            return "-1";
+        
         if(isMin){
             tgap = 1;
             count = count -1;
@@ -812,20 +954,41 @@ public class SRTEAlgorithm extends Thread{
             tgap = TimeInterval/60;
         
         Calendar c = Calendar.getInstance();
-        if(isZeroStart)
+        if(isZeroStart){
             c.set(p.start_year, p.start_month-1, p.start_date, 0, 0);
+            count = count-1;
+        }
         else
             c.set(p.start_year, p.start_month-1, p.start_date, p.start_hour, p.start_min);
         for(int i=0; i<=count; i++) c.add(Calendar.MINUTE, tgap);
-
+        
+        int cInteger = (int)originCount;
+        double Emin = Math.abs(originCount - cInteger);
+//        System.out.println(count+"-"+cInteger +"="+Emin+",   Emin*15="+Emin*tgap+",     round="+(int)Math.round(Emin*tgap));
+        if(Emin > 0){
+            int AddMin = (int)Math.round(Emin * tgap);
+            c.add(Calendar.MINUTE,AddMin);
+        }
+        
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int min = c.get(Calendar.MINUTE);
+        
         
         return String.format("%02d:%02d", hour, min);
     }
     private String getTime(Period p,int count)
     {
         return getTime(p,count,false);
+    }
+    
+    private int getMinute(String time){
+        if(time.equals("-1"))
+            return -1;
+        String[] splittime = time.split(":");
+        int hour = Integer.parseInt(splittime[0]);
+        int min = Integer.parseInt(splittime[1]);
+        
+        return (hour*60) + min;
     }
     
     private String getFileName(String name, String ext) {

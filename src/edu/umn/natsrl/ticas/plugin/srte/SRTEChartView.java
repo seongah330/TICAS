@@ -641,6 +641,16 @@ public class SRTEChartView extends javax.swing.JFrame {
          */
         bare.put(currentStationResult.getBareLaneTimeStep(),true);
         
+        /**
+         * Speed Limit
+         */
+        HashMap<Integer,Boolean> SL = new HashMap<Integer,Boolean>();
+        int speedLimit = (int)currentStationResult.SpeedLimit;
+        SRTEResult.SpeedMap smap = currentStationResult.getSpeedList().get(speedLimit);
+        if(smap != null)
+            SL.put((int)Math.round(smap.getKeyTimeStep()),true);
+        else
+            SL.put(0,true);
         PanelChart.removeAll();
         SRTEChart srtechart = null;
         
@@ -650,7 +660,7 @@ public class SRTEChartView extends javax.swing.JFrame {
             srtechart = xy;
         }else{
             SRTEChartLine c = new SRTEChartLine();
-            c.setSpeedData(point, timestep,bare,srtPoint,RCRPoint,KeyPoint, data, dataType);
+            c.setSpeedData(point, timestep,bare,srtPoint,RCRPoint,KeyPoint,SL, data, dataType);
             srtechart = c;
         }
         

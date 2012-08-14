@@ -906,17 +906,17 @@ public class SRTEProcess {
         int srtPoint = result.getcurrentPoint().csrt > 0 ? result.getcurrentPoint().csrt : ePoint;
         System.out.println("RCRBoundary Speed Limit : "+RCRBoundaryLimit + " l : "+config.RCRBoundary);
         System.out.println("RST Delta : "+config.RSTDelta);
-//        if(sdata[result.getcurrentPoint().rst] < (50 - config.RSTDelta)){
-//            ePoint = this.getuLimitPoint(resetPoint, srtPoint, RCRBoundaryLimit, sdata);
-//            if(ePoint >= srtPoint)
-//                ePoint = srtPoint - 1;
-//            System.out.println("rst < 50 : ePoint - "+ePoint);
-//        }
-//        else{
+        if(sdata[result.getcurrentPoint().rst] < (50 - config.RSTDelta)){
+            ePoint = this.getuLimitPoint(resetPoint, srtPoint, RCRBoundaryLimit, sdata);
+            if(ePoint >= srtPoint)
+                ePoint = srtPoint - 1;
+            System.out.println("rst < 50 : ePoint - "+ePoint);
+        }
+        else{
             ePoint = srtPoint;
             ePoint --;
             System.out.println("rst >= 50 : ePoint - "+ePoint);
-//        }
+        }
         
         
         point = calculatePoint(sdata,resetPoint,ePoint,true,true);
