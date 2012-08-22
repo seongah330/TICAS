@@ -46,7 +46,7 @@ public class Corridor extends InfraObject implements Comparable {
         for(int i=0; i<list.getLength(); i++)
         {
             Element ele = (Element)list.item(i);
-            String rid = ele.getAttribute("id");
+            String rid = ele.getAttribute("name");
             rnode_list.add(rid);
             String sid = ele.getAttribute("station_id");
             if(sid != null && !sid.isEmpty()) {

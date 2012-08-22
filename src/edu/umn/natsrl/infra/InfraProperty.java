@@ -25,12 +25,23 @@ package edu.umn.natsrl.infra;
 public enum InfraProperty {
     
     DownStreamNodeId, UpStreamNodeId, NextRNodeIdInSameCorridor,CorridorId,
+    easting, //modify -> lon
+    northing,//modify -> lat
+    green, //delete, but needed
+    passage,//delete, but needed
+    queue,//delete, but needed
+    bypass,//delete, but needed
+    merge,//delete, but needed
+    dets, //delete
+    name, //id -> name
+    forks, // new : like downstream but It is another stream name
+    lon,
+    lat,
+    downstream, //delete -> forks
+    label, n_type, attach_side, transition, station_id, 
+    lanes, shift, s_limit, storage, max_wait,// rnode
     
-    id, label, n_type, attach_side, transition, station_id, easting, northing, 
-    lanes, shift, s_limit, dets, downstream, storage, max_wait, green, passage, 
-    queue, bypass, merge, // rnode
-    
-    index, lane, field, category, abandoned // detector
+    lane, field, category, abandoned // detector
     ;    
 
     

@@ -366,12 +366,12 @@ public class DetectorDataReader {
     
     private String getCachFilePath(Calendar c, TrafficType type)
     {
-        return this.getCacheDirPath(c) + File.separator + this.detector.getId() + type.getExtension();
+        return this.getCacheDirPath(c) + File.separator + this.detector.getIdFulltext() + type.getExtension();
     }
     
     private String getFailFilePath(Calendar c, TrafficType type)
     {
-        return this.getFailDirPath(c) + File.separator + this.detector.getId() + type.getExtension();
+        return this.getFailDirPath(c) + File.separator + this.detector.getIdFulltext() + type.getExtension();
     }    
 
     private String getRemoteDataFilePath(Calendar c, TrafficType type)

@@ -197,7 +197,8 @@ public class VISSIMController {
                         if (k > 300) {
                             System.out.println("WARNING!! VISSIMController > too high density : " + k);
                         }
-                        SimDetector simDetector = simObjects.getDetector("D" + detector_id);
+//                        SimDetector simDetector = simObjects.getDetector("D"+detector_id);
+                        SimDetector simDetector = simObjects.getDetector(""+detector_id);
                         simDetector.addData(v, q, u, k, occupancy);
 
                     }
@@ -472,7 +473,9 @@ public class VISSIMController {
                 detectorList[i - 1] = d;
                 detectorData[i - 1] = new DetectorData();
 
-                Detector det = infra.getDetector("D" + d.getID());
+//                Detector det = infra.getDetector("D"+d.getID());
+                Detector det = infra.getDetector(""+d.getID());
+//                System.out.println("did : "+d.getID()+" det : "+det.getId()+" "+det.getIdFulltext()+" "+det.getLabel());
                 if (det.getLaneType() == LaneType.QUEUE) {
                     queueDetectorList[i - 1] = det;
                 } else {

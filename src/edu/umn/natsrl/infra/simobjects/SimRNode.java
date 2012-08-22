@@ -47,7 +47,8 @@ public class SimRNode extends SimObject {
 //        SimDetector[] simDets = new SimDetector[dets.length];
         ArrayList<SimDetector> simDets = new ArrayList<SimDetector>();
         for(int i=0; i<dets.length; i++) {
-            SimDetector tempsim = simObjects.getDetectorWithoutNull("D"+dets[i].getDetectorId());
+//            SimDetector tempsim = simObjects.getDetectorWithoutNull("D"+dets[i].getDetectorId());
+            SimDetector tempsim = simObjects.getDetectorWithoutNull(""+dets[i].getDetectorId());
             if(tempsim != null)
                 simDets.add(tempsim);
         }

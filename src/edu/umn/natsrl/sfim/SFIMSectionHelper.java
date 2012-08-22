@@ -67,16 +67,17 @@ public class SFIMSectionHelper {
             }   
             ArrayList<String> dets = VISSIMHelper.loadDetectorsFromCasefile(casefile);
             for(String det : dets) {
-                detectors.add(simObjects.getDetector("D"+det));
+//                detectors.add(simObjects.getDetector("D"+det));
+                detectors.add(simObjects.getDetector(det));
             }            
             
         } catch (Exception ex) {
             ex.printStackTrace();
         }
         
-        SimMeter meter = simObjects.getMeter("M35WN27");
-        meter.getMeter().setPassage("D120");
-        meter.getMeter().setQueue("D3495");
+//        SimMeter meter = simObjects.getMeter("M35WN27");
+//        meter.getMeter().setPassage("120");
+//        meter.getMeter().setQueue("3495");
         
         init();
     }
@@ -110,7 +111,7 @@ public class SFIMSectionHelper {
 
         for (SimMeter m : meters) {
             String name = m.getId();
-            if (name.contains("_L")) {
+            if (name != null && name.contains("_L")) {
                 name = name.split("_")[0];
             }
             EntranceState es = findStateHasMeter(m);            

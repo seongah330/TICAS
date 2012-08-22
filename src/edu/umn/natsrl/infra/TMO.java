@@ -144,7 +144,7 @@ public class TMO implements Serializable {
         sectionManager = new SectionManager();        
         this.isLoaded = true;  
         
-        makeCouple("M35WN27", "Nrnd_86415");
+//        makeCouple("M35WN27", "Nrnd_86415");
     }
     
     public void setup(String configXmlFilePath)
@@ -155,11 +155,11 @@ public class TMO implements Serializable {
         sectionManager = new SectionManager();        
         this.isLoaded = true;  
         
-        makeCouple("M35WN27", "Nrnd_86415");
+//        makeCouple("M35WN27", "Nrnd_86415");
     }    
 
     /**
-     * 
+     * @deprecated 
      * @param meterId meter id (e.g. M35WN27)
      * @param entranceId rnode id of entrance (e.g. Nrnd_86415)
      */

@@ -136,6 +136,10 @@ public abstract class InfraObject implements Serializable {
     public String getId() {
         return this.id;
     }
+    
+    public String getIdFulltext(){
+        return "D"+this.id;
+    }
 
     protected TMO getTMO() {
         return TMO.getInstance();

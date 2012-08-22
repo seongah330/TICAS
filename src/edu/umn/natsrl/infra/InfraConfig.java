@@ -109,7 +109,7 @@ public class InfraConfig implements Serializable {
             else doc = docBuilder.parse(is);
             
             System.out.println(" (OK)");
-
+            
             loadDetectorsFromConfigXML(doc.getElementsByTagName("detector"));
             loadMetersFromConfigXML(doc.getElementsByTagName("meter"));
             loadRNodesFromConfigXML(doc.getElementsByTagName("r_node"));
@@ -150,8 +150,10 @@ public class InfraConfig implements Serializable {
 
     private void loadRNodesFromConfigXML(NodeList rnodeList) {
         System.out.print("Loading rnodes ...................... ");
+        System.out.println();
         for(int i=0; i<rnodeList.getLength(); i++)
         {
+//            System.out.print("rnode["+i+"] : "); //debug
             RNode rnode = RNode.create((Element) rnodeList.item(i));
             if(rnode == null) continue;
             //System.out.println("   adding : " + rnode.infraType.toString() + ", " + rnode.id);

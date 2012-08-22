@@ -270,7 +270,7 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         }
         
         for(String det : dets) {
-            detectors.add(simObjects.getDetector("D"+det));
+            detectors.add(simObjects.getDetector(""+det));
 //            System.out.println("Detectors : D"+ det);
         }
     }    

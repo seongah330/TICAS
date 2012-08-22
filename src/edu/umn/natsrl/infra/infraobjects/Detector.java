@@ -62,10 +62,14 @@ public class Detector extends InfraObject implements Comparable {
     
     public Detector(Element element) {
         super(element);
-        this.id = this.getProperty(InfraProperty.index);
+        this.id = this.getProperty(InfraProperty.name);
         this.laneType = LaneType.get(getProperty(InfraProperty.category));
         this.infraType = InfraType.DETECTOR;
-        this.detector_id = Integer.parseInt(this.id.substring(1));  // D123 -> 123        
+//        this.detector_id = Integer.parseInt(this.id.substring(1));  // D123 -> 123        
+        if(this.id.contains("T")) // T123 -> 123
+            this.detector_id = Integer.parseInt(this.id.substring(1)); 
+        else
+            this.detector_id = Integer.parseInt(this.id);  //
     }
        
     /**

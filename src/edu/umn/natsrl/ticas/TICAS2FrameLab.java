@@ -98,7 +98,7 @@ import org.jdesktop.swingx.mapviewer.GeoPosition;
  * @author Chongmyung Park
  */
 public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSimulation {
-
+    //temporary empty - soobin Jeon
     static SplashDialog sd = new SplashDialog(null, true);
     static TMO tmoInit = TMO.getInstance();
     
@@ -112,7 +112,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
 //            InfraConstants.TRAFFIC_CONFIG_URL = opt.getTrafficConfigUrl();
 //            InfraConstants.TRAFFIC_DATA_URL = opt.getTrafficDataUrl();
         }
-
+        
         // create ticas frame
         final TICAS2FrameLab ticas = new TICAS2FrameLab(tmoInit);
 
@@ -122,12 +122,16 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             @Override
             public void run() {
                 // setup TMO object after 10ms
+                System.out.println("set Start");
                 tmoInit.setup();
                                
                 // clear all chaches older than 365 days
                 //tmo.clearAllCache(365);
                 
                 // run ticas frame
+               /*
+                * temporary empty - soobin Jeon
+                */
                 ticas.init();
                 ticas.setAlwaysOnTop(true);
                 ticas.setVisible(true);
@@ -140,6 +144,9 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         }, 10);
 
         // show splash window dialog
+        /*
+        * temporary empty - soobin Jeon
+        */
         sd.setVisible(true);
 
     }

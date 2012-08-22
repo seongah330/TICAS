@@ -18,22 +18,20 @@
 
 package edu.umn.natsrl.infra.infraobjects;
 
-import edu.umn.natsrl.infra.InfraConstants;
-import edu.umn.natsrl.infra.InfraObject;
-import edu.umn.natsrl.infra.InfraProperty;
-import edu.umn.natsrl.infra.Period;
-import edu.umn.natsrl.infra.TMO;
+import edu.umn.natsrl.infra.*;
 import edu.umn.natsrl.infra.interfaces.IDetectorChecker;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
 import edu.umn.natsrl.infra.types.AdjustType;
 import edu.umn.natsrl.infra.types.InfraType;
 import edu.umn.natsrl.infra.types.TrafficType;
 import edu.umn.natsrl.infra.types.TransitionType;
+import edu.umn.natsrl.map.CoordinateConversion;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 import javax.swing.JOptionPane;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -53,24 +51,34 @@ public class RNode extends InfraObject {
     transient protected RNode downstreamNode;
     transient protected RNode upstreamNode;
     transient protected RNode nextRNodeInSameCorridor;
+    
+    /**
+     * Location
+     */
+    private int easting = 0;
+    private int northing = 0;
 
     protected HashMap<String, Detector> detectors = new HashMap<String, Detector>();   
     
     public RNode(Element element)
     {
         super(element);
-        this.id = this.getProperty("id");
+        this.id = this.getProperty("name");
         this.transitionType = TransitionType.get(getProperty(InfraProperty.transition));
         this.infraType = InfraType.get(getProperty(InfraProperty.n_type));
-        initDetectors();
+        initDetectors(element);
+        setLocation();
     }
 
     public static RNode create(Element element) {
-        String type = element.getAttribute("n_type");
+        String type = element.getAttribute("n_type");  
         String sid = element.getAttribute("station_id");
-        if(type.equals("Station")) {
+        
+        
+        if(type.equals("Station") && !sid.contains("T")) {
+            String active = element.getAttribute("active");
             Station s = new Station(element);
-            if(sid.isEmpty()) {
+            if(sid.isEmpty() || (!active.isEmpty() && active.equals("f"))) {
                 s.isAvailable = false;
             }
             return s;
@@ -147,19 +155,29 @@ public class RNode extends InfraObject {
         setProperty(InfraProperty.NextRNodeIdInSameCorridor, n.getId());
     }
     
-    private void initDetectors()
+    private void initDetectors(Element ele)
     {
         if(detectors != null && !detectors.isEmpty()) return;                
         if(detectors == null) detectors = new HashMap<String, Detector>();        
-        String[] dets = getPropertyArray(InfraProperty.dets);
-        if(dets == null) return;
+        
+        NodeList detectorList = ele.getElementsByTagName(InfraObjects.detector.toString());
+        if(detectorList.getLength() == 0){
+//            System.out.println("do not find detector"); //debug test
+            return;
+        }
+        
+//        System.out.println("find Detector : "+detectorList.getLength()); //debug test
+        
         TMO tmo = TMO.getInstance();
-        for(String d : dets) {
+        for(int i=0;i<detectorList.getLength();i++){
+            Element e = (Element)detectorList.item(i);
+            String d = e.getAttribute(InfraProperty.name.toString());
             Detector det = tmo.getInfra().getDetector(d);
-            if(det != null) {
-                detectors.put(d, det);
+            if(det != null){
+                detectors.put(d,det);
                 det.setRNode(this);
             }
+//            System.out.println("dname : "+d); //debug test
         }
     }
     
@@ -173,9 +191,17 @@ public class RNode extends InfraObject {
         else return detectors.get(0).getDataSize();
     }
     
+    /**
+     * @deprecated 
+     * @return 
+     */
     public String[] getDownstreamName()
     {
         return getPropertyArray(InfraProperty.downstream);        
+    }
+    
+    public String[] getForkName(){
+        return getPropertyArray(InfraProperty.forks);
     }
 
     public double[] getSpeed() { return getData(null, TrafficType.SPEEDFORSTATION); }
@@ -466,13 +492,39 @@ public class RNode extends InfraObject {
         if(corridor == null) corridor = tmo.getInfra().getCorridor(getProperty(InfraProperty.CorridorId));
         return corridor;
     }
-
-    public int getEasting() {
-        return getPropertyInt(InfraProperty.easting);
+    
+    private void setLocation() {
+        CoordinateConversion converter = new CoordinateConversion();
+        String en = converter.latLon2UTM(getLat(), getLon());
+        String[] EN = en.split(" ");
+        if(EN.length > 3){
+            easting = Integer.parseInt(EN[2]);
+            northing = Integer.parseInt(EN[3]);
+        }
     }
 
+    /**
+     * @return 
+     */
+    public int getEasting() {
+        return easting;
+//        return getPropertyInt(InfraProperty.easting);
+    }
+
+    /**
+     * @return 
+     */
     public int getNorthing() {
-        return getPropertyInt(InfraProperty.northing);
+        return northing;
+//        return getPropertyInt(InfraProperty.northing);
+    }
+    
+    public double getLon(){
+        return this.getPropertyDouble(InfraProperty.lon);
+    }
+    
+    public double getLat(){
+        return this.getPropertyDouble(InfraProperty.lat);
     }
     
     public String getStationId() {
@@ -543,6 +595,4 @@ public class RNode extends InfraObject {
         }
         return true;
     }
-
-       
 }

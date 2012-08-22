@@ -22,6 +22,7 @@ import edu.umn.natsrl.infra.InfraObject;
 import edu.umn.natsrl.infra.InfraProperty;
 import edu.umn.natsrl.infra.types.InfraType;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -31,8 +32,11 @@ public class RampMeter extends InfraObject {
 
     public RampMeter(Element element) {
         super(element);
-        this.id = getProperty(InfraProperty.id);
-        this.infraType = InfraType.METER;        
+        Element parentElement = (Element)element.getParentNode();
+        this.id = getProperty(InfraProperty.name);
+        this.infraType = InfraType.METER;
+        this.setProperty(InfraProperty.label,parentElement.getAttribute("label")); //set Label
+        setDetector(parentElement);
     }
 
     public RampMeter() {
@@ -97,5 +101,19 @@ public class RampMeter extends InfraObject {
 
     public void setQueue(String names) {
         this.setProperty(InfraProperty.queue, names);
-    }    
+    }
+
+    private void setDetector(Element element) {
+        NodeList dList = element.getElementsByTagName("detector");
+        for(int i=0;i<dList.getLength();i++){
+            Element det = (Element)dList.item(i);
+            String name = det.getAttribute(InfraProperty.name.toString());
+            String category = det.getAttribute(InfraProperty.category.toString());
+            if("Q".equals(category)) setQueue(name);
+            else if("B".equals(category)) setByPass(name);
+            else if("P".equals(category)) setPassage(name);
+            else if("G".equals(category)) setGreen(name);
+            else if("M".equals(category)) setMerge(name);
+        }
+    }
 }

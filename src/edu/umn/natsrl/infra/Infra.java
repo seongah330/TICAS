@@ -25,6 +25,7 @@ import edu.umn.natsrl.infra.infraobjects.RampMeter;
 import edu.umn.natsrl.infra.infraobjects.Detector;
 import edu.umn.natsrl.infra.infraobjects.Corridor;
 import edu.umn.natsrl.infra.types.InfraType;
+import edu.umn.natsrl.map.CoordinateConversion;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -178,7 +179,7 @@ public class Infra implements Serializable {
                     System.out.println("R_NODE : " + nodeId + " is null");
                     continue;
                 }
-
+                
                 // add r_node to corridor
                 co.addRNode(r_node);
                 r_node.setCorridor(co);
@@ -206,10 +207,22 @@ public class Infra implements Serializable {
     {
         for (Corridor co : this.getCorridors())
         {
+//            System.out.println("================="+co.getId()+"=========================");
+            int nodeCnt = 1;
             for(RNode r_node : co.getRnodes())
-            {                
+            {       
+//                System.out.print("r_node["+r_node.id+"] : type-"+r_node.getInfraType().toString());
+                RNode next_node = null;
+                if(nodeCnt < co.getRnodes().size()){
+                    next_node = co.getRnodes().get(nodeCnt);
+                    r_node.setNextRNodeInSameCorridor((RNode)this.find(next_node.id));
+//                    System.out.println(", next_node : "+next_node.id);
+                }
+//                else
+//                    System.out.println();
                 // set downstream node
-                String[] downstream = r_node.getDownstreamName();
+//                String[] downstream = r_node.getDownstreamName();
+                String[] downstream = r_node.getForkName();
 
                 if (downstream != null) {
                     for(int i=0; i<downstream.length; i++) {
@@ -222,6 +235,7 @@ public class Infra implements Serializable {
                         if(co.equals(downstreamCorridor)) {
                             r_node.setNextRNodeInSameCorridor(drn);
                         } else {
+//                            System.out.println(r_node.id+" : "+drn.id+"-otherCorridor");
                             r_node.setDownstreamNodeToOtherCorridor(drn);
                         }
                         
@@ -238,11 +252,25 @@ public class Infra implements Serializable {
 //                        }
                     }
                     
-                    if(downstream.length == 1) r_node.setNextRNodeInSameCorridor((RNode)this.find(downstream[0]));
+//                    if(downstream.length == 1) r_node.setNextRNodeInSameCorridor((RNode)this.find(downstream[0]));
                 
-                } else {
-                        //System.out.println("   - RNode(" + r_node.id + ") : downstream = null");
                 }
+//                else {
+//                        //System.out.println("   - RNode(" + r_node.id + ") : downstream = null");
+//                }
+                nodeCnt++;
+                /**
+                 * Debug - soobin Jeon
+                 */
+//        CoordinateConversion converter = new CoordinateConversion();
+//        String en = converter.latLon2UTM(r_node.getLat(), r_node.getLon());
+//        System.out.println("Easting Northing : "+en+" === Lat : "+r_node.getLat()+", lon : "+r_node.getLon());
+//        String[] EN = en.split(" ");
+//        double[] lat = converter.utm2LatLon(en);
+//        System.out.println("lat : "+lat[0]+", lon : "+lat[1]);
+//        System.out.println("easting : "+EN[2]+", northing : "+EN[3]);
+//        System.out.print("real EN ====");
+//        System.out.println("easting : "+r_node.getEasting()+", northing : "+r_node.getNorthing());
             }
         }       
     }    

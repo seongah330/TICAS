@@ -67,7 +67,8 @@ public class Controller170 extends Controller implements IStepListener {
             String device_name = ci.IOs.get(i);
             int pin = ci.PINs.get(i);
             
-            if(pin > SFIMConfig.RAMPMETER_PIN_RANGE_END && pin <= SFIMConfig.DETECTOR_PIN_RANGE_END) device_name = "D"+device_name;
+//            if(pin > SFIMConfig.RAMPMETER_PIN_RANGE_END && pin <= SFIMConfig.DETECTOR_PIN_RANGE_END) device_name = "D"+device_name;
+            if(pin > SFIMConfig.RAMPMETER_PIN_RANGE_END && pin <= SFIMConfig.DETECTOR_PIN_RANGE_END) device_name = ""+device_name;
             
             InfraObject o = infra.find(device_name);
             
@@ -158,7 +159,8 @@ public class Controller170 extends Controller implements IStepListener {
             if(this.detectors[i] == null) continue;
             String id = this.detectors[i].getId();            
             for(int j=0; j<detectorIds.length; j++) {
-                if(id.equals("D"+detectorIds[j])) {
+//                if(id.equals("D"+detectorIds[j])) {
+                if(id.equals(""+detectorIds[j])) {
                     detectorMap[i] = j;
                     break;
                 } 
