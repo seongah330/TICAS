@@ -15,17 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/*
- * TICASVersion.java
- *
- * Created on Dec 30, 2011, 1:38:27 PM
- */
-package edu.umn.natsrl.ticas;
+package edu.umn.natsrl.infra.weather;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Soobin Jeon <j.soobin@gmail.com>
  */
-public class TICASVersion {
-    public static String version = " 3.21alpha";            
+public interface WeatherImpl {
+    public void load();
+    /**
+     * set Variable Option
+     * set Accurary
+     * set WeatherType
+     * set adjustTrafficData
+     */
+    public void setOption();
 }

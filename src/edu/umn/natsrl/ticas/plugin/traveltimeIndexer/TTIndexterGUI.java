@@ -28,10 +28,14 @@ import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.TMO;
 import edu.umn.natsrl.infra.section.SectionManager;
+import edu.umn.natsrl.infra.weather.WeatherTMC;
+import edu.umn.natsrl.infra.weather.type.WeatherDevice;
+import edu.umn.natsrl.infra.weather.type.WeatherType;
 import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.*;
+import javax.swing.JCheckBox;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
@@ -44,11 +48,12 @@ public class TTIndexterGUI extends javax.swing.JPanel {
     private TMO tmo = TMO.getInstance();
     private List<Section> sections = new ArrayList<Section>();
     private PluginFrame simFrame;
+    private boolean isHoliday = false;
 
     public TTIndexterGUI(PluginFrame frame) {
         initComponents();
         this.simFrame = frame;
-        this.simFrame.setSize(740, 740);
+        this.simFrame.setSize(740, 830);
         this.simFrame.setResizable(false);
         loadSection();
 
@@ -79,6 +84,16 @@ public class TTIndexterGUI extends javax.swing.JPanel {
         });
         this.simFrame.addToolsMenu(merger);
         this.label_loadC.setVisible(false);
+        
+        /**
+         * set WeatherList
+         */
+        this.cbxWeatherDList.removeAllItems();
+        for(WeatherDevice wd : WeatherDevice.values()){
+            this.cbxWeatherDList.addItem(wd);
+        }
+        this.cbxWeatherAll.setSelected(true);
+        
         new Timer().schedule(new TimerTask(){
 
             @Override
@@ -90,7 +105,13 @@ public class TTIndexterGUI extends javax.swing.JPanel {
     }
 
     private void evaluate() {
-        List<Period> periods = getPeriods();
+        this.btnEvaulate.setEnabled(false);
+        this.btnEvaulate.setText("Calculating...");
+        
+        List<WeatherTMC> weatherList = new ArrayList<WeatherTMC>();
+        List<Period> periods = getPeriodwithWeather(weatherList,getPeriods());
+        System.out.println("after P Length : "+periods.size());
+        System.out.println("after Selected Length : "+weatherList.size());
         Section section = (Section) this.cbxSections.getSelectedItem();
         Interval dataInterval = (Interval) this.cbxDataInterval.getSelectedItem();
         Interval evalInterval = (Interval) this.cbxEvalInterval.getSelectedItem();
@@ -104,7 +125,7 @@ public class TTIndexterGUI extends javax.swing.JPanel {
         }
 
         String[] targetStations = targetStation.split(" ");
-        TravelTimeIndexer ev = new TravelTimeIndexer(section, periods, targetStations, dataInterval, evalInterval, ttInterval, freeflowTT);
+        TravelTimeIndexer ev = new TravelTimeIndexer(section, periods, targetStations, dataInterval, evalInterval, ttInterval, freeflowTT,weatherList);
         ev.run();
         System.out.println("End of Evaulation");
         if (simFrame != null) {
@@ -114,9 +135,14 @@ public class TTIndexterGUI extends javax.swing.JPanel {
         if (simFrame != null) {
             this.simFrame.setAlwaysOnTop(false);
         }
+        
+        this.btnEvaulate.setEnabled(true);
+        this.btnEvaulate.setText("Evaluate");
     }
-
-    private List<Period> getPeriods() {
+    private List<Period> getPeriods(){
+        return getPeriods(null);
+    }
+    private List<Period> getPeriods(List<Calendar> weatherSkip) {
         Boolean[] okDays = new Boolean[]{chkSunday.isSelected(),
             chkMonday.isSelected(), chkTuesday.isSelected(),
             chkWednesday.isSelected(), chkThursday.isSelected(),
@@ -158,6 +184,16 @@ public class TTIndexterGUI extends javax.swing.JPanel {
             if (!skip) {
                 for (int i = 0; i < 7; i++) {
                     if (!okDays[DAY_OF_WEEK - 1]) {
+                        skip = true;
+                        break;
+                    }
+                }
+            }
+            
+            if(weatherSkip != null){
+                for(Calendar c : weatherSkip){
+                    if(cursor.equals(c)){
+                        System.out.println("W skip : "+c.getTime().toString());
                         skip = true;
                         break;
                     }
@@ -274,6 +310,16 @@ public class TTIndexterGUI extends javax.swing.JPanel {
         jLabel10 = new javax.swing.JLabel();
         tbxFreeFlowTravelTime = new javax.swing.JTextField();
         jLabel13 = new javax.swing.JLabel();
+        jPanel8 = new javax.swing.JPanel();
+        cbxWeatherDList = new javax.swing.JComboBox();
+        jLabel14 = new javax.swing.JLabel();
+        cbxWeatherAll = new javax.swing.JCheckBox();
+        jLabel15 = new javax.swing.JLabel();
+        cbxWeatherDry = new javax.swing.JCheckBox();
+        cbxWeatherRain = new javax.swing.JCheckBox();
+        cbxWeatherMixed = new javax.swing.JCheckBox();
+        cbxWeatherSnow = new javax.swing.JCheckBox();
+        cbxWeatherHail = new javax.swing.JCheckBox();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Section", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 12))); // NOI18N
 
@@ -290,7 +336,7 @@ public class TTIndexterGUI extends javax.swing.JPanel {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(cbxSections, 0, 207, Short.MAX_VALUE)
+                .addComponent(cbxSections, 0, 237, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -336,10 +382,10 @@ public class TTIndexterGUI extends javax.swing.JPanel {
                     .addComponent(jLabel2))
                 .addGap(31, 31, 31)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cbxEndHour, 0, 117, Short.MAX_VALUE)
-                    .addComponent(cbxStartHour, 0, 117, Short.MAX_VALUE)
+                    .addComponent(cbxEndHour, 0, 147, Short.MAX_VALUE)
+                    .addComponent(cbxStartHour, 0, 147, Short.MAX_VALUE)
                     .addComponent(calEndDate, 0, 0, Short.MAX_VALUE)
-                    .addComponent(calStartDate, javax.swing.GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE))
+                    .addComponent(calStartDate, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -445,23 +491,21 @@ public class TTIndexterGUI extends javax.swing.JPanel {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tbxVolumeAnalTargetStation, javax.swing.GroupLayout.DEFAULT_SIZE, 367, Short.MAX_VALUE)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jLabel7)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 117, Short.MAX_VALUE)
-                        .addComponent(jLabel8)))
-                .addContainerGap())
+                    .addComponent(jLabel7)
+                    .addComponent(tbxVolumeAnalTargetStation, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel8))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(jLabel8))
+                .addComponent(jLabel7)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(tbxVolumeAnalTargetStation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(54, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Date Option", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 12))); // NOI18N
@@ -585,7 +629,7 @@ public class TTIndexterGUI extends javax.swing.JPanel {
                 .addComponent(tbxFreeFlowTravelTime, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel13)
-                .addContainerGap(306, Short.MAX_VALUE))
+                .addContainerGap(308, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -598,6 +642,109 @@ public class TTIndexterGUI extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Weather", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 12))); // NOI18N
+
+        cbxWeatherDList.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        cbxWeatherDList.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+
+        jLabel14.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        jLabel14.setText("Device List");
+
+        cbxWeatherAll.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        cbxWeatherAll.setText("All Weather");
+        cbxWeatherAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxWeatherAllActionPerformed(evt);
+            }
+        });
+
+        jLabel15.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        jLabel15.setText("Available Weather");
+
+        cbxWeatherDry.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        cbxWeatherDry.setText("Dry");
+        cbxWeatherDry.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxWeatherDryActionPerformed(evt);
+            }
+        });
+
+        cbxWeatherRain.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        cbxWeatherRain.setText("Rain");
+        cbxWeatherRain.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxWeatherRainActionPerformed(evt);
+            }
+        });
+
+        cbxWeatherMixed.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        cbxWeatherMixed.setText("Rain&Snow");
+        cbxWeatherMixed.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxWeatherMixedActionPerformed(evt);
+            }
+        });
+
+        cbxWeatherSnow.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        cbxWeatherSnow.setText("Snow");
+        cbxWeatherSnow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxWeatherSnowActionPerformed(evt);
+            }
+        });
+
+        cbxWeatherHail.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        cbxWeatherHail.setText("Hailstone");
+        cbxWeatherHail.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxWeatherHailActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addComponent(cbxWeatherDry)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbxWeatherRain)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbxWeatherMixed)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbxWeatherSnow)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbxWeatherHail))
+                    .addComponent(cbxWeatherAll)
+                    .addComponent(jLabel14)
+                    .addComponent(cbxWeatherDList, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel15))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel14)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cbxWeatherDList, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel15)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cbxWeatherAll)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cbxWeatherDry)
+                    .addComponent(cbxWeatherRain)
+                    .addComponent(cbxWeatherMixed)
+                    .addComponent(cbxWeatherSnow)
+                    .addComponent(cbxWeatherHail))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -606,16 +753,17 @@ public class TTIndexterGUI extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnEvaulate, javax.swing.GroupLayout.DEFAULT_SIZE, 646, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addComponent(btnEvaulate, javax.swing.GroupLayout.DEFAULT_SIZE, 644, Short.MAX_VALUE))
+                            .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -628,10 +776,13 @@ public class TTIndexterGUI extends javax.swing.JPanel {
                         .addGap(11, 11, 11)
                         .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -644,8 +795,42 @@ public class TTIndexterGUI extends javax.swing.JPanel {
 }//GEN-LAST:event_cbxSectionsActionPerformed
 
     private void btnEvaulateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEvaulateActionPerformed
-        this.evaluate();
+        if(isHoliday)
+            this.evaluate();
+        else
+            JOptionPane.showMessageDialog(this.simFrame, "Setting of Except dayes is not completed. \nPlease Wait..");
     }//GEN-LAST:event_btnEvaulateActionPerformed
+
+    private void cbxWeatherAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxWeatherAllActionPerformed
+        // TODO add your handling code here:
+        removeAllCheckBox(this.cbxWeatherAll);
+    }//GEN-LAST:event_cbxWeatherAllActionPerformed
+
+    private void cbxWeatherDryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxWeatherDryActionPerformed
+        // TODO add your handling code here:
+        removeAllCheckBox(this.cbxWeatherDry);
+    }//GEN-LAST:event_cbxWeatherDryActionPerformed
+
+    private void cbxWeatherRainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxWeatherRainActionPerformed
+        // TODO add your handling code here:
+        removeAllCheckBox(this.cbxWeatherRain);
+    }//GEN-LAST:event_cbxWeatherRainActionPerformed
+
+    private void cbxWeatherMixedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxWeatherMixedActionPerformed
+        // TODO add your handling code here:
+        removeAllCheckBox(this.cbxWeatherMixed);
+    }//GEN-LAST:event_cbxWeatherMixedActionPerformed
+
+    private void cbxWeatherSnowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxWeatherSnowActionPerformed
+        // TODO add your handling code here:
+        removeAllCheckBox(this.cbxWeatherSnow);
+    }//GEN-LAST:event_cbxWeatherSnowActionPerformed
+
+    private void cbxWeatherHailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxWeatherHailActionPerformed
+        // TODO add your handling code here:
+        removeAllCheckBox(this.cbxWeatherHail);
+    }//GEN-LAST:event_cbxWeatherHailActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnEvaulate;
     private datechooser.beans.DateChooserCombo calEndDate;
@@ -656,6 +841,13 @@ public class TTIndexterGUI extends javax.swing.JPanel {
     private javax.swing.JComboBox cbxSections;
     private javax.swing.JComboBox cbxStartHour;
     private javax.swing.JComboBox cbxTTInterval;
+    private javax.swing.JCheckBox cbxWeatherAll;
+    private javax.swing.JComboBox cbxWeatherDList;
+    private javax.swing.JCheckBox cbxWeatherDry;
+    private javax.swing.JCheckBox cbxWeatherHail;
+    private javax.swing.JCheckBox cbxWeatherMixed;
+    private javax.swing.JCheckBox cbxWeatherRain;
+    private javax.swing.JCheckBox cbxWeatherSnow;
     private javax.swing.JCheckBox chkFriday;
     private javax.swing.JCheckBox chkMonday;
     private javax.swing.JCheckBox chkSaturday;
@@ -668,6 +860,8 @@ public class TTIndexterGUI extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -683,6 +877,7 @@ public class TTIndexterGUI extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JLabel label_loadC;
     private edu.umn.natsrl.gadget.calendar.NATSRLCalendar natsrlCalendar;
     private javax.swing.JTextField tbxFreeFlowTravelTime;
@@ -785,6 +980,7 @@ public class TTIndexterGUI extends javax.swing.JPanel {
         
         this.natsrlCalendar.setVisible(true);
         this.label_loadC.setVisible(false);
+        this.isHoliday = true;
     }
 
     protected Calendar getHoliday(Date date) {
@@ -795,6 +991,98 @@ public class TTIndexterGUI extends javax.swing.JPanel {
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);       
         return c;
+    }
+
+    private List<Period> getPeriodwithWeather(List<WeatherTMC> weatherList, List<Period> periods) {
+        WeatherDevice selectedDevice = (WeatherDevice)this.cbxWeatherDList.getSelectedItem();
+        System.out.println(selectedDevice.toString());
+        /**
+         * 0 : All
+         * 1 : Dry
+         * 2 : Rain
+         * 3 : Mix
+         * 4 : snow
+         * 5 : hail
+         */
+        Boolean[] Weathercheck = new Boolean[]{this.cbxWeatherAll.isSelected(),this.cbxWeatherDry.isSelected(),
+                                            this.cbxWeatherRain.isSelected(),this.cbxWeatherMixed.isSelected(),
+                                            this.cbxWeatherSnow.isSelected(),this.cbxWeatherHail.isSelected()};
+    
+        List<String> nonWeather = new ArrayList<String>();
+        
+        List<Calendar> weatherSkip = new ArrayList<Calendar>();
+        
+        for(Period p : periods){
+            Period rp = p.clone();
+            rp.setInterval(60);
+            System.out.println(p.getPeriodString());
+            WeatherTMC we = new WeatherTMC(selectedDevice,rp);
+            we.load();
+            /**
+             * Check Accurary
+             */
+            if(!we.isAccurary()){
+                nonWeather.add(we.getPeriod().getPeriodStringHWithoutTime());
+                continue;
+            }
+            /**
+             * Check Skip date
+             */
+            if(!Weathercheck[0]){
+                if(!Weathercheck[we.getWeatherType().getId()+1]){
+                    Calendar c = Calendar.getInstance();
+                    c.setTime(we.getPeriod().startDate);
+                    c.set(Calendar.HOUR_OF_DAY, 0);
+                    c.set(Calendar.MINUTE, 0);
+                    c.set(Calendar.SECOND, 0);
+                    c.set(Calendar.MILLISECOND, 0);
+                    weatherSkip.add(c);
+                }
+            }
+            
+            /**
+             * set Selected Date
+             */
+            if(Weathercheck[0] || Weathercheck[we.getWeatherType().getId()+1])
+                weatherList.add(we);
+            System.out.println("Weather Type : "+we.getWeatherType().toString()+", Acc : "+we.getAccurary()+", Rainfall : "+we.getAvgRainFall());
+        }
+        System.out.println("Period Length : "+periods.size());
+        System.out.println("Seletected length : "+weatherList.size());
+        System.out.println("Skip length : "+weatherSkip.size());
+        for(Calendar c : weatherSkip){
+            System.out.println("Cal : "+c.getTime().toString());
+        }
+        if(nonWeather.size() > 0){
+            int wcnt = 0;
+            String str = "There is no Weathere Data.\n It Does not apply to the following dates."+"\n";
+            for(String nw : nonWeather){
+                if(wcnt > 13){
+                    str += "and more..";
+                    break;
+                }
+                str += "- "+nw + "\n";
+                wcnt++;
+            }
+            JOptionPane.showMessageDialog(null, str);
+        }
+            
+        return getPeriods(weatherSkip);
+    }
+
+    private void removeAllCheckBox(JCheckBox selectedcbx) {
+        JCheckBox[] WeatherCbx = new JCheckBox[]{this.cbxWeatherDry,this.cbxWeatherRain,this.cbxWeatherMixed,
+                                                this.cbxWeatherSnow,this.cbxWeatherHail};
+        if(!selectedcbx.isSelected())
+            return;
+        
+        if(selectedcbx.equals(this.cbxWeatherAll)){
+            for(JCheckBox cbx : WeatherCbx){
+                cbx.setSelected(false);
+            }
+        }else{
+            this.cbxWeatherAll.setSelected(false);
+        }
     }
     
     class Dates {

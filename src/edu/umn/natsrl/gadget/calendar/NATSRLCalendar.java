@@ -71,7 +71,7 @@ public final class NATSRLCalendar extends javax.swing.JPanel {
     protected final JLabel[] spacer = new JLabel[8];
     protected final JToggleButton dayButton[] = new JToggleButton[31];
     protected final TreeSet<Date> selected = new TreeSet<Date>();
-    protected int maxSelectedDays = 100;
+    protected int maxSelectedDays = 300;
     protected Listener listeners;
 
     /** Get the current selection set */

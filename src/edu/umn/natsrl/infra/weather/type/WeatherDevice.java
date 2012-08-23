@@ -15,17 +15,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/*
- * TICASVersion.java
- *
- * Created on Dec 30, 2011, 1:38:27 PM
- */
-package edu.umn.natsrl.ticas;
+package edu.umn.natsrl.infra.weather.type;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Soobin Jeon <j.soobin@gmail.com>
  */
-public class TICASVersion {
-    public static String version = " 3.21alpha";            
+public enum WeatherDevice {
+    WS35W25(1,"WS35W25"),
+    WS94W38(2, "WS94W38"),
+    WS94W40(3, "WS94W40"),
+    WS94W42(4, "WS94W42");
+    
+    int sid;
+    String name;
+    WeatherDevice(int _sid, String _name){
+        sid = _sid;
+        name = _name;
+    }
+    
+    public String getName(){
+        return name;
+    }
+    
+    public int getId(){
+        return sid;
+    }
+    
+    @Override
+    public String toString(){
+        return name;
+    }
 }

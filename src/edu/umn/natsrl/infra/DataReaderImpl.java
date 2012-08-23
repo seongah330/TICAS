@@ -15,17 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/*
- * TICASVersion.java
- *
- * Created on Dec 30, 2011, 1:38:27 PM
- */
-package edu.umn.natsrl.ticas;
+package edu.umn.natsrl.infra;
+
+import edu.umn.natsrl.infra.types.TrafficType;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Soobin Jeon <j.soobin@gmail.com>
  */
-public class TICASVersion {
-    public static String version = " 3.21alpha";            
+public interface DataReaderImpl {
+    public void load();
+    public double[] read(TrafficType trafficType);
 }

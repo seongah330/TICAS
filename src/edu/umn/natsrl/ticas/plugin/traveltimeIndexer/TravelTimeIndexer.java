@@ -32,6 +32,9 @@ import edu.umn.natsrl.infra.TMO;
 import edu.umn.natsrl.infra.infraobjects.Detector;
 import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.infra.interfaces.IDetectorChecker;
+import edu.umn.natsrl.infra.weather.WeatherTMC;
+import edu.umn.natsrl.infra.weather.type.WeatherDevice;
+import edu.umn.natsrl.infra.weather.type.WeatherType;
 import edu.umn.natsrl.util.FileHelper;
 import edu.umn.natsrl.util.NumUtil;
 import edu.umn.natsrl.util.StringUtil;
@@ -67,13 +70,19 @@ public class TravelTimeIndexer {
     private Infra infra;
     private List<String> toExceptDate = new ArrayList<String>();
     
+    /**
+     * Weather List
+     */
+    List<WeatherTMC> weatherList;
+    
     public TravelTimeIndexer(Section section, 
             List<Period> periods, 
             String[] targetStations, 
             Interval dataInterval, 
             Interval evalInterval, 
             Interval ttInterval,
-            double freeflowTT) {
+            double freeflowTT,
+            List<WeatherTMC> wList) {
         
         this.section = section;
         this.periods = periods;
@@ -83,6 +92,7 @@ public class TravelTimeIndexer {
         this.volumeAnalysisTargetStations = targetStations;
         this.freeflowTT = freeflowTT;
         this.infra = tmo.getInfra();
+        weatherList = wList;
     }
         
     public void run() {
@@ -90,6 +100,10 @@ public class TravelTimeIndexer {
         Evaluation.clearCache();
         
         System.out.println("Starting evaluation....");
+        if(periods.size() == 0){
+            JOptionPane.showMessageDialog(null, "There are no Datas in selected weather.");
+            return;
+        }
         Period p = periods.get(0);
         
         opt.setSection(section);
@@ -155,7 +169,7 @@ public class TravelTimeIndexer {
             processTotal(dvh);
 //            processTotal()
             processTravelTimeIndex(tt, vmt);
-            
+            processWeather(weatherList);
            // volume
             if(this.volumeAnalysisTargetStations != null && this.volumeAnalysisTargetStations.length > 0 && !this.volumeAnalysisTargetStations[0].isEmpty()) {
                 opt.setInterval(Interval.I1HOUR);
@@ -172,6 +186,18 @@ public class TravelTimeIndexer {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(null, "Fail to evaulate");
         }
+    }
+    
+    private void processWeather(List<WeatherTMC> weatherList) {
+        EvalData wData = new EvalData("Average of Weather Rainfall");
+        EvalData wType = new EvalData("Weather Type",true);
+        for(WeatherTMC wtmc : weatherList){
+            String date = getDateString(wtmc.getPeriod().getPeriodString());
+            wData.add(date, wtmc.getAvgRainFall());
+            wType.add(date, wtmc.getWeatherType());
+        }
+        this.evaluationResults.add(wType);
+        this.evaluationResults.add(wData);
     }
     
     /**
@@ -210,6 +236,7 @@ public class TravelTimeIndexer {
                 if(maxSpeedDiffAtSameTimeLine < 0) maxSpeedDiff.add(maxSpeedDiffAtSameTimeLine);
                 else System.out.println(res.getName() + " : max speed diff at same time line > 0 (time=" + res.get(0, row) +", value=" + maxSpeedDiffAtSameTimeLine + ")");
             }                
+            System.out.println(title);
             String date = getDateString(title);
             evalData.add(date, average(maxSpeedDiff));
         }
@@ -792,11 +819,32 @@ public class TravelTimeIndexer {
 //                    System.out.print(" ,"+data+"("+date+")");
 //                    if(this.toExceptDate.contains(date)) continue;
                     sheet.addCell(new Label(colIdx, row, date));
-                    sheet.addCell(new Number(colIdx++, row+1, NumUtil.roundUp(data, 2)));                                        
+                    if(!ed.isWeatherType)
+                        sheet.addCell(new Number(colIdx++, row+1, NumUtil.roundUp(data, 2)));                                        
+                    else
+                        sheet.addCell(new Label(colIdx++, row+1, ed.wType.get(i).getName()));
                 }                
                 row += 2;
 //                System.out.println();
 
+            }
+            /**
+             * teporary sheet
+             */
+            int cnt = 2;
+            for(WeatherTMC wtmc : weatherList){
+                Period pr = wtmc.getPeriod();
+                WritableSheet wsheet = workbook.createSheet("W"+wtmc.getPeriod().getPeriodStringWithoutTime(), cnt);
+                col = 0;            
+                row = 0;
+                for(String timeline : pr.getTimeline()){
+                    col = 0;
+                    wsheet.addCell(new Label(col++,row,timeline));
+                    wsheet.addCell(new Label(col++,row,WeatherType.getWeatherType((int)wtmc.type[row]).toString()));
+                    wsheet.addCell(new Number(col++,row,wtmc.rainfall[row]));
+                    row++;
+                }
+                cnt ++;
             }
             workbook.write();
             workbook.close();
@@ -846,7 +894,7 @@ public class TravelTimeIndexer {
     {
         String date = title.substring(0, 8);
         return date.substring(0, 4) + "-" + date.substring(4, 6);
-    }    
+    }
 
     
     /**
@@ -856,15 +904,25 @@ public class TravelTimeIndexer {
         String name;
         List<String> dates = new ArrayList<String>();
         List<Double> data = new ArrayList<Double>();
+        List<WeatherType> wType = new ArrayList<WeatherType>();
+        boolean isWeatherType = false;
 
         public EvalData(String name) {
             this.name = name;
-        }     
+        }
+        public EvalData(String name, boolean iswType){
+            this(name);
+            this.isWeatherType = iswType;
+        }
         
         public void add(String date, Double value)
         {
             this.dates.add(date);
             this.data.add(value);
+        }
+        public void add(String date, WeatherType type){
+            this.dates.add(date);
+            this.wType.add(type);
         }
     }
 }
