@@ -99,7 +99,7 @@ import org.jdesktop.swingx.mapviewer.GeoPosition;
  */
 public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSimulation {
     //temporary empty - soobin Jeon
-    static SplashDialog sd = new SplashDialog(null, true);
+//    static SplashDialog sd = new SplashDialog(null, true);
     static TMO tmoInit = TMO.getInstance();
     
     public static void main(String[] args) {
@@ -137,7 +137,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 ticas.setVisible(true);
 
                 // close splash window dialog
-                sd.dispose();
+//                sd.dispose();
 
                 ticas.setAlwaysOnTop(false);
             }
@@ -147,7 +147,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         /*
         * temporary empty - soobin Jeon
         */
-        sd.setVisible(true);
+//        sd.setVisible(true);
 
     }
     

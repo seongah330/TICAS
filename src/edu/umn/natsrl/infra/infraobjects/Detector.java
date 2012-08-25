@@ -26,6 +26,7 @@ import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.simobjects.SimDetector;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
 import edu.umn.natsrl.infra.types.AdjustType;
+import edu.umn.natsrl.infra.types.DetectorType;
 import edu.umn.natsrl.infra.types.InfraType;
 import edu.umn.natsrl.infra.types.TrafficType;
 import edu.umn.natsrl.infra.types.LaneType;
@@ -62,14 +63,12 @@ public class Detector extends InfraObject implements Comparable {
     
     public Detector(Element element) {
         super(element);
-        this.id = this.getProperty(InfraProperty.name);
         this.laneType = LaneType.get(getProperty(InfraProperty.category));
         this.infraType = InfraType.DETECTOR;
 //        this.detector_id = Integer.parseInt(this.id.substring(1));  // D123 -> 123        
-        if(this.id.contains("T")) // T123 -> 123
-            this.detector_id = Integer.parseInt(this.id.substring(1)); 
-        else
-            this.detector_id = Integer.parseInt(this.id);  //
+        String tempID = this.getProperty(InfraProperty.name);
+        this.detector_id = DetectorType.getDetectorIDbyType(tempID);
+        this.id = tempID;
     }
        
     /**

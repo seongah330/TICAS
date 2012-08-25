@@ -18,6 +18,7 @@
 
 package edu.umn.natsrl.infra.infraobjects;
 
+import edu.umn.natsrl.infra.types.StationType;
 import java.util.HashMap;
 import org.w3c.dom.Element;
 
@@ -38,8 +39,13 @@ public class Station extends RNode {
         super(ele);
         String station_id = getStationId();
         if(station_id == null || station_id.isEmpty()) return;
-        this.sid = Integer.parseInt(station_id.substring(1));  // S43 -> 43
+        
+//        this.sid = Integer.parseInt(station_id.substring(1));  // S43 -> 43
+        this.sid = StationType.getStationIDbyType(station_id);
+        
         if(this.sid / 100 == 17) this.isWavetronicsStation = true;        
+        
+        System.out.println(station_id + ", "+sid);
     }
 
     public void setDownstreamStation(String sectionName, Station s) {

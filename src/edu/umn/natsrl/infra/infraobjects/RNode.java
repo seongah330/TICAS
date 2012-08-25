@@ -75,7 +75,7 @@ public class RNode extends InfraObject {
         String sid = element.getAttribute("station_id");
         
         
-        if(type.equals("Station") && !sid.contains("T")) {
+        if(type.equals("Station")) {
             String active = element.getAttribute("active");
             Station s = new Station(element);
             if(sid.isEmpty() || (!active.isEmpty() && active.equals("f"))) {
