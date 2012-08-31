@@ -266,6 +266,10 @@ public class SimMeter extends SimObject {
     public RampMeter getMeter() {
         return meter;
     }
+    
+    public String[] getMeterID(){
+        return meterId;
+    }
 
     /**
      * set enable status

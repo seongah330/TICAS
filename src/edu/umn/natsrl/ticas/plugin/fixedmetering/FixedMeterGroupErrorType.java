@@ -15,49 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package edu.umn.natsrl.infra.weather.type;
+package edu.umn.natsrl.ticas.plugin.fixedmetering;
 
 /**
  *
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
-public enum WeatherType {
-    DRY(0,"Dry"),
-    RAIN(1,"Rain"),
-    MIXED(2,"Rain&Snow"),
-    SNOW(3,"Snow"),
-    HAIN(4,"Hailstone"),
-    ERROR(-1,"Error");
+public enum FixedMeterGroupErrorType {
+    NOT_LOADED(1,"Data is not loaded."),
+    ERROR_STRUCTURE(2,"Case file Structure is different from current Save File.\nDelete Data File"),
+    SUCCESS(99,"Success");
     
-    int id;
-    String name;
-    WeatherType(int _id, String _name){
-        id = _id;
-        name = _name;
-    }
-    public static WeatherType getWeatherType(int id){
-        for(WeatherType t : WeatherType.values()){
-            if(t.getId() == id)
-                return t;
-        }
-        return null;
-        
-    }
-    public int getId(){
-        return id;
-    }
-    public String getName(){
-        return name;
+    int error_type = 99;
+    String error_string;
+    
+    FixedMeterGroupErrorType(int i, String data){
+        error_type = i;
+        error_string = data;
     }
     
     @Override
     public String toString(){
-        return name;
+        return error_string;
     }
     
-    public boolean isDRY(){return this==DRY;}
-    public boolean isRAIN(){return this==RAIN;}
-    public boolean isMIXED(){return this==MIXED;}
-    public boolean isSNOW(){return this==SNOW;}
-    public boolean isHAIN(){return this==HAIN;}
+    boolean isNOT_LOADED(){return this == NOT_LOADED;}
+    boolean isERROR_STRUCTURE(){return this == ERROR_STRUCTURE;}
+    boolean isSUCCESS(){return this == SUCCESS;}
 }

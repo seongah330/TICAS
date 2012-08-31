@@ -91,7 +91,10 @@ public class SimRNode extends SimObject {
         }        
         
         if(validCount > 0) {
-                return sum/validCount;
+                if(type.isFlow() || type.isVolume())
+                    return sum;
+                else
+                    return sum/validCount;
         }
         else return -1;
     }

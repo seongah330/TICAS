@@ -58,6 +58,7 @@ import edu.umn.natsrl.ticas.error.StringErrorStream;
 import edu.umn.natsrl.ticas.plugin.VideoChecker.VideoChecker;
 import edu.umn.natsrl.ticas.plugin.datareader.DataReader;
 import edu.umn.natsrl.ticas.plugin.detecterdatareader.DetecterDataReader;
+import edu.umn.natsrl.ticas.plugin.fixedmetering.FixedMeteringSimulation;
 import edu.umn.natsrl.ticas.plugin.rampmeterevaluator.RampMeterEvaluatorPlugin;
 import edu.umn.natsrl.ticas.plugin.srte.TICASPluginSRTE;
 import edu.umn.natsrl.ticas.plugin.srte.TestFrame;
@@ -99,7 +100,7 @@ import org.jdesktop.swingx.mapviewer.GeoPosition;
  */
 public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSimulation {
     //temporary empty - soobin Jeon
-//    static SplashDialog sd = new SplashDialog(null, true);
+    static SplashDialog sd = new SplashDialog(null, true);
     static TMO tmoInit = TMO.getInstance();
     
     public static void main(String[] args) {
@@ -137,7 +138,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 ticas.setVisible(true);
 
                 // close splash window dialog
-//                sd.dispose();
+                sd.dispose();
 
                 ticas.setAlwaysOnTop(false);
             }
@@ -147,7 +148,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         /*
         * temporary empty - soobin Jeon
         */
-//        sd.setVisible(true);
+        sd.setVisible(true);
 
     }
     
@@ -440,8 +441,11 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             addSimulationPlugins(simEvaluator);            
         }
         
+        PluginInfo simFixedMetering = new PluginInfo("Fixed Simulation", PluginType.TOOL, FixedMeteringSimulation.class);       
+        addSimulationPlugins(simFixedMetering);
+        
         if(addMeteringPlugin) {
-            PluginInfo meteringPlugin = new PluginInfo("Metering Simulation", PluginType.SIMULATION, MeteringSimulation.class);
+            PluginInfo meteringPlugin = new PluginInfo("K_Adaptive Metering Simulation", PluginType.SIMULATION, MeteringSimulation.class);
             addSimulationPlugins(meteringPlugin);            
         }        
         
@@ -455,7 +459,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         }
         
         if(addVSLEvaulatorPlugin) {
-            PluginInfo ttIndexer = new PluginInfo("Travel Time Indexer", PluginType.TOOL, TTIndexterPlugin.class);
+            PluginInfo ttIndexer = new PluginInfo("Operation measures", PluginType.TOOL, TTIndexterPlugin.class);
             addTools(ttIndexer);
         }
         
@@ -473,13 +477,13 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         PluginInfo DdataReader = new PluginInfo("Detector Data Reader", PluginType.TOOL, DetecterDataReader.class);       
         addTools(DdataReader);        
         
-        if(VideoChecker){
-            PluginInfo videochecker = new PluginInfo("Video Checker", PluginType.TOOL, VideoChecker.class);       
-            addTools(videochecker);        
-        }
+//        if(VideoChecker){
+//            PluginInfo videochecker = new PluginInfo("Video Checker", PluginType.TOOL, VideoChecker.class);       
+//            addTools(videochecker);        
+//        }
         
         PluginInfo srte = new PluginInfo("SRTE", PluginType.TOOL, TICASPluginSRTE.class);       
-        addSimulationPlugins(srte);        
+        addSimulationPlugins(srte);
     }
 
     /**

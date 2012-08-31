@@ -44,8 +44,6 @@ public class Station extends RNode {
         this.sid = StationType.getStationIDbyType(station_id);
         
         if(this.sid / 100 == 17) this.isWavetronicsStation = true;        
-        
-        System.out.println(station_id + ", "+sid);
     }
 
     public void setDownstreamStation(String sectionName, Station s) {

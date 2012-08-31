@@ -117,7 +117,7 @@ public class TravelTimeIndexer {
             @Override
             public boolean check(Detector d) {
                 if(d.isHov()) return false; 
-                if(d.isAuxiliary()) return false; 
+//                if(d.isAuxiliary()) return false; 
                 if(d.isWavetronics()) return false;
                 if(d.isAbandoned()) return false;
                 return true;
@@ -837,11 +837,17 @@ public class TravelTimeIndexer {
                 WritableSheet wsheet = workbook.createSheet("W"+wtmc.getPeriod().getPeriodStringWithoutTime(), cnt);
                 col = 0;            
                 row = 0;
+                System.out.println("error = " + wtmc.getPeriod().getPeriodStringHWithoutTime());
                 for(String timeline : pr.getTimeline()){
                     col = 0;
                     wsheet.addCell(new Label(col++,row,timeline));
-                    wsheet.addCell(new Label(col++,row,WeatherType.getWeatherType((int)wtmc.type[row]).toString()));
-                    wsheet.addCell(new Number(col++,row,wtmc.rainfall[row]));
+                    System.out.println(pr.getTimeline().length + " " + wtmc.type.length);
+                    if(wtmc.type.length != 0){
+                        System.out.println((int)wtmc.type[row]);
+                        wsheet.addCell(new Label(col++,row,WeatherType.getWeatherType((int)wtmc.type[row]).toString()));
+                        wsheet.addCell(new Number(col++,row,wtmc.rainfall[row]));
+                    }else
+                        System.out.println("error = " + wtmc.getPeriod().getPeriodStringHWithoutTime());
                     row++;
                 }
                 cnt ++;

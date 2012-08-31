@@ -29,6 +29,7 @@ import edu.umn.natsrl.infra.simobjects.SimDetector;
 import edu.umn.natsrl.infra.simobjects.SimMeter;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
 import edu.umn.natsrl.infra.simobjects.SimStation;
+import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import edu.umn.natsrl.util.FileHelper;
 import edu.umn.natsrl.vissimcom.IStepListener;
 import edu.umn.natsrl.vissimcom.ITravelTimeListener;
@@ -45,6 +46,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
 import jxl.Workbook;
 import jxl.write.Label;
 import jxl.write.Number;
@@ -76,7 +78,6 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
             this.seed = seed;
             this.section = section;
             this.noMetering = noMetering;
-            
             loadSignalGroupFromCasefile(this.caseFile);
             loadDetectorsFromCasefile(this.caseFile);
         } catch (IOException ex) {
@@ -137,8 +138,11 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
                     if(setTime%MeteringConfig.getInterval() == 0){
                         //calculate log data
                         for(int z=0;z<logvalues.get(i).length;z++){
-                            if(z != 3)
+                            if(z != 3){
+                                System.out.print(MeteringConfig.getInterval() + ", "+30+", "+MeteringConfig.getInterval()/30+"  ");
+                                System.out.println(logvalues.get(i)[z]);
                                 logvalues.get(i)[z] /= (MeteringConfig.getInterval()/30);
+                            }
                         }
                         
                         ulog.append(s.id+"("+String.format("Speed:%.1fmile/h Density:%.1f Flow:%.1f, Volume:%.1f", logvalues.get(i)[0],logvalues.get(i)[1],logvalues.get(i)[2],logvalues.get(i)[3])+")\n");

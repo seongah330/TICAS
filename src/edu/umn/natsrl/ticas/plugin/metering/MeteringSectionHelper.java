@@ -312,10 +312,10 @@ public class MeteringSectionHelper {
     /**
      * State class to organize for metering
      */
-    class State {
+    public class State {
 
         StateType type;
-        String id;
+        public String id;
         int idx;
         int easting, northing;
         State upstream;
@@ -356,7 +356,7 @@ public class MeteringSectionHelper {
     /**
      * State class that represents entrance
      */
-    class EntranceState extends State {
+    public class EntranceState extends State {
         Entrance entrance;
         SimMeter meter;
         StationState associatedStation;
@@ -864,7 +864,7 @@ public class MeteringSectionHelper {
     /**
      * State class that represents station
      */
-    class StationState extends State {
+    public class StationState extends State {
 
         SimStation station;
         //EntranceState associatedEntrance;

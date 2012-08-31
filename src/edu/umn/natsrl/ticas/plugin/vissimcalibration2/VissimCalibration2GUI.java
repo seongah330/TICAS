@@ -183,7 +183,7 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
         if(samples < 5) {
             JOptionPane.showMessageDialog(simFrame, "Too short simulation");
             simFrame.afterSimulation(null, null);
-            this.simFrame.setVisible(false);            
+//            this.simFrame.setVisible(false);            
         }
 
         int duration = samples * 30;        
