@@ -31,6 +31,8 @@ import edu.umn.natsrl.infra.section.SectionManager;
 import edu.umn.natsrl.infra.weather.WeatherTMC;
 import edu.umn.natsrl.infra.weather.type.WeatherDevice;
 import edu.umn.natsrl.infra.weather.type.WeatherType;
+import edu.umn.natsrl.ticas.RunningDialog;
+import edu.umn.natsrl.ticas.TICAS2FrameLab;
 import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -125,8 +127,15 @@ public class TTIndexterGUI extends javax.swing.JPanel {
         }
 
         String[] targetStations = targetStation.split(" ");
-        TravelTimeIndexer ev = new TravelTimeIndexer(section, periods, targetStations, dataInterval, evalInterval, ttInterval, freeflowTT,weatherList);
-        ev.run();
+        RunningDialog rd = new RunningDialog(simFrame, true);
+        rd.setLocationRelativeTo(this);
+        Timer t = new Timer();
+        t.schedule(new TravelTimeIndexer(section, periods, targetStations, dataInterval, evalInterval, ttInterval, freeflowTT,weatherList, rd), 10);
+        rd.setTimer(t);
+        rd.showLog();
+        rd.setVisible(true);      
+//        TravelTimeIndexer ev = new TravelTimeIndexer(section, periods, targetStations, dataInterval, evalInterval, ttInterval, freeflowTT,weatherList);
+//        ev.run();
         System.out.println("End of Evaulation");
         if (simFrame != null) {
             this.simFrame.setAlwaysOnTop(true);

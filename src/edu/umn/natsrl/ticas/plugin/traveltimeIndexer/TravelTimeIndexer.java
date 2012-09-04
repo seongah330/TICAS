@@ -35,6 +35,7 @@ import edu.umn.natsrl.infra.interfaces.IDetectorChecker;
 import edu.umn.natsrl.infra.weather.WeatherTMC;
 import edu.umn.natsrl.infra.weather.type.WeatherDevice;
 import edu.umn.natsrl.infra.weather.type.WeatherType;
+import edu.umn.natsrl.ticas.RunningDialog;
 import edu.umn.natsrl.util.FileHelper;
 import edu.umn.natsrl.util.NumUtil;
 import edu.umn.natsrl.util.StringUtil;
@@ -44,6 +45,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.TimerTask;
 import java.util.TreeSet;
 import javax.swing.JOptionPane;
 import jxl.Workbook;
@@ -56,7 +58,7 @@ import jxl.write.Number;
  *
  * @author Chongmyung Park
  */
-public class TravelTimeIndexer {
+public class TravelTimeIndexer extends TimerTask {
     private List<Period> periods;
     private Interval dataInterval;
     private Interval evalInterval;
@@ -69,7 +71,7 @@ public class TravelTimeIndexer {
     private TMO tmo = TMO.getInstance();
     private Infra infra;
     private List<String> toExceptDate = new ArrayList<String>();
-    
+    private RunningDialog rd;
     /**
      * Weather List
      */
@@ -82,7 +84,8 @@ public class TravelTimeIndexer {
             Interval evalInterval, 
             Interval ttInterval,
             double freeflowTT,
-            List<WeatherTMC> wList) {
+            List<WeatherTMC> wList,
+            RunningDialog _rd) {
         
         this.section = section;
         this.periods = periods;
@@ -93,8 +96,10 @@ public class TravelTimeIndexer {
         this.freeflowTT = freeflowTT;
         this.infra = tmo.getInfra();
         weatherList = wList;
+        this.rd = _rd;
     }
-        
+    
+    @Override
     public void run() {
         
         Evaluation.clearCache();
@@ -127,6 +132,7 @@ public class TravelTimeIndexer {
         opt.addOption(OptionType.FIXING_MISSING_DATA);
 
         try {
+            System.out.println("Evaluating Station Speed...");
             // speed / accel
             opt.setInterval(this.dataInterval);
             Evaluation speed = Evaluation.createEvaluate(OptionType.STATION_SPEED, opt);   
@@ -134,11 +140,13 @@ public class TravelTimeIndexer {
             speed.doEvaluate();
             //speed.saveExcel(".");
             
+            System.out.println("Evaluating Station Acc and Dec....");
             Evaluation accel = Evaluation.createEvaluate(OptionType.STATION_ACCEL, opt);        
             accel.setPrintDebug(false);
             accel.doEvaluate();
             
             // tt
+            System.out.println("Evaluating TravelTime....");
             opt.setInterval(this.ttInterval);
             Evaluation tt = Evaluation.createEvaluate(OptionType.EVAL_TT, opt);
             tt.setPrintDebug(false);
@@ -151,15 +159,18 @@ public class TravelTimeIndexer {
             opt.setInterval(this.evalInterval);
             
             // eval
+            System.out.println("Evaluating Station VMT.....");
             opt.removeOption(OptionType.WITHOUT_VIRTUAL_STATIONS);
             Evaluation vmt = Evaluation.createEvaluate(OptionType.EVAL_VMT, opt);  
             vmt.setPrintDebug(false);
             vmt.doEvaluate();
             
+            System.out.println("Evaluating Station DVH.....");
             Evaluation dvh = Evaluation.createEvaluate(OptionType.EVAL_DVH, opt);
             dvh.setPrintDebug(false);
             dvh.doEvaluate();
             
+            System.out.println("Evaluating Station LVMT.....");
             Evaluation lvmt = Evaluation.createEvaluate(OptionType.EVAL_LVMT, opt);
             lvmt.setPrintDebug(false);
             lvmt.doEvaluate();
@@ -168,7 +179,10 @@ public class TravelTimeIndexer {
             processTotal(lvmt);
             processTotal(dvh);
 //            processTotal()
+            
+            System.out.println("Evaluating TravelTime Index.....");
             processTravelTimeIndex(tt, vmt);
+            System.out.println("Evaluating Weather Data.....");
             processWeather(weatherList);
            // volume
             if(this.volumeAnalysisTargetStations != null && this.volumeAnalysisTargetStations.length > 0 && !this.volumeAnalysisTargetStations[0].isEmpty()) {
@@ -179,9 +193,10 @@ public class TravelTimeIndexer {
                 processFlow(flow);
             }               
             
+            System.out.println("Saving Results.....");
             //printResults();            
             saveResults();
-            
+            rd.close(1.8);
         } catch(Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(null, "Fail to evaulate");
@@ -802,10 +817,10 @@ public class TravelTimeIndexer {
             WritableSheet sheet = workbook.createSheet("data", 0);
             col = 0;            
             row = 0;
-            System.out.println(evaluationResults.size());
+//            System.out.println(evaluationResults.size());
             for(EvalData ed : evaluationResults) {
                 int colIdx = 0;
-                
+                System.out.println("  - "+ed.name+"...");
                 // print evaluation name
                 sheet.addCell(new Label(colIdx++, row, ed.name));
 //                System.out.print(ed.name+" : "+ed.dates.size());
@@ -837,17 +852,18 @@ public class TravelTimeIndexer {
                 WritableSheet wsheet = workbook.createSheet("W"+wtmc.getPeriod().getPeriodStringWithoutTime(), cnt);
                 col = 0;            
                 row = 0;
-                System.out.println("error = " + wtmc.getPeriod().getPeriodStringHWithoutTime());
+//                System.out.println("error = " + wtmc.getPeriod().getPeriodStringHWithoutTime());
                 for(String timeline : pr.getTimeline()){
                     col = 0;
                     wsheet.addCell(new Label(col++,row,timeline));
-                    System.out.println(pr.getTimeline().length + " " + wtmc.type.length);
+//                    System.out.println(pr.getTimeline().length + " " + wtmc.type.length);
                     if(wtmc.type.length != 0){
-                        System.out.println((int)wtmc.type[row]);
+//                        System.out.println((int)wtmc.type[row]);
                         wsheet.addCell(new Label(col++,row,WeatherType.getWeatherType((int)wtmc.type[row]).toString()));
                         wsheet.addCell(new Number(col++,row,wtmc.rainfall[row]));
-                    }else
-                        System.out.println("error = " + wtmc.getPeriod().getPeriodStringHWithoutTime());
+                    }else{
+//                        System.out.println("error = " + wtmc.getPeriod().getPeriodStringHWithoutTime());
+                    }
                     row++;
                 }
                 cnt ++;
