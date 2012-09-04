@@ -30,9 +30,11 @@ import edu.umn.natsrl.infra.simobjects.SimMeter;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
 import edu.umn.natsrl.ticas.plugin.metering.MeteringSectionHelper.StationState;
 import edu.umn.natsrl.util.FileHelper;
+import edu.umn.natsrl.vissimcom.ComError;
 import edu.umn.natsrl.vissimcom.IStepListener;
 import edu.umn.natsrl.vissimcom.ITravelTimeListener;
 import edu.umn.natsrl.vissimcom.VISSIMController;
+import edu.umn.natsrl.vissimcom.VISSIMVersion;
 //import edu.umn.natsrl.vissimctrl.IStepListener;
 //import edu.umn.natsrl.vissimctrl.ITravelTimeListener;
 //import edu.umn.natsrl.vissimctrl.VISSIMController;
@@ -68,14 +70,16 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     private ISimEndSignal signalListener;            
     private int samples = 0;    
     private boolean noMetering = true;
+    private VISSIMVersion version;
     
-    public Simulation(String caseFile, int seed, Section section, boolean noMetering) {
+    private boolean isStop = false;
+    public Simulation(String caseFile, int seed, Section section, boolean noMetering, VISSIMVersion v) {
         try {
             this.caseFile = caseFile;
             this.seed = seed;
             this.section = section;
             this.noMetering = noMetering;
-            
+            version = v;
             loadSignalGroupFromCasefile(this.caseFile);
             loadDetectorsFromCasefile(this.caseFile);
         } catch (IOException ex) {
@@ -88,9 +92,17 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     
     @Override
     public void run() {        
-        
+        isStop = false;
         vc = new VISSIMController();
-        vc.initialize(caseFile, seed);
+        
+        ComError ce = ComError.getErrorbyID(vc.initialize(caseFile,seed,version));
+        if(!ce.isCorrect()){
+            this.signalListener.signalEnd(ce.getErrorType());
+            this.vc.stop();
+            this.vc.close();
+            return;
+        }
+        
         vc.initializeMetering(100);
         vc.initializeTravelTimeMeasuring();
         vc.addTravelTimeListener(this);
@@ -107,6 +119,8 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         ArrayList<StationState> stationStates = metering.sectionHelper.getStationStates();
         
         while(true) {
+            if(isStop)
+                break;
             
             vc.run(30);
             
@@ -163,6 +177,11 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         this.vc.close();
     }
     
+    public void simulationStop(){
+        isStop = true;
+        vc.stop();
+        vc.close();
+    }
     @Override
     /**
      * routine executed every simulation step by VISSIMController

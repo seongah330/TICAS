@@ -27,6 +27,8 @@ import edu.umn.natsrl.sfim.SectionInfoDialog;
 import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import edu.umn.natsrl.ticas.plugin.fixedmetering.FixedSimulation.ISimEndSignal;
 import edu.umn.natsrl.util.FileHelper;
+import edu.umn.natsrl.vissimcom.ComError;
+import edu.umn.natsrl.vissimcom.VISSIMVersion;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -39,6 +41,8 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -76,6 +80,11 @@ public class FixedMeteringSimulationGUI extends javax.swing.JPanel implements IS
             this.cbxInterval.addItem(i);
         }
         
+        //VissimVersion
+        for(VISSIMVersion v : VISSIMVersion.values()){
+            this.cbxvissimVersion.addItem(v);
+        }
+        
         MeteringConfig.loadConfig();
         this.tbxCaseFile.setText(MeteringConfig.CASE_FILE);
         DecimalFormat df = new DecimalFormat();
@@ -84,6 +93,18 @@ public class FixedMeteringSimulationGUI extends javax.swing.JPanel implements IS
         isLoaded(false);
         
         ExcelAdapter exap = new ExcelAdapter(this.tbRate);
+        
+        this.addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent event) {}
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+                sim.simulationStop();
+            }
+            @Override
+            public void ancestorMoved(AncestorEvent event) {}
+        });
     }
 
     /**
@@ -108,6 +129,8 @@ public class FixedMeteringSimulationGUI extends javax.swing.JPanel implements IS
         jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         tbxRandom = new javax.swing.JTextField();
+        cbxvissimVersion = new javax.swing.JComboBox();
+        jLabel6 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         cbxInterval = new javax.swing.JComboBox();
         btnLoadCasefile = new javax.swing.JButton();
@@ -177,6 +200,11 @@ public class FixedMeteringSimulationGUI extends javax.swing.JPanel implements IS
         tbxRandom.setText("13");
         tbxRandom.setPreferredSize(new java.awt.Dimension(59, 25));
 
+        cbxvissimVersion.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+
+        jLabel6.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
+        jLabel6.setText("VISSIM Version");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -184,25 +212,24 @@ public class FixedMeteringSimulationGUI extends javax.swing.JPanel implements IS
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(btnBrowse)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(tbxCaseFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(cbxSections, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnSectionInfo)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnOpenSectionEditor)))
-                        .addContainerGap(151, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(tbxRandom, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                            .addComponent(btnBrowse)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(tbxCaseFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                            .addComponent(cbxSections, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnSectionInfo)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnOpenSectionEditor)))
+                    .addComponent(tbxRandom, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbxvissimVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6))
+                .addContainerGap(151, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -224,7 +251,11 @@ public class FixedMeteringSimulationGUI extends javax.swing.JPanel implements IS
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(tbxRandom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(71, 71, 71))
+                .addGap(15, 15, 15)
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(cbxvissimVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         jLabel5.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
@@ -456,12 +487,14 @@ public class FixedMeteringSimulationGUI extends javax.swing.JPanel implements IS
     private javax.swing.JButton btnStart;
     private javax.swing.JComboBox cbxInterval;
     private javax.swing.JComboBox cbxSections;
+    private javax.swing.JComboBox cbxvissimVersion;
     private javax.swing.JCheckBox chkShowVehicles;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -545,25 +578,37 @@ public class FixedMeteringSimulationGUI extends javax.swing.JPanel implements IS
 
             startTime = new Date();
             Section section = (Section)this.cbxSections.getSelectedItem();
+            sim = new FixedSimulation(MeteringConfig.CASE_FILE,MeteringConfig.RANDOM_SEED,section,(VISSIMVersion)this.cbxvissimVersion.getSelectedItem());
             sim.setSignalListener(this);
             sim.setFixedMeter(fmg.getFixedMeters());
+            sim.setVISSIMVersion((VISSIMVersion)this.cbxvissimVersion.getSelectedItem());
 
             MeteringConfig.RANDOM_SEED = Integer.parseInt(this.tbxRandom.getText());
             sim.setRandomSeed(MeteringConfig.RANDOM_SEED);
             sim.start();
+            System.out.println("Start!");
         }catch(Exception ex){
+            ex.printStackTrace();
             isSimulationStart(false);
         }
     }
     
     @Override
     public void signalEnd(int code) {
-        if(code == 0) {
+        if(code == -1) {
             this.chkShowVehicles.setEnabled(true);
             this.chkShowVehicles.setSelected(false);            
             setVissimVisible(false);
             return;
         }
+        
+        ComError ce = ComError.getErrorbyID(code);
+        if(!ce.isCorrect()){
+            JOptionPane.showMessageDialog(simFrame, ce.toString());
+            isSimulationStart(false);
+            return;
+        }
+        
         int samples = sim.getSamples();
         if(samples < 5) {
             JOptionPane.showMessageDialog(simFrame, "Too short simulation");
@@ -593,7 +638,7 @@ public class FixedMeteringSimulationGUI extends javax.swing.JPanel implements IS
         MeteringConfig.saveConfig();
         
         Section section = (Section)this.cbxSections.getSelectedItem();
-        sim = new FixedSimulation(MeteringConfig.CASE_FILE,MeteringConfig.RANDOM_SEED,section);
+        sim = new FixedSimulation(MeteringConfig.CASE_FILE,MeteringConfig.RANDOM_SEED,section,(VISSIMVersion)this.cbxvissimVersion.getSelectedItem());
         for(SimMeter m : sim.getSimMeter()){
             System.out.print(m.getMeter().getLabel()+"  - ");
             for(String mid : m.getMeterID())

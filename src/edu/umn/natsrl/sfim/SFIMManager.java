@@ -39,6 +39,7 @@ import edu.umn.natsrl.util.FileHelper;
 import edu.umn.natsrl.util.Logger;
 import edu.umn.natsrl.vissimcom.ITravelTimeListener;
 import edu.umn.natsrl.vissimcom.VISSIMController;
+import edu.umn.natsrl.vissimcom.VISSIMVersion;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -528,7 +529,7 @@ public class SFIMManager implements ITravelTimeListener {
             // param 2 : signal control id for detector (see case file)
             // param 3 : random seed (if -1, use random seed of case file)
 //            System.err.println("tests1");
-            vc.initialize(vissimCaseFile, 1, randomSeed);
+            vc.initialize(vissimCaseFile, 1, randomSeed,VISSIMVersion.VISSIM540x64);
             vc.initializeTravelTimeMeasuring();
             vc.addTravelTimeListener(this);
             // param 1 : signal control id for metering (see case file)

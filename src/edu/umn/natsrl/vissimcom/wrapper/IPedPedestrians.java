@@ -218,4 +218,16 @@ public class IPedPedestrians extends DispatchPtr {
           return res;
         
     }
+    /**
+    *
+    
+    * @param PedID
+    * @return void
+    **/
+    public void RemoveBeelinePedPedestrian(int PedID) throws COMException
+    {
+      
+		invokeN("RemoveBeelinePedPedestrian", new Object[] {new Integer(PedID)});
+        
+    }
 }

@@ -32,6 +32,8 @@ import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import edu.umn.natsrl.ticas.plugin.metering.Simulation.ISimEndSignal;
 import edu.umn.natsrl.util.FileHelper;
 import edu.umn.natsrl.util.PropertiesWrapper;
+import edu.umn.natsrl.vissimcom.ComError;
+import edu.umn.natsrl.vissimcom.VISSIMVersion;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -43,6 +45,8 @@ import javax.swing.JOptionPane;
 import java.util.Vector;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 /**
  *
@@ -64,6 +68,11 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
         this.simFrame = parent;
         this.loadSection();
         
+        //VissimVersion
+        for(VISSIMVersion v : VISSIMVersion.values()){
+            this.cbxVissimVersion.addItem(v);
+        }
+        
         MeteringConfig.loadConfig();
         DecimalFormat df = new DecimalFormat();
         df.setDecimalSeparatorAlwaysShown(false);
@@ -82,6 +91,18 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
         this.tbxMaxWaittingTime.setText(df.format(MeteringConfig.MAX_WAIT_TIME_MINUTE));
         this.tbxMaxWaittingTimeF2F.setText(df.format(MeteringConfig.MAX_WAIT_TIME_MINUTE_F2F));        
 
+        
+        this.addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent event) {}
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+                sim.simulationStop();
+            }
+            @Override
+            public void ancestorMoved(AncestorEvent event) {}
+        });
     }
     
     private void runSimulation() {
@@ -112,7 +133,7 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
             
             Section section = (Section)this.cbxSections.getSelectedItem();
             boolean noMetering = this.chkNoMetering.isSelected();
-            sim = new Simulation(MeteringConfig.CASE_FILE, MeteringConfig.RANDOM_SEED, section, noMetering);
+            sim = new Simulation(MeteringConfig.CASE_FILE, MeteringConfig.RANDOM_SEED, section, noMetering, (VISSIMVersion)this.cbxVissimVersion.getSelectedItem());
             sim.setSignalListener(this);
             sim.start();
             
@@ -169,6 +190,14 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
             setVissimVisible(false);
             return;
         }
+        
+        ComError ce = ComError.getErrorbyID(code);
+        if(!ce.isCorrect()){
+            JOptionPane.showMessageDialog(simFrame, ce.toString());
+            this.restoreOutput();
+            return;
+        }
+        
         int samples = sim.getSamples();
         if(samples < 5) {
             JOptionPane.showMessageDialog(simFrame, "Too short simulation");
@@ -318,6 +347,8 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
         jLabel4 = new javax.swing.JLabel();
         chkShowVehicles = new javax.swing.JCheckBox();
         chkNoMetering = new javax.swing.JCheckBox();
+        cbxVissimVersion = new javax.swing.JComboBox();
+        jLabel13 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
@@ -373,10 +404,10 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Simulation Parameters", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 12))); // NOI18N
 
-        jLabel3.setFont(new java.awt.Font("Verdana", 1, 10));
+        jLabel3.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel3.setText("Section");
 
-        cbxSections.setFont(new java.awt.Font("Verdana", 0, 10));
+        cbxSections.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         cbxSections.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbxSectionsActionPerformed(evt);
@@ -397,10 +428,10 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
             }
         });
 
-        jLabel1.setFont(new java.awt.Font("Verdana", 1, 10));
+        jLabel1.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel1.setText("Case File");
 
-        btnBrowse.setFont(new java.awt.Font("Verdana", 0, 11));
+        btnBrowse.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         btnBrowse.setText("Browse");
         btnBrowse.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -408,20 +439,20 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
             }
         });
 
-        tbxCaseFile.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxCaseFile.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxCaseFile.setPreferredSize(new java.awt.Dimension(6, 25));
 
-        jLabel2.setFont(new java.awt.Font("Verdana", 1, 10));
+        jLabel2.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel2.setText("Random Number");
 
-        tbxRandom.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxRandom.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxRandom.setText("13");
         tbxRandom.setPreferredSize(new java.awt.Dimension(59, 25));
 
-        jLabel4.setFont(new java.awt.Font("Verdana", 1, 10));
+        jLabel4.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel4.setText("Option");
 
-        chkShowVehicles.setFont(new java.awt.Font("Verdana", 0, 12));
+        chkShowVehicles.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         chkShowVehicles.setSelected(true);
         chkShowVehicles.setText("show vehicles and road");
         chkShowVehicles.setEnabled(false);
@@ -431,8 +462,13 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
             }
         });
 
-        chkNoMetering.setFont(new java.awt.Font("Verdana", 0, 12));
+        chkNoMetering.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         chkNoMetering.setText("no metering");
+
+        cbxVissimVersion.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+
+        jLabel13.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
+        jLabel13.setText("VISSIM Version");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -441,14 +477,8 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(chkShowVehicles)
-                        .addGap(18, 18, 18)
-                        .addComponent(chkNoMetering))
                     .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(tbxRandom, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                         .addComponent(btnBrowse)
@@ -459,8 +489,21 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSectionInfo)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnOpenSectionEditor)))
-                .addContainerGap(51, Short.MAX_VALUE))
+                        .addComponent(btnOpenSectionEditor))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(tbxRandom, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(cbxVissimVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(chkShowVehicles))
+                        .addGap(18, 18, 18)
+                        .addComponent(chkNoMetering))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(49, 49, 49)
+                        .addComponent(jLabel13)))
+                .addContainerGap(55, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -478,9 +521,13 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
                     .addComponent(btnBrowse)
                     .addComponent(tbxCaseFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jLabel2)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel13))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(tbxRandom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tbxRandom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbxVissimVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -492,117 +539,117 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Metering Parameters", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 12))); // NOI18N
 
-        jLabel5.setFont(new java.awt.Font("Verdana", 0, 12));
+        jLabel5.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel5.setText("Kjam");
 
-        jLabel6.setFont(new java.awt.Font("Verdana", 0, 12));
+        jLabel6.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel6.setText("Kcrit");
 
-        jLabel7.setFont(new java.awt.Font("Verdana", 0, 12));
+        jLabel7.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel7.setText("Max Wait Time1");
 
-        tbxMaxWaittingTime.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxMaxWaittingTime.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxMaxWaittingTime.setText("4");
 
-        tbxKjam.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxKjam.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxKjam.setText("180");
 
-        tbxKc.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxKc.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxKc.setText("40");
 
-        jLabel8.setFont(new java.awt.Font("Verdana", 0, 11));
+        jLabel8.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jLabel8.setText("min");
 
-        jLabel9.setFont(new java.awt.Font("Verdana", 0, 11));
+        jLabel9.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jLabel9.setText("veh/hr");
 
-        jLabel10.setFont(new java.awt.Font("Verdana", 0, 11));
+        jLabel10.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jLabel10.setText("veh/hr");
 
-        jLabel11.setFont(new java.awt.Font("Verdana", 0, 11));
+        jLabel11.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jLabel11.setText("x Kcrit");
 
-        jLabel12.setFont(new java.awt.Font("Verdana", 0, 12));
+        jLabel12.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel12.setText("Kd");
 
-        tbxKd_Rate.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxKd_Rate.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxKd_Rate.setText("0.8");
 
-        jLabel15.setFont(new java.awt.Font("Verdana", 0, 12));
+        jLabel15.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel15.setText("Max Red Time");
 
-        tbxMaxRedTime.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxMaxRedTime.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxMaxRedTime.setText("30");
 
-        jLabel16.setFont(new java.awt.Font("Verdana", 0, 11));
+        jLabel16.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jLabel16.setText("seconds");
 
-        jLabel17.setFont(new java.awt.Font("Verdana", 0, 12));
+        jLabel17.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel17.setText("Max Wait Time2");
 
-        tbxMaxWaittingTimeF2F.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxMaxWaittingTimeF2F.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxMaxWaittingTimeF2F.setText("2");
 
-        jLabel18.setFont(new java.awt.Font("Verdana", 0, 11));
+        jLabel18.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jLabel18.setText("min");
 
-        jLabel19.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel19.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel19.setText("(freeway to freeway)");
 
-        jLabel20.setFont(new java.awt.Font("Verdana", 0, 12));
+        jLabel20.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel20.setText("Kb");
 
-        tbxKb.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxKb.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxKb.setText("25");
 
-        jLabel21.setFont(new java.awt.Font("Verdana", 0, 11));
+        jLabel21.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jLabel21.setText("veh/hr");
 
-        jLabel22.setFont(new java.awt.Font("Verdana", 0, 12));
+        jLabel22.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel22.setText("Ab");
 
-        tbxAb.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxAb.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxAb.setText("1000");
 
-        jLabel23.setFont(new java.awt.Font("Verdana", 0, 11));
+        jLabel23.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jLabel23.setText("mile/hr^2");
 
-        jLabel24.setFont(new java.awt.Font("Verdana", 0, 12));
+        jLabel24.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel24.setText("Kstop");
 
-        tbxKstop.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxKstop.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxKstop.setText("20");
 
-        jLabel25.setFont(new java.awt.Font("Verdana", 0, 11));
+        jLabel25.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jLabel25.setText("veh/hr");
 
-        jLabel26.setFont(new java.awt.Font("Verdana", 0, 12));
+        jLabel26.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel26.setText("Stop Duration");
 
-        tbxStopDuration.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxStopDuration.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxStopDuration.setText("10");
 
-        jLabel27.setFont(new java.awt.Font("Verdana", 0, 11));
+        jLabel27.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jLabel27.setText("time steps");
 
-        jLabel28.setFont(new java.awt.Font("Verdana", 0, 12));
+        jLabel28.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel28.setText("Stop BS Trend");
 
         tbxStopTrend.setEditable(false);
         tbxStopTrend.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxStopTrend.setText("0");
 
-        jLabel29.setFont(new java.awt.Font("Verdana", 0, 11));
+        jLabel29.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jLabel29.setText("time steps");
 
-        jLabel30.setFont(new java.awt.Font("Verdana", 0, 12));
+        jLabel30.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel30.setText("Stop Upstream #");
 
         tbxStopUpstreamCount.setEditable(false);
         tbxStopUpstreamCount.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxStopUpstreamCount.setText("0");
 
-        jLabel31.setFont(new java.awt.Font("Verdana", 0, 11));
+        jLabel31.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jLabel31.setText("stations");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -724,10 +771,10 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
                     .addComponent(jLabel15)
                     .addComponent(tbxMaxRedTime, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel16))
-                .addContainerGap(14, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
-        btnRun.setFont(new java.awt.Font("Verdana", 0, 12));
+        btnRun.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnRun.setText("Run Simulation");
         btnRun.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -768,7 +815,7 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
         tbxLog.setRows(5);
         jScrollPane1.setViewportView(tbxLog);
 
-        btnClearLog.setFont(new java.awt.Font("Verdana", 0, 12));
+        btnClearLog.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnClearLog.setText("Clear");
         btnClearLog.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -776,7 +823,7 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
             }
         });
 
-        btnSaveLog.setFont(new java.awt.Font("Verdana", 0, 12));
+        btnSaveLog.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnSaveLog.setText("Save");
         btnSaveLog.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -825,7 +872,7 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 744, Short.MAX_VALUE)
+                .addComponent(jSplitPane1)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -887,12 +934,14 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
     private javax.swing.JButton btnSaveLog;
     private javax.swing.JButton btnSectionInfo;
     private javax.swing.JComboBox cbxSections;
+    private javax.swing.JComboBox cbxVissimVersion;
     private javax.swing.JCheckBox chkNoMetering;
     private javax.swing.JCheckBox chkShowVehicles;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;

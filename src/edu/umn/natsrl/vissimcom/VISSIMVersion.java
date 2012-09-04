@@ -15,17 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/*
- * TICASVersion.java
- *
- * Created on Dec 30, 2011, 1:38:27 PM
- */
-package edu.umn.natsrl.ticas;
+package edu.umn.natsrl.vissimcom;
+
+import org.jawin.GUID;
 
 /**
  *
- * @author Chongmyung Park
+ * @author Soobin Jeon <j.soobin@gmail.com>
  */
-public class TICASVersion {
-    public static String version = " 3.251";            
+public enum VISSIMVersion {
+    VISSIM540x64("{0157c47c-cb54-4788-9613-C444C7F0117C}"),
+    VISSIM540x86("{325df941-0b2d-40b1-B6C5-133E632203CD}");
+
+    private GUID CLSID;
+    VISSIMVersion(String guid){
+        CLSID = new GUID(guid);
+    }
+    
+    public GUID getGUID(){
+        return CLSID;
+    }
+    
+    public boolean is540x86(){
+        return this == VISSIM540x86;
+    }
+    public boolean is540x64(){
+        return this == VISSIM540x64;
+    }
 }

@@ -36,6 +36,8 @@ import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import edu.umn.natsrl.ticas.plugin.vissimcalibration2.Simulation.ISimEndSignal;
 import edu.umn.natsrl.util.FileHelper;
 import edu.umn.natsrl.util.PropertiesWrapper;
+import edu.umn.natsrl.vissimcom.ComError;
+import edu.umn.natsrl.vissimcom.VISSIMVersion;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
@@ -56,6 +58,8 @@ import javax.swing.JList;
 import javax.swing.JTextArea;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 /**
  *
@@ -82,6 +86,11 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
         this.simFrame = parent;
         this.loadSection();
         
+        //VissimVersion
+        for(VISSIMVersion v : VISSIMVersion.values()){
+            this.cbxVissimVersion.addItem(v);
+        }
+        
         MeteringConfig.loadConfig();
         DecimalFormat df = new DecimalFormat();
         df.setDecimalSeparatorAlwaysShown(false);
@@ -103,6 +112,18 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
         //modify for Random 02/22/2012
         this.randomseeds = RandomSeeds.load(RandomSeeds.SAVE_PROP_NAME);
         this.ReflashGroupList();
+        
+        this.addAncestorListener(new AncestorListener() {
+            @Override
+            public void ancestorAdded(AncestorEvent event) {}
+
+            @Override
+            public void ancestorRemoved(AncestorEvent event) {
+                sim.simulationStop();
+            }
+            @Override
+            public void ancestorMoved(AncestorEvent event) {}
+        });
     }
     
     private void runSimulation() {
@@ -137,7 +158,7 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             MeteringConfig.saveConfig();
             
             Section section = (Section)this.cbxSections.getSelectedItem();
-            sim = new Simulation(MeteringConfig.CASE_FILE, MeteringConfig.RANDOM_SEED, section, true);
+            sim = new Simulation(MeteringConfig.CASE_FILE, MeteringConfig.RANDOM_SEED, section, true, (VISSIMVersion)this.cbxVissimVersion.getSelectedItem() );
             sim.setSignalListener(this);
             sim.start();
             
@@ -173,12 +194,20 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
 
     @Override
     public void signalEnd(int code) {
-        if(code == 0) {
+        if(code == -1) {
             this.chkShowVehicles.setEnabled(true);
             this.chkShowVehicles.setSelected(false);            
             setVissimVisible(false);
             return;
         }
+        
+        ComError ce = ComError.getErrorbyID(code);
+        if(!ce.isCorrect()){
+            JOptionPane.showMessageDialog(simFrame, ce.toString());
+            this.restoreOutput();
+            return;
+        }
+        
         int samples = sim.getSamples();
         if(samples < 5) {
             JOptionPane.showMessageDialog(simFrame, "Too short simulation");
@@ -419,6 +448,8 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
         chkShowVehicles = new javax.swing.JCheckBox();
         jLabel5 = new javax.swing.JLabel();
         cbxTimeInterval = new javax.swing.JComboBox();
+        jLabel6 = new javax.swing.JLabel();
+        cbxVissimVersion = new javax.swing.JComboBox();
         btnRun = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
@@ -461,10 +492,10 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Simulation Parameters", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 12))); // NOI18N
 
-        jLabel3.setFont(new java.awt.Font("Verdana", 1, 10));
+        jLabel3.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel3.setText("Section");
 
-        cbxSections.setFont(new java.awt.Font("Verdana", 0, 10));
+        cbxSections.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         cbxSections.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbxSectionsActionPerformed(evt);
@@ -485,10 +516,10 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             }
         });
 
-        jLabel1.setFont(new java.awt.Font("Verdana", 1, 10));
+        jLabel1.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel1.setText("Case File");
 
-        btnBrowse.setFont(new java.awt.Font("Verdana", 0, 11));
+        btnBrowse.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         btnBrowse.setText("Browse");
         btnBrowse.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -496,13 +527,13 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             }
         });
 
-        tbxCaseFile.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxCaseFile.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxCaseFile.setPreferredSize(new java.awt.Dimension(6, 25));
 
-        jLabel4.setFont(new java.awt.Font("Verdana", 1, 10));
+        jLabel4.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel4.setText("Option");
 
-        chkShowVehicles.setFont(new java.awt.Font("Verdana", 0, 12));
+        chkShowVehicles.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         chkShowVehicles.setSelected(true);
         chkShowVehicles.setText("show vehicles and road");
         chkShowVehicles.setEnabled(false);
@@ -512,10 +543,16 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             }
         });
 
-        jLabel5.setFont(new java.awt.Font("Verdana", 1, 10));
+        jLabel5.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel5.setText("Simulation DataLog Time Interval");
 
         cbxTimeInterval.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "30 second", "1 min", "2 min", "3 min", "4 min", "5 min", "10 min", "15 min", "20 min", "30 min", "1 hour" }));
+
+        jLabel6.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
+        jLabel6.setText("VISSIM Version");
+
+        cbxVissimVersion.setEditable(true);
+        cbxVissimVersion.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -540,8 +577,10 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
                     .addComponent(jLabel5)
                     .addComponent(cbxTimeInterval, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4)
-                    .addComponent(chkShowVehicles))
-                .addContainerGap(52, Short.MAX_VALUE))
+                    .addComponent(chkShowVehicles)
+                    .addComponent(jLabel6)
+                    .addComponent(cbxVissimVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -565,10 +604,15 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkShowVehicles))
+                .addComponent(chkShowVehicles)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cbxVissimVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(24, Short.MAX_VALUE))
         );
 
-        btnRun.setFont(new java.awt.Font("Verdana", 0, 12));
+        btnRun.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnRun.setText("Run Simulation");
         btnRun.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -599,7 +643,7 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Random Number"));
 
-        tbxRandom.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxRandom.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxRandom.setText("13");
         tbxRandom.setEnabled(false);
         tbxRandom.setPreferredSize(new java.awt.Dimension(59, 25));
@@ -693,11 +737,11 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 97, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(jPanel8Layout.createSequentialGroup()
                         .addGap(1, 1, 1)
                         .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtRnumber, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
+                            .addComponent(txtRnumber, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(jPanel8Layout.createSequentialGroup()
                                 .addComponent(jButton1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -739,7 +783,6 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
         });
 
         jButton5.setText("◀ Clear");
-        jButton5.setMinimumSize(new java.awt.Dimension(73, 23));
         jButton5.setPreferredSize(new java.awt.Dimension(73, 35));
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -858,18 +901,18 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnRun, javax.swing.GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE)
-                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 389, Short.MAX_VALUE))
+                    .addComponent(btnRun, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jTabbedPane1))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 133, Short.MAX_VALUE)
+                .addGap(50, 50, 50)
                 .addComponent(btnRun, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -883,7 +926,7 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
         tbxLog.setRows(5);
         jScrollPane1.setViewportView(tbxLog);
 
-        btnClearLog.setFont(new java.awt.Font("Verdana", 0, 12));
+        btnClearLog.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnClearLog.setText("Clear");
         btnClearLog.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -891,7 +934,7 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             }
         });
 
-        btnSaveLog.setFont(new java.awt.Font("Verdana", 0, 12));
+        btnSaveLog.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnSaveLog.setText("Save");
         btnSaveLog.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -917,7 +960,7 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 633, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 635, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSaveLog, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -933,13 +976,13 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(20, 20, 20)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 942, Short.MAX_VALUE))
+                .addComponent(jSplitPane1))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 723, Short.MAX_VALUE)
+                .addComponent(jSplitPane1)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -1153,6 +1196,7 @@ private void chxRunwithsingleRandomActionPerformed(java.awt.event.ActionEvent ev
     private javax.swing.JComboBox cbxRandomSeedList;
     private javax.swing.JComboBox cbxSections;
     private javax.swing.JComboBox cbxTimeInterval;
+    private javax.swing.JComboBox cbxVissimVersion;
     private javax.swing.JCheckBox chkShowVehicles;
     private javax.swing.JCheckBox chxRunwithsingleRandom;
     private javax.swing.JButton jButton1;
@@ -1166,6 +1210,7 @@ private void chxRunwithsingleRandomActionPerformed(java.awt.event.ActionEvent ev
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;

@@ -207,7 +207,7 @@ public class IDesiredSpeedDecision extends DispatchPtr {
     *
     * @param AttValue
     **/
-    public void setAttValue(String Attribute,int newValue2) throws COMException
+    public void setAttValue(String Attribute,Variant newValue2) throws COMException
     {
         put("AttValue", Attribute, newValue2);
     }
@@ -216,7 +216,7 @@ public class IDesiredSpeedDecision extends DispatchPtr {
     *
     * @return Variant
     **/
-    public Object getAttValue1(String Attribute,int Parameter) throws COMException
+    public Object getAttValue1(String Attribute,Variant Parameter) throws COMException
     {
          return getN("AttValue1", new Object[] {Attribute,Parameter});
     }

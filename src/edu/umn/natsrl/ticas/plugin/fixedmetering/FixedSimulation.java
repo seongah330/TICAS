@@ -25,9 +25,11 @@ import edu.umn.natsrl.ticas.plugin.metering.MeteringSectionHelper;
 import edu.umn.natsrl.ticas.plugin.metering.MeteringSectionHelper.StationState;
 import edu.umn.natsrl.ticas.plugin.metering.Simulation;
 import edu.umn.natsrl.util.FileHelper;
+import edu.umn.natsrl.vissimcom.ComError;
 import edu.umn.natsrl.vissimcom.IStepListener;
 import edu.umn.natsrl.vissimcom.ITravelTimeListener;
 import edu.umn.natsrl.vissimcom.VISSIMController;
+import edu.umn.natsrl.vissimcom.VISSIMVersion;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -64,11 +66,15 @@ public class FixedSimulation extends Thread implements IStepListener, ITravelTim
     
     public MeteringSectionHelper sectionHelper;
     
-    public FixedSimulation(String caseFile, int seed, Section section){
+    private VISSIMVersion version;
+    
+    private boolean isStop = false;
+    public FixedSimulation(String caseFile, int seed, Section section, VISSIMVersion v){
         try{
             this.caseFile = caseFile;
             this.seed = seed;
             this.section = section;
+            version = v;
             
             loadSignalGroupFromCasefile(this.caseFile);
             loadDetectorsFromCasefile(this.caseFile);
@@ -80,9 +86,17 @@ public class FixedSimulation extends Thread implements IStepListener, ITravelTim
     
     @Override
     public void run(){
+        isStop = false;
         System.out.print("Starting VISSIM Simulator......");
         vc = new VISSIMController();
-        vc.initialize(caseFile,seed);
+        ComError ce = ComError.getErrorbyID(vc.initialize(caseFile,seed,version));
+        if(!ce.isCorrect()){
+            this.signalListener.signalEnd(ce.getErrorType());
+            this.vc.stop();
+            this.vc.close();
+            return;
+        }
+        
         System.out.println("Ok");
         
         System.out.print("VISSIM initializing.......");
@@ -90,7 +104,7 @@ public class FixedSimulation extends Thread implements IStepListener, ITravelTim
         vc.initializeTravelTimeMeasuring();
         vc.addTravelTimeListener(this);
         vc.addStepListener(1, this);
-        this.signalListener.signalEnd(0);
+        this.signalListener.signalEnd(-1);
         System.out.println("Ok");
         
          int totalExecutionStep = vc.getTotalExecutionStep();
@@ -103,6 +117,8 @@ public class FixedSimulation extends Thread implements IStepListener, ITravelTim
         int simcount=0; //30sec interval
         int runInterval = 30;
         while(true){
+            if(isStop)
+                break;
             System.out.println("\nData Log (Total Sec : "+simcount+")");
             setMeterRate(simcount);
             simcount+=runInterval;
@@ -131,6 +147,12 @@ public class FixedSimulation extends Thread implements IStepListener, ITravelTim
         
         this.vc.stop();
         this.vc.close();
+    }
+    
+    public void simulationStop(){
+        isStop = true;
+        vc.stop();
+        vc.close();
     }
     
     
@@ -372,6 +394,10 @@ public class FixedSimulation extends Thread implements IStepListener, ITravelTim
             float cycle = 3600 / (float)rate;
             return Math.max(cycle - meter.GREEN_YELLOW_TIME, MeteringConfig.MIN_RED_TIME);
         }
+
+    void setVISSIMVersion(VISSIMVersion selectedItem) {
+        version = selectedItem;
+    }
     
     public static interface ISimEndSignal {
         public void signalEnd(int code);

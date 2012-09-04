@@ -404,8 +404,8 @@ public class VISSIMController {
      * set signal controller for detector to DEFAULT_SC_FOR_DETECTOR(1) and
      * use random seed of case file
      */
-    public void initialize(String casefile) {
-        initialize(casefile, this.DEFAULT_SC_FOR_DETECTOR, -1);
+    public int initialize(String casefile,VISSIMVersion v) {
+        return initialize(casefile, this.DEFAULT_SC_FOR_DETECTOR, -1,v);
     }
 
     /**
@@ -413,8 +413,8 @@ public class VISSIMController {
      * set signal controller for detector to DEFAULT_SC_FOR_DETECTOR(1)
      * @param randomSeed 
      */
-    public void initialize(String casefile, int randomSeed) {
-        initialize(casefile, 1, randomSeed);
+    public int initialize(String casefile, int randomSeed, VISSIMVersion v) {
+        return initialize(casefile, 1, randomSeed,v);
     }
 
     /**
@@ -422,13 +422,14 @@ public class VISSIMController {
      * @param signalControlIdForDetector
      * @param randomSeed 
      */
-    public void initialize(String casefile, int signalControlIdForDetector, int randomSeed) {
+    public int initialize(String casefile, int signalControlIdForDetector, int randomSeed, VISSIMVersion vversion) {
         try {
             // set casefile
             this.caseFile = casefile;
 
             // get vissim
-            vissim = new IVissim(Vissim.CLSID);
+            
+            vissim = new IVissim(vversion.getGUID());
             vissim.LoadNet(this.caseFile, 0);
             simulation = vissim.getSimulation();
             net = vissim.getNet();
@@ -512,9 +513,11 @@ public class VISSIMController {
 
             simulation.RunSingleStep();
             simStep++;
-
+            
+            return 0;
         } catch (Exception ex) {
             ex.printStackTrace();
+            return ComError.getError(ex.toString()).getErrorType();
         }
     }
 

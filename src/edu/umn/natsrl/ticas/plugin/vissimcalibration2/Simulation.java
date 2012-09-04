@@ -38,6 +38,8 @@ import edu.umn.natsrl.vissimcom.VISSIMController;
 //import edu.umn.natsrl.vissimctrl.ITravelTimeListener;
 //import edu.umn.natsrl.vissimctrl.VISSIMController;
 import edu.umn.natsrl.ticas.plugin.vissimcalibration2.MeteringSectionHelper.StationState;
+import edu.umn.natsrl.vissimcom.ComError;
+import edu.umn.natsrl.vissimcom.VISSIMVersion;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -71,13 +73,16 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     private ISimEndSignal signalListener;            
     private int samples = 0;    
     private boolean noMetering = true;
+    private VISSIMVersion version;
     
-    public Simulation(String caseFile, int seed, Section section, boolean noMetering) {
+    private boolean isStop = false;
+    public Simulation(String caseFile, int seed, Section section, boolean noMetering, VISSIMVersion v) {
         try {
             this.caseFile = caseFile;
             this.seed = seed;
             this.section = section;
             this.noMetering = noMetering;
+            version = v;
             loadSignalGroupFromCasefile(this.caseFile);
             loadDetectorsFromCasefile(this.caseFile);
         } catch (IOException ex) {
@@ -92,12 +97,20 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     public void run() {        
         
         vc = new VISSIMController();
-        vc.initialize(caseFile, seed);
+        
+        ComError ce = ComError.getErrorbyID(vc.initialize(caseFile,seed,version));
+        if(!ce.isCorrect()){
+            this.signalListener.signalEnd(ce.getErrorType());
+            this.vc.stop();
+            this.vc.close();
+            return;
+        }
+        
         vc.initializeMetering(100);
         vc.initializeTravelTimeMeasuring();
         vc.addTravelTimeListener(this);
         vc.addStepListener(1, this);
-        this.signalListener.signalEnd(0);
+        this.signalListener.signalEnd(-1);
         
         int totalExecutionStep = vc.getTotalExecutionStep();
         int totalSamples = totalExecutionStep / 300;
@@ -118,7 +131,8 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         }
         
         while(true) {
-            
+            if(isStop)
+                break;
             vc.run(30);
                 
                 StringBuilder ulog = new StringBuilder();
@@ -177,6 +191,12 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         
         this.vc.stop();
         this.vc.close();
+    }
+    
+    public void simulationStop(){
+        isStop = true;
+        vc.stop();
+        vc.close();
     }
     
     @Override
