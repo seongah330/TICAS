@@ -153,8 +153,8 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
                         //calculate log data
                         for(int z=0;z<logvalues.get(i).length;z++){
                             if(z != 3){
-                                System.out.print(MeteringConfig.getInterval() + ", "+30+", "+MeteringConfig.getInterval()/30+"  ");
-                                System.out.println(logvalues.get(i)[z]);
+//                                System.out.print(MeteringConfig.getInterval() + ", "+30+", "+MeteringConfig.getInterval()/30+"  ");
+//                                System.out.println(logvalues.get(i)[z]);
                                 logvalues.get(i)[z] /= (MeteringConfig.getInterval()/30);
                             }
                         }
@@ -187,7 +187,7 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         int s = ( elapsedSeconds % 3600 ) % 60;
         System.out.println("Simulation has been done (run time="+String.format("%02d", h)+":"+String.format("%02d", m)+":"+String.format("%02d", s)+")");
         writeTTLog();
-        this.signalListener.signalEnd(1);
+        this.signalListener.signalEnd(0);
         
         this.vc.stop();
         this.vc.close();

@@ -171,7 +171,7 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         int s = ( elapsedSeconds % 3600 ) % 60;
         System.out.println("Simulation has been done (run time="+String.format("%02d", h)+":"+String.format("%02d", m)+":"+String.format("%02d", s)+")");
         writeTTLog();
-        this.signalListener.signalEnd(1);
+        this.signalListener.signalEnd(0);
         
         this.vc.stop();
         this.vc.close();

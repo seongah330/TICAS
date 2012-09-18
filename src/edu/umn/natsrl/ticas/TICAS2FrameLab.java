@@ -441,7 +441,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             addSimulationPlugins(simEvaluator);            
         }
         
-        PluginInfo simFixedMetering = new PluginInfo("Fixed Simulation", PluginType.TOOL, FixedMeteringSimulation.class);       
+        PluginInfo simFixedMetering = new PluginInfo("Fixed Metering Simulation", PluginType.TOOL, FixedMeteringSimulation.class);       
         addSimulationPlugins(simFixedMetering);
         
         if(addMeteringPlugin) {

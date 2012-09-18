@@ -126,8 +126,8 @@ public class FixedSimulation extends Thread implements IStepListener, ITravelTim
             //for debuging
             for (int i = 0; i < stationStates.size(); i++) {
                 System.out.println(stationStates.get(i).id + " : q="+stationStates.get(i).getFlow()
-                        + " k=" +stationStates.get(i).getDensity()+"("+stationStates.get(i).getAggregatedDensity()+")"
-                        + " u=" + stationStates.get(i).getSpeed()+"("+stationStates.get(i).getAggregatedSpeed()+")"
+                        + " k=" +String.format("%.1f", stationStates.get(i).getDensity())
+                        + " u=" + String.format("%.1f", stationStates.get(i).getSpeed())
                         + " v=" + stationStates.get(i).getVolume());
             }
             samples++;
@@ -143,7 +143,7 @@ public class FixedSimulation extends Thread implements IStepListener, ITravelTim
         int s = ( elapsedSeconds % 3600 ) % 60;
         System.out.println("Simulation has been done (run time="+String.format("%02d", h)+":"+String.format("%02d", m)+":"+String.format("%02d", s)+")");
 //        writeTTLog();
-        this.signalListener.signalEnd(1);
+        this.signalListener.signalEnd(0);
         
         this.vc.stop();
         this.vc.close();
