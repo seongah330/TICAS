@@ -76,7 +76,6 @@ public abstract class AStationData extends Evaluation {
             {
                 // retrieve station
                 Station s = stations[col];
-                
                 // get data from station 
                 // this 'getTrafficData' method is implemented child-class
                 double[] data = getTrafficData(s);

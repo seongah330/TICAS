@@ -166,9 +166,13 @@ public class InfraViewerPanel extends javax.swing.JPanel {
             obj = infra.getStation(infraId);
             infraType = InfraType.STATION;
         } else if (infraId.startsWith("D")) {
+            infraId = infraId.substring(1);
             obj = infra.getDetector(infraId);
             infraType = InfraType.DETECTOR;
-        } else if (infraId.startsWith("M")) {
+        } else if(infraId.startsWith("T")){
+            obj = infra.getDetector(infraId);
+            infraType = InfraType.DETECTOR;
+        }else if (infraId.startsWith("M")) {
             obj = infra.getMeter(infraId);
             infraType = InfraType.METER;
         } else {
@@ -356,14 +360,14 @@ public class InfraViewerPanel extends javax.swing.JPanel {
             }
         });
 
-        cbxSections.setFont(new java.awt.Font("Verdana", 0, 10));
+        cbxSections.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         cbxSections.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbxSectionsActionPerformed(evt);
             }
         });
 
-        btnOpenSectionEditor.setFont(new java.awt.Font("Verdana", 0, 11));
+        btnOpenSectionEditor.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         btnOpenSectionEditor.setText("Section Editor");
         btnOpenSectionEditor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -379,10 +383,10 @@ public class InfraViewerPanel extends javax.swing.JPanel {
         });
         jScrollPane1.setViewportView(listSectionRNodes);
 
-        jLabel20.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel20.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel20.setText("* Center : double-click item");
 
-        jLabel21.setFont(new java.awt.Font("Verdana", 1, 11));
+        jLabel21.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
         jLabel21.setText("Action");
 
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
@@ -425,7 +429,7 @@ public class InfraViewerPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(cbxSections, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 334, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
                 .addGap(11, 11, 11)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -441,7 +445,7 @@ public class InfraViewerPanel extends javax.swing.JPanel {
             }
         });
 
-        btnFind.setFont(new java.awt.Font("Verdana", 0, 11));
+        btnFind.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         btnFind.setText("Find");
         btnFind.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -457,28 +461,28 @@ public class InfraViewerPanel extends javax.swing.JPanel {
         });
         jScrollPane3.setViewportView(listInfraObjects);
 
-        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 11));
+        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel5.setText("Search Example");
 
-        jLabel6.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel6.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel6.setText("Station : S43");
 
-        jLabel7.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel7.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel7.setText("Detector : D281");
 
-        jLabel8.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel8.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel8.setText("Meter : M35WN14");
 
-        jLabel9.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel9.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel9.setText("RNode : Nrnd_86405");
 
-        jLabel3.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel3.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel3.setText("* Center : double-click item");
 
-        jLabel10.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel10.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel10.setText("* Remove : right-click item");
 
-        jLabel11.setFont(new java.awt.Font("Verdana", 1, 11));
+        jLabel11.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
         jLabel11.setText("Action");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -520,7 +524,7 @@ public class InfraViewerPanel extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        btnLoadList.setFont(new java.awt.Font("Verdana", 0, 11));
+        btnLoadList.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         btnLoadList.setText("Load List");
         btnLoadList.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -528,7 +532,7 @@ public class InfraViewerPanel extends javax.swing.JPanel {
             }
         });
 
-        btnSaveList.setFont(new java.awt.Font("Verdana", 0, 11));
+        btnSaveList.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         btnSaveList.setText("Save List");
         btnSaveList.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -543,22 +547,21 @@ public class InfraViewerPanel extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel4)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(tbxFind, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnFind, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(btnLoadList)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 69, Short.MAX_VALUE)
-                        .addComponent(btnSaveList)))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(tbxFind, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnFind, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(btnLoadList)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 69, Short.MAX_VALUE)
+                                .addComponent(btnSaveList)))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -574,7 +577,7 @@ public class InfraViewerPanel extends javax.swing.JPanel {
                         .addComponent(jLabel4)
                         .addGap(67, 67, 67))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnLoadList)
@@ -608,10 +611,10 @@ public class InfraViewerPanel extends javax.swing.JPanel {
             }
         });
 
-        jLabel18.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel18.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel18.setText("* Remove : right-click item");
 
-        jLabel19.setFont(new java.awt.Font("Verdana", 1, 11));
+        jLabel19.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
         jLabel19.setText("Action");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
@@ -659,7 +662,7 @@ public class InfraViewerPanel extends javax.swing.JPanel {
                     .addComponent(cbxCorridors, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAddCorridor))
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 313, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -678,7 +681,6 @@ public class InfraViewerPanel extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 899, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 879, Short.MAX_VALUE)
@@ -686,7 +688,6 @@ public class InfraViewerPanel extends javax.swing.JPanel {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 549, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 527, Short.MAX_VALUE)

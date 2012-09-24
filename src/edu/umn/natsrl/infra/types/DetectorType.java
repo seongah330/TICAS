@@ -23,7 +23,8 @@ package edu.umn.natsrl.infra.types;
  */
 public enum DetectorType {
     ORIGINDETECTOR("",1),
-    TEMPDETECTOR("T",10000);
+    TEMPDETECTOR("T",10000),
+    TEMPDETECTOR_DT("DT",100000);
     
     String sType;
     int plot;
@@ -34,6 +35,8 @@ public enum DetectorType {
     }
     
     public static DetectorType getDetectorType(String _id){
+        if(_id == null)
+            return ORIGINDETECTOR;
         for(DetectorType t : DetectorType.values()){
             if(!t.isOriginDetector() && _id.contains(t.getTypeName())){
                 return t;
@@ -60,6 +63,11 @@ public enum DetectorType {
         return sType;
     }
     
-    boolean isOriginDetector(){return this == ORIGINDETECTOR;}
-    boolean isTempDetector(){return this == TEMPDETECTOR;}
+    public boolean isOriginDetector(){return this == ORIGINDETECTOR;}
+    public boolean isTempDetector(){
+        if(this == TEMPDETECTOR || this == TEMPDETECTOR_DT)
+            return this == TEMPDETECTOR;
+        else
+            return false;
+    }
 }

@@ -37,7 +37,17 @@ public enum StationType {
         return sType;
     }
     
-    static StationType getStationType(String _id){
+    public static String getStationNameFromTitle(String title, String contain) {
+        if(contain == null)
+            contain = "";
+        for(StationType t : StationType.values()){
+            if(title.contains(contain+t.sType))
+                return contain+t.sType;
+        }
+        return null;
+    }
+    
+    public static StationType getStationType(String _id){
         for(StationType t : StationType.values()){
             if(!t.isOriginStation() && _id.contains(t.getTypeName())){
                 return t;
@@ -70,7 +80,7 @@ public enum StationType {
         else return 0;
     }
     
-    boolean isOriginStation(){return this == ORIGINSTATION;}
-    boolean isTempStation_ST(){return this == TEMPSTATION_ST;}
-    boolean isTempStation_T(){return this == TEMPSTATION_T;}
+    public boolean isOriginStation(){return this == ORIGINSTATION;}
+    public boolean isTempStation_ST(){return this == TEMPSTATION_ST;}
+    public boolean isTempStation_T(){return this == TEMPSTATION_T;}
 }

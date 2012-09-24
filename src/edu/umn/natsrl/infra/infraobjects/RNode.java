@@ -167,17 +167,15 @@ public class RNode extends InfraObject {
         }
         
 //        System.out.println("find Detector : "+detectorList.getLength()); //debug test
-        
         TMO tmo = TMO.getInstance();
         for(int i=0;i<detectorList.getLength();i++){
             Element e = (Element)detectorList.item(i);
             String d = e.getAttribute(InfraProperty.name.toString());
             Detector det = tmo.getInfra().getDetector(d);
             if(det != null){
-                detectors.put(d,det);
+                detectors.put(det.getId(),det);
                 det.setRNode(this);
             }
-//            System.out.println("dname : "+d); //debug test
         }
     }
     
@@ -321,7 +319,6 @@ public class RNode extends InfraObject {
 
         }else{
             int idx = 0;
-
             for(Detector d : this.detectors.values())
             {
                     ddata[idx++] = d.getData(type);            
@@ -383,8 +380,9 @@ public class RNode extends InfraObject {
              * modify soobin Jeon 02/14/2012
              */
             if(validCount > 0) {
-                    if(atype.isFlow() || atype.isVolume() || atype.isFlowForAverage())
+                    if(atype.isFlow() || atype.isVolume() || atype.isFlowForAverage()){
                         avg[i] = sum;
+                    }
                     else{
                         avg[i] = sum/validCount;
 //                        if(avg[i] < 1)

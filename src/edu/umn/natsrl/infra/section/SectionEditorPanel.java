@@ -123,9 +123,15 @@ public class SectionEditorPanel extends javax.swing.JPanel {
         Infra infra = tmo.getInfra();
         sm.loadSections();
         Vector<Section> sections = sm.getSections();
-                
+
+        System.out.println("find Section\n");
         for (Section s : sections)  
-        {             
+        {      
+//            for(int i=0;i<s.getStations().length;i++){
+//                System.out.println("s : "+s.getStations()[i].getLabel()+"("+s.getStations()[i].getId()+")\n");
+//                RNode node = infra.find(s.getStations()[i].getId());
+//                if(node != null) s.addRNode(node);
+//            }
             for(String nid : s.getStationIds())
             {
                 RNode node = infra.find(nid);

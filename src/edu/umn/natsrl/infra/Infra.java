@@ -24,6 +24,7 @@ import edu.umn.natsrl.infra.infraobjects.RNode;
 import edu.umn.natsrl.infra.infraobjects.RampMeter;
 import edu.umn.natsrl.infra.infraobjects.Detector;
 import edu.umn.natsrl.infra.infraobjects.Corridor;
+import edu.umn.natsrl.infra.types.DetectorType;
 import edu.umn.natsrl.infra.types.InfraType;
 import edu.umn.natsrl.map.CoordinateConversion;
 import java.io.File;
@@ -466,7 +467,12 @@ public class Infra implements Serializable {
      * @return detector object
      */
     public Detector getDetector(String detector_id) {
-        return this.find(detector_id, InfraType.DETECTOR);
+        DetectorType dtype = DetectorType.getDetectorType(detector_id);
+        String did;
+        if(dtype.isTempDetector())
+            did = "D"+detector_id;
+        else did = detector_id;
+        return this.find(did, InfraType.DETECTOR);
     }
 
     /**

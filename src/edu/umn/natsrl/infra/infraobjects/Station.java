@@ -34,7 +34,9 @@ public class Station extends RNode {
     private HashMap<String, Station> upstreamStation = new HashMap<String, Station>();
     private HashMap<String, Integer> distanceToDownstreamStation = new HashMap<String, Integer>();    // unit = feet
     private HashMap<String, Integer> distanceToUpstreamStation = new HashMap<String, Integer>();    // unit = feet    
-        
+    
+    StationType sType;
+    
     public Station(Element ele) {
         super(ele);
         String station_id = getStationId();
@@ -42,8 +44,9 @@ public class Station extends RNode {
         
 //        this.sid = Integer.parseInt(station_id.substring(1));  // S43 -> 43
         this.sid = StationType.getStationIDbyType(station_id);
-        
-        if(this.sid / 100 == 17) this.isWavetronicsStation = true;        
+        sType = StationType.getStationType(station_id);
+        if(this.sid / 100 == 17) this.isWavetronicsStation = true;
+        if(!sType.isOriginStation()) this.isWavetronicsStation = true;
     }
 
     public void setDownstreamStation(String sectionName, Station s) {

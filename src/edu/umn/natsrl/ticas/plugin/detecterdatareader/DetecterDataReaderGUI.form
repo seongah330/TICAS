@@ -550,7 +550,7 @@
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Verdana" size="11" style="0"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="e.g. D100"/>
+        <Property name="text" type="java.lang.String" value="e.g. D100 or T502"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JCheckBox" name="cbxScan">

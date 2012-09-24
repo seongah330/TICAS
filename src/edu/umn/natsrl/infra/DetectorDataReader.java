@@ -55,7 +55,7 @@ public class DetectorDataReader extends DataReader implements DataReaderImpl{
 
     // constructor
     public DetectorDataReader(Detector detector, Period period) {
-        super(period,detector.getId());
+        super(period,detector.getOriginId());
         this.detector = detector;
         dataMap.put(TrafficType.VOLUME, volume);
         dataMap.put(TrafficType.SPEED_FOR_MICROWAVE, speed);

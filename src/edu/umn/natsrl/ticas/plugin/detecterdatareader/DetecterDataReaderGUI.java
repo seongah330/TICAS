@@ -10,6 +10,7 @@ import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.TMO;
 import edu.umn.natsrl.infra.infraobjects.Detector;
 import edu.umn.natsrl.ticas.plugin.PluginFrame;
+import edu.umn.natsrl.ticas.plugin.datareader.error.ErrorType;
 import edu.umn.natsrl.ticas.plugin.traveltimeIndexer.DateChecker;
 import edu.umn.natsrl.util.FileHelper;
 import java.awt.Desktop;
@@ -76,10 +77,9 @@ public class DetecterDataReaderGUI extends javax.swing.JPanel {
         boolean readScan = this.cbxScan.isSelected();
         boolean readOccu = this.cbxOccupancy.isSelected();
         boolean readVol = this.cbxVol.isSelected();
-        
-        String filepath = FileHelper.getNumberedFileName("D"+detector.getDetectorId()+".xls");
+        String filepath = FileHelper.getNumberedFileName(detector.getOriginId()+".xls");
         WritableWorkbook workbook = Workbook.createWorkbook(new File(filepath));
-        WritableSheet sheet = workbook.createSheet(String.valueOf(detector.getDetectorId()), 0);
+        WritableSheet sheet = workbook.createSheet(detector.getOriginId(), 0);
         int colldx = 0;
         System.out.println("detector Length("+detector.getLabel()+") : "+detector.getFieldLength());
         addData(sheet,colldx++,new String[]{"",""},peroids.get(0).getTimeline());
@@ -150,7 +150,14 @@ public class DetecterDataReaderGUI extends javax.swing.JPanel {
         
         if(!this.tbxDetector.getText().isEmpty()){
             String detectorid = this.tbxDetector.getText().toUpperCase();
+            if(detectorid.contains("D"))
+                detectorid = detectorid.split("D")[1];
+            System.out.println(detectorid);
             Detector detector = tmo.getInfra().getDetector(detectorid);
+            
+            if(detector == null)
+                JOptionPane.showMessageDialog(this, ErrorType.NOTFOUNDDETECTOR.toString());
+            
             try {
                 this.readData(detector,periods);
                 //JOptionPane.showMessageDialog(this, "Complete!");
@@ -254,31 +261,31 @@ public class DetecterDataReaderGUI extends javax.swing.JPanel {
         cbxOccupancy = new javax.swing.JCheckBox();
         cbxVol = new javax.swing.JCheckBox();
 
-        jLabel1.setFont(new java.awt.Font("Verdana", 1, 12));
+        jLabel1.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel1.setText("Dates");
 
-        jLabel2.setFont(new java.awt.Font("Verdana", 1, 12));
+        jLabel2.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel2.setText("Detecter");
 
-        tbxDetector.setFont(new java.awt.Font("Verdana", 0, 12));
+        tbxDetector.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxDetector.setPreferredSize(new java.awt.Dimension(60, 22));
 
-        jLabel3.setFont(new java.awt.Font("Verdana", 1, 12));
+        jLabel3.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel3.setText("Data Type");
 
-        chkDensity.setFont(new java.awt.Font("Verdana", 0, 12));
+        chkDensity.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         chkDensity.setSelected(true);
         chkDensity.setText("Density");
 
-        chkSpeed.setFont(new java.awt.Font("Verdana", 0, 12));
+        chkSpeed.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         chkSpeed.setSelected(true);
         chkSpeed.setText("Speed");
 
-        chkFlow.setFont(new java.awt.Font("Verdana", 0, 12));
+        chkFlow.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         chkFlow.setSelected(true);
         chkFlow.setText("Flow");
 
-        btRead.setFont(new java.awt.Font("Verdana", 0, 18));
+        btRead.setFont(new java.awt.Font("Verdana", 0, 18)); // NOI18N
         btRead.setText("Read");
         btRead.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -288,22 +295,22 @@ public class DetecterDataReaderGUI extends javax.swing.JPanel {
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel5.setFont(new java.awt.Font("Verdana", 1, 12));
+        jLabel5.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel5.setText("Start Time");
         jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(29, 29, -1, -1));
 
-        jLabel4.setFont(new java.awt.Font("Verdana", 1, 12));
+        jLabel4.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel4.setText("Time Interval");
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 1, -1, -1));
 
         cbxInterval.setPreferredSize(new java.awt.Dimension(156, 20));
         jPanel1.add(cbxInterval, new org.netbeans.lib.awtextra.AbsoluteConstraints(109, 0, -1, -1));
 
-        cbxEndMinInter.setFont(new java.awt.Font("Verdana", 0, 12));
+        cbxEndMinInter.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         cbxEndMinInter.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59" }));
         jPanel1.add(cbxEndMinInter, new org.netbeans.lib.awtextra.AbsoluteConstraints(164, 54, -1, -1));
 
-        cbxEndTimeInter.setFont(new java.awt.Font("Verdana", 0, 12));
+        cbxEndTimeInter.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         cbxEndTimeInter.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" }));
         cbxEndTimeInter.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -312,11 +319,11 @@ public class DetecterDataReaderGUI extends javax.swing.JPanel {
         });
         jPanel1.add(cbxEndTimeInter, new org.netbeans.lib.awtextra.AbsoluteConstraints(108, 54, -1, -1));
 
-        jLabel6.setFont(new java.awt.Font("Verdana", 1, 12));
+        jLabel6.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel6.setText(":");
         jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(155, 29, -1, -1));
 
-        cbxStartTimeInter.setFont(new java.awt.Font("Verdana", 0, 12));
+        cbxStartTimeInter.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         cbxStartTimeInter.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" }));
         cbxStartTimeInter.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -325,15 +332,15 @@ public class DetecterDataReaderGUI extends javax.swing.JPanel {
         });
         jPanel1.add(cbxStartTimeInter, new org.netbeans.lib.awtextra.AbsoluteConstraints(108, 26, -1, -1));
 
-        jLabel7.setFont(new java.awt.Font("Verdana", 1, 12));
+        jLabel7.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel7.setText("End Time");
         jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(38, 57, -1, -1));
 
-        cbxStartMinInter.setFont(new java.awt.Font("Verdana", 0, 12));
+        cbxStartMinInter.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         cbxStartMinInter.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59" }));
         jPanel1.add(cbxStartMinInter, new org.netbeans.lib.awtextra.AbsoluteConstraints(164, 26, -1, -1));
 
-        jLabel9.setFont(new java.awt.Font("Verdana", 1, 12));
+        jLabel9.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel9.setText("or for");
         jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(61, 82, -1, -1));
 
@@ -345,21 +352,21 @@ public class DetecterDataReaderGUI extends javax.swing.JPanel {
         });
         jPanel1.add(cbxduration, new org.netbeans.lib.awtextra.AbsoluteConstraints(108, 82, 100, -1));
 
-        jLabel10.setFont(new java.awt.Font("Verdana", 1, 12));
+        jLabel10.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel10.setText("hour");
         jPanel1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(215, 85, -1, -1));
 
-        jLabel8.setFont(new java.awt.Font("Verdana", 1, 12));
+        jLabel8.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
         jLabel8.setText(":");
         jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(155, 57, -1, -1));
 
-        jLabel11.setFont(new java.awt.Font("Verdana", 0, 11));
-        jLabel11.setText("e.g. D100");
+        jLabel11.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
+        jLabel11.setText("e.g. D100 or T502");
 
-        cbxScan.setFont(new java.awt.Font("Verdana", 0, 12));
+        cbxScan.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         cbxScan.setText("Scan");
 
-        cbxOccupancy.setFont(new java.awt.Font("Verdana", 0, 12));
+        cbxOccupancy.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         cbxOccupancy.setText("Occupancy");
 
         cbxVol.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N

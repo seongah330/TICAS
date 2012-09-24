@@ -61,6 +61,8 @@ public class Detector extends InfraObject implements Comparable {
     transient private Vector<Double> scan = new Vector<Double>();
     transient private static DetectorCache detectorCache = new DetectorCache();
     
+    DetectorType dType;
+    
     public Detector(Element element) {
         super(element);
         this.laneType = LaneType.get(getProperty(InfraProperty.category));
@@ -68,7 +70,13 @@ public class Detector extends InfraObject implements Comparable {
 //        this.detector_id = Integer.parseInt(this.id.substring(1));  // D123 -> 123        
         String tempID = this.getProperty(InfraProperty.name);
         this.detector_id = DetectorType.getDetectorIDbyType(tempID);
-        this.id = tempID;
+        dType = DetectorType.getDetectorType(tempID);
+        
+        //if T Detector -> add "D" -- it's like as Station 'T'
+        if(dType.isTempDetector()){
+            this.id = "D"+tempID;
+        }else
+            this.id = tempID;
     }
        
     /**
@@ -110,15 +118,15 @@ public class Detector extends InfraObject implements Comparable {
          * modify soobin Jeon 02/17/2012
          * not correct.. wavetronics speed calculate... perhaps...
          */
-//        if (this.isWavetronics()) {
-//            double[] speed_data = ddr.read(TrafficType.SPEED_FOR_MICROWAVE);
-//            if (speed_data != null) {
-//                this.speed.clear();
-//                for (double d : speed_data) {
-//                    this.speed.add(d);
-//                }
-//            }
-//        }
+        if (this.isWavetronics()) {
+            double[] speed_data = ddr.read(TrafficType.SPEED_FOR_MICROWAVE);
+            if (speed_data != null) {
+                this.speed.clear();
+                for (double d : speed_data) {
+                    this.speed.add(d);
+                }
+            }
+        }
         
         this.saveCache();
     }
@@ -188,7 +196,7 @@ public class Detector extends InfraObject implements Comparable {
 //            } else {
 //                validCount++;
 //            }
-
+            
             this.flow.add(q);
             this.occupancy.add(o);
             this.speed.add(u);
@@ -210,8 +218,7 @@ public class Detector extends InfraObject implements Comparable {
     public Vector<Double> adjustInterval(Vector<Double> data, AdjustType atype) {
         int interval = this.period.interval / 30;
         Vector<Double> aData = new Vector<Double>();
-        
-        //System.out.println(this.getId() + " : interval="+interval + ", size="+data.size());
+
         for (int i = 0; i < data.size(); i += interval) {
             double sum = 0.0;
             double validCount = 0;
@@ -656,5 +663,12 @@ public class Detector extends InfraObject implements Comparable {
     
     public String getLabel() {
         return this.property.getProperty("label");
+    }
+    
+    public String getOriginId(){
+        if(dType.isTempDetector())
+            return this.id.split("D")[1];
+        else
+            return this.id;
     }
 }

@@ -27,6 +27,7 @@ import edu.umn.natsrl.infra.infraobjects.Detector;
 import edu.umn.natsrl.infra.infraobjects.RNode;
 import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.infra.interfaces.IDetectorChecker;
+import edu.umn.natsrl.infra.types.StationType;
 import java.util.ArrayList;
 
 /**
@@ -253,7 +254,8 @@ public class EvalHelper {
      * @return 
      */
     public static String getStationNameFromTitle(String title) {
-        return title.substring(title.indexOf("(S")+1, title.indexOf(")"));        
+        String index = StationType.getStationNameFromTitle(title,"(");
+        return title.substring(title.indexOf(index)+1, title.indexOf(")"));        
     }
 
     /**

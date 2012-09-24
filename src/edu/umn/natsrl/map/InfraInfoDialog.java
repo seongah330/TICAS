@@ -72,6 +72,23 @@ public class InfraInfoDialog extends javax.swing.JDialog {
         if (rnode.isStation()) {
             tm.addRow(new Object[]{"station id", rnode.getStationId()});
             tm.addRow(new Object[]{"speed limit", rnode.getSpeedLimit()});
+            int dcnt = 1;
+            for(Detector d : rnode.getDetectors()){
+                String dextend = "";
+                if(d.isAbandoned())
+                    dextend += "X,";
+                if(d.isAuxiliary())
+                    dextend += "Aux,";
+                if(d.isHov())
+                    dextend += "Hov,";
+                if(d.isWavetronics())
+                    dextend += "Wave";
+                if(!dextend.equals("")){
+                    dextend = "("+dextend+")";
+                }
+                tm.addRow(new Object[]{"detector "+dcnt,d.getOriginId()+dextend});
+                dcnt++;
+            }
         }
         tm.addRow(new Object[]{"corridor", rnode.getCorridor()});
         tm.addRow(new Object[]{"label", rnode.getLabel()});

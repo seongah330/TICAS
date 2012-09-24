@@ -192,6 +192,8 @@ public class MeteringSectionHelper {
 
         for (SimMeter m : meters) {
             String name = m.getId();
+            if(name == null)
+                continue;
             if (name.contains("_L")) {
                 name = name.split("_")[0];
             }

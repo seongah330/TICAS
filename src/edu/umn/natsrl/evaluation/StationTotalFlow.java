@@ -65,15 +65,16 @@ public class StationTotalFlow extends Evaluation {
             for(int c=res.COL_DATA_START(); c<res.getColumnSize(); c++)
             {
                 boolean useFlow = false;
-                String stationName = res.get(c, 0).toString();                
-
+                String stationName = res.get(c, 0).toString();     
+                
                 // use flow data when station is not virtual
                 if(!"-".equals(stationName) )
                 {
                     stationName = EvalHelper.getStationNameFromTitle(stationName);
                     useFlow = true;
                     flow = EvalHelper.getStation(stations, stationName).getFlow(detectorChecker);
-                } else {
+                }
+                else {
                     // use flow data when station is virtual and it must same with data of prev or next station
                     // according to distance
                     // we can know which station is used by checking speed and density data

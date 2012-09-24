@@ -33,7 +33,7 @@ public class VissimCalibration2 implements ITicasPlugin {
     @Override
     public void init(PluginFrame frame) {
      
-        frame.setSize(990, 780);
+        frame.setSize(990, 800);
         Container container = frame.getContentPane();
         container.setLayout(new BorderLayout());        
         container.add(new VissimCalibration2GUI(frame));
