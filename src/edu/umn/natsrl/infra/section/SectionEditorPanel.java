@@ -124,7 +124,6 @@ public class SectionEditorPanel extends javax.swing.JPanel {
         sm.loadSections();
         Vector<Section> sections = sm.getSections();
 
-        System.out.println("find Section\n");
         for (Section s : sections)  
         {      
 //            for(int i=0;i<s.getStations().length;i++){

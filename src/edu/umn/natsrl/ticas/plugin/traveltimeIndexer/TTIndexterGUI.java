@@ -51,6 +51,7 @@ public class TTIndexterGUI extends javax.swing.JPanel {
     private List<Section> sections = new ArrayList<Section>();
     private PluginFrame simFrame;
     private boolean isHoliday = false;
+    private List<String> nonweather;
 
     public TTIndexterGUI(PluginFrame frame) {
         initComponents();
@@ -119,7 +120,6 @@ public class TTIndexterGUI extends javax.swing.JPanel {
         Interval evalInterval = (Interval) this.cbxEvalInterval.getSelectedItem();
         Interval ttInterval = (Interval) this.cbxTTInterval.getSelectedItem();
         String targetStation = this.tbxVolumeAnalTargetStation.getText();
-
         double freeflowTT = -1;
         try {
             freeflowTT = Double.parseDouble(this.tbxFreeFlowTravelTime.getText());
@@ -129,13 +129,15 @@ public class TTIndexterGUI extends javax.swing.JPanel {
         String[] targetStations = targetStation.split(" ");
         RunningDialog rd = new RunningDialog(simFrame, true);
         rd.setLocationRelativeTo(this);
-        Timer t = new Timer();
+        Timer t = new Timer();   
         t.schedule(new TravelTimeIndexer(section, periods, targetStations, dataInterval, evalInterval, ttInterval, freeflowTT,weatherList, rd), 10);
-        rd.setTimer(t);
         rd.showLog();
-        rd.setVisible(true);      
+        rd.setTimer(t);
+        rd.setVisible(true);   
 //        TravelTimeIndexer ev = new TravelTimeIndexer(section, periods, targetStations, dataInterval, evalInterval, ttInterval, freeflowTT,weatherList);
 //        ev.run();
+        //send non Weather Data message 
+        checkNonWeather(nonweather);
         System.out.println("End of Evaulation");
         if (simFrame != null) {
             this.simFrame.setAlwaysOnTop(true);
@@ -1062,20 +1064,7 @@ public class TTIndexterGUI extends javax.swing.JPanel {
         for(Calendar c : weatherSkip){
             System.out.println("Cal : "+c.getTime().toString());
         }
-        if(nonWeather.size() > 0){
-            int wcnt = 0;
-            String str = "There is no Weathere Data.\n It Does not apply to the following dates."+"\n";
-            for(String nw : nonWeather){
-                if(wcnt > 13){
-                    str += "and more..";
-                    break;
-                }
-                str += "- "+nw + "\n";
-                wcnt++;
-            }
-            JOptionPane.showMessageDialog(null, str);
-        }
-            
+        this.nonweather = nonWeather;
         return getPeriods(weatherSkip);
     }
 
@@ -1091,6 +1080,22 @@ public class TTIndexterGUI extends javax.swing.JPanel {
             }
         }else{
             this.cbxWeatherAll.setSelected(false);
+        }
+    }
+
+    private void checkNonWeather(List<String> nonWeather) {
+        if(nonWeather.size() > 0){
+            int wcnt = 0;
+            String str = "There is no Weathere Data.\n It Does not apply to the following dates."+"\n";
+            for(String nw : nonWeather){
+                if(wcnt > 13){
+                    str += "and more..";
+                    break;
+                }
+                str += "- "+nw + "\n";
+                wcnt++;
+            }
+            JOptionPane.showMessageDialog(null, str);
         }
     }
     

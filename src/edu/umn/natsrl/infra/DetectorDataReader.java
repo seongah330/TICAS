@@ -75,8 +75,8 @@ public class DetectorDataReader extends DataReader implements DataReaderImpl{
         loadLocalFiles(TrafficType.VOLUME);
         
 //        System.out.print(detector.getLabel());
-        if(detector.isWavetronics())
-            System.out.println(" node : " + detector.getRNode().getLabel());
+//        if(detector.isWavetronics())
+//            System.out.println(" node : " + detector.getRNode().getLabel());
         if(detector.isWavetronics()) {
             loadLocalFiles(TrafficType.SPEED_FOR_MICROWAVE);
         }    

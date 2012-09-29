@@ -69,7 +69,6 @@ public final class SectionManager {
         // retrieve r_node  
         for(String nid : s.getStationIds())
         {
-            System.out.println("sid : "+nid+"\n");
             RNode node = tmo.getInfra().find(nid);
             if(node != null) s.addRNode(node);
         }     
