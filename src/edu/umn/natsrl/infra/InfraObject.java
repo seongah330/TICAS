@@ -134,6 +134,8 @@ public abstract class InfraObject implements Serializable {
     }
 
     public String getId() {
+        if(id == null)
+            return "null";
         return this.id;
     }
     

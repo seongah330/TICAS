@@ -15,21 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package edu.umn.natsrl.ticas.plugin.vissimcalibration2;
+package edu.umn.natsrl.ticas.Simulation;
 
 /**
  *
  * @author Chongmyung Park
  */
-public enum DIR {
+public enum StateType {
+    
+        STATION, METER, ENTRANCE, EXIT;
 
-    UP, DOWN;
+        public boolean isStation() {
+            return this == STATION;
+        }
 
-    public boolean isUpstream() {
-        return this == UP;
-    }
+        public boolean isMeter() {
+            return this == METER;
+        }
 
-    public boolean isDownstream() {
-        return this == DOWN;
-    }
+        public boolean isEntrance() {
+            return this == ENTRANCE;
+        }
+
+        public boolean isExit() {
+            return this == EXIT;
+        }    
 }

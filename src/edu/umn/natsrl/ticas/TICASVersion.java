@@ -22,10 +22,53 @@
  */
 package edu.umn.natsrl.ticas;
 
+import edu.umn.natsrl.util.PropertiesWrapper;
+import java.io.File;
+
 /**
  *
  * @author Chongmyung Park
  */
 public class TICASVersion {
-    public static String version = " 3.26a";            
+    public static final String version = " 3.265";            
+    public static String currentVersion;
+    
+    private static String versionFoler = "config";
+    private static String versionFile = "version.config" ;
+    private final static String VERSION_LOC = "VERSION";
+    
+    private static PropertiesWrapper prop = new PropertiesWrapper();
+    
+    public static void saveConfig(){
+        prop.put(VERSION_LOC, version);
+        File MainDir = new File(versionFoler);
+        if (!MainDir.mkdir() && !MainDir.exists()) {
+            return;
+        }     
+        
+        prop.save(versionFoler+"\\"+versionFile);
+    }
+    public static PropertiesWrapper loadConfig(){
+        PropertiesWrapper p = PropertiesWrapper.load(versionFoler+"\\"+versionFile);
+        if(p != null){
+            prop = p;
+            currentVersion = prop.get(VERSION_LOC);
+            return prop;
+        }else{
+            return p;
+        }
+    }
+    public static String toStr(){
+        String v = "Update Info";
+        if(TICASVersion.currentVersion != null){
+            v+= "\nCurrent Version : " + TICASVersion.currentVersion;
+        }
+        v+="\n-> Update Version : "+TICASVersion.version;
+        v+= "\n"+versionInfo();
+        return v;
+    }
+
+    private static String versionInfo() {
+        return "";
+    }
 }

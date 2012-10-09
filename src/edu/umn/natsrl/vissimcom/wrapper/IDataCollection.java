@@ -222,8 +222,6 @@ public class IDataCollection extends DispatchPtr {
     **/
     public Object GetResult(String Parameter,String Function,int VehicleClass) throws COMException
     {
-      
 		return invokeN("GetResult", new Object[] {Parameter, Function, new Integer(VehicleClass)});
-        
     }
 }

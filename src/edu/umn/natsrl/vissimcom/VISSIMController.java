@@ -25,10 +25,13 @@ import edu.umn.natsrl.infra.simobjects.SimDetector;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
 import edu.umn.natsrl.infra.types.LaneType;
 import edu.umn.natsrl.util.FileHelper;
+import edu.umn.natsrl.vissimcom.wrapper.IDataCollection;
+import edu.umn.natsrl.vissimcom.wrapper.IDataCollections;
 import edu.umn.natsrl.vissimcom.wrapper.IDesiredSpeedDecision;
 import edu.umn.natsrl.vissimcom.wrapper.IDesiredSpeedDecisions;
 import edu.umn.natsrl.vissimcom.wrapper.IDetector;
 import edu.umn.natsrl.vissimcom.wrapper.IDetectors;
+import edu.umn.natsrl.vissimcom.wrapper.IEvaluation;
 import edu.umn.natsrl.vissimcom.wrapper.INet;
 import edu.umn.natsrl.vissimcom.wrapper.ISignalController;
 import edu.umn.natsrl.vissimcom.wrapper.ISignalControllers;
@@ -72,6 +75,10 @@ public class VISSIMController {
     private IDetectors detectors;
     private IDetector[] detectorList;
     private Detector[] queueDetectorList;
+    
+    private IDataCollections datacollections;
+    private IDataCollection[] datacollectionList;
+    
     private boolean[] detectorPulse;
     private int[] speedLimits;
     private IDesiredSpeedDecisions desiredSpeedDecisions;
@@ -119,6 +126,7 @@ public class VISSIMController {
         }
     }
 
+    
     /**
      * runStepListener for given duration that should be multiple of 30
      * @param runTime time in second to runStepListener
@@ -137,10 +145,8 @@ public class VISSIMController {
             }
             float second = 0;
             int step;
-
             // loop for running
             for (step = simStep; step <= runToThisStep; step++, simStep++) {
-               
                 //sooba intend
                 /*try {
                     int nDelayTime;
@@ -167,6 +173,14 @@ public class VISSIMController {
                 // every 30s routine
                 if (second % RUNNING_STEP == 0) {
 
+                    /**
+                    * DataCollection Test
+                    */
+//                    for(int i=0;i<this.datacollectionList.length;i++){
+//                        IDataCollection d = datacollectionList[i];
+//                        System.out.println("DCID("+d.getID()+") : "+getDouble(d.GetResult("NVEHICLES", "SUM", 0))+"-"+getDouble(d.GetResult("SPEED", "MEAN", 0)));
+////                            System.out.println("DCID("+d.getID()+") : "+getInt(d.getAttValue("ID")));
+//                    }
                     /********************************
                      * read traffic data
                      *********************************/
@@ -175,15 +189,17 @@ public class VISSIMController {
                         // calculate traffic data
                         int detector_id = this.detectorList[i].getID();
                         int v = this.detectorData[i].getVolume();
-
-                        //System.out.println("detector_id : " + detector_id + " volume : " + v);
                         
                         int q = v * FLOW_CONSTANT;
 
                         double u = (v == 0 ? speedLimits[i]+5 : this.detectorData[i].getSpeed() / v);
                         double k = (u <= 0 ? 0 : q / u);
-
+//                        if(detector_id == 1020 || detector_id == 1021){
+//                            System.out.println("DID("+detector_id+") : "+v+"-"+u);
+//                        }
                         double occupancy = -1;
+//                        System.out.print("detector_id : " + detector_id + " -- ");
+//                        System.out.println("v="+v+", u="+u+", k="+k+", occ=" + occupancy);
                         if (queueDetectorList[i] != null) {
 //                            Detector d = TMO.getInstance().getInfra().getDetector("D" + this.detectorList[i].getID());
                             double total_occupancy = this.detectorData[i].getOccupancy();
@@ -191,7 +207,7 @@ public class VISSIMController {
 //                            double scanData = occupancy * InfraConstants.MAX_SCANS / 100;
 //                            double sk = occupancy * 5280 / d.getFieldLength() / 100;                            
 //                            double su = q / sk;
-//                            System.out.println("v="+v+", u="+u+", k="+k+", occ=" + occupancy + ", scan="+scanData + ", u="+su+", k="+sk);
+                            
                         }
 
                         if (k > 300) {
@@ -231,7 +247,7 @@ public class VISSIMController {
                         }
                     }
                 }
-
+                
                 // Read data using threads (Java COM is very slow)
                 //System.out.println("dLen=" + detectorList.length + " threadStep="+threadStep);
                 for (int i = 0, k=0; i < this.detectorList.length; i += threadStep, k++) {
@@ -240,13 +256,12 @@ public class VISSIMController {
                     collectThreads[k] = new CollectDataThread(i, to);
                     collectThreads[k].start();
                 }
-            
+
                 for (int i = 0; i < collectThreads.length; i++) {
                     try {
                         collectThreads[i].join();
                     } catch (InterruptedException ex) {}
                 }
-                
                 //System.out.println("  * All threads are joined");
 
                 // read detector data from VISSIM every step 
@@ -272,9 +287,9 @@ public class VISSIMController {
                         }
                     }
                 }
-
+            
             } // for : main loop
-
+            
 
             return simStep;
 
@@ -312,7 +327,7 @@ public class VISSIMController {
                      * IMPULSE formula of jawin COM interface differ with jacozoom.
                      */
                     //System.out.println("dID = " + detectorList[0].getID() + "value("+count+") = "+getInt(detectorList[i].getAttValue("IMPULSE")));
-
+                    
                     // if any vehicle was over the detector IMPULSE
                     int impulse = getInt(detectorList[i].getAttValue("IMPULSE"));
                     if (impulse == 1 && !detectorPulse[i]) {
@@ -468,6 +483,20 @@ public class VISSIMController {
             detectorData = new DetectorData[detectors.getCount()];
             speedLimits = new int[detectorList.length];
 
+            /**
+             * DataCollectin
+             */
+            IEvaluation eval = vissim.getEvaluation();
+            eval.setAttValue("DATACOLLECTION", true);
+            this.datacollections = net.getDataCollections();
+            datacollectionList = new IDataCollection[datacollections.getCount()];
+            
+            System.out.println("D Collector-"+datacollections.getCount());
+            for(int i=0;i<datacollections.getCount();i++){
+                datacollectionList[i] = datacollections.getItem(i+1);
+//                System.out.println("DCollection : "+datacollectionList[i].getID() + "="+datacollectionList[i].getName());
+            }
+            
             Infra infra = TMO.getInstance().getInfra();
             for (int i = 1; i <= detectors.getCount(); i++) {
                 IDetector d = detectors.getItem(i);

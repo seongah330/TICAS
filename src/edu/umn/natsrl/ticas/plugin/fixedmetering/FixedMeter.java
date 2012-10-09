@@ -18,7 +18,8 @@
 package edu.umn.natsrl.ticas.plugin.fixedmetering;
 
 import edu.umn.natsrl.infra.simobjects.SimMeter;
-import edu.umn.natsrl.ticas.plugin.metering.MeteringConfig;
+import edu.umn.natsrl.ticas.Simulation.SimRampMeter;
+import edu.umn.natsrl.ticas.Simulation.SimulationConfig;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,14 +27,11 @@ import java.util.List;
  *
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
-public class FixedMeter {
-    ArrayList<Double> rate = new ArrayList<Double>();
-    SimMeter meter;
-    private double lastRate = 0;
-    private int interval = 30;
-    
+public class FixedMeter extends SimRampMeter{
+    protected int interval = 30;
+
     public FixedMeter(SimMeter _meter, int timeInterval){
-        meter = _meter;
+        super(_meter);
         interval = timeInterval;
     }
     
@@ -67,37 +65,25 @@ public class FixedMeter {
      * set Rate
      * @param currentStep 
      */
-    public void setRate(int step) {
+    public void setFixedRate(int step) {
         double rnext = 0;
         int currentStep = step / interval;
         
-        if(currentStep >= rate.size())
+        if(currentStep >= rate.size()) {
             rnext = getLastRate();
-        else
+        }
+        else {
             rnext = rate.get(currentStep);
+        }
         
-        lastRate = rnext;
-        
-        float redTime = calculateRedTime(rnext);
-        redTime = Math.round(redTime * 10) / 10f;
-        meter.setRate((byte)1);
-        meter.setRedTime(redTime);
+        setRate(rnext);
     }
     
     public double getLastRate(){
         if(lastRate == 0)
-            return MeteringConfig.MAX_RATE;
+            return SimulationConfig.MAX_RATE;
         else
             return lastRate;
         
-    }
-    /**
-    * Return red time that converted from rate
-    * @param rate
-    * @return red time in seconds
-    */
-    private float calculateRedTime(double rate) {
-        float cycle = 3600 / (float)rate;
-        return Math.max(cycle - meter.GREEN_YELLOW_TIME, MeteringConfig.MIN_RED_TIME);
     }
 }

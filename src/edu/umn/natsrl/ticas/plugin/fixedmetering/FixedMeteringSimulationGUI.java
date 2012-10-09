@@ -730,7 +730,7 @@ public class FixedMeteringSimulationGUI extends javax.swing.JPanel implements IS
         
         DefaultTableModel rows = (DefaultTableModel)tbRate.getModel();
         for(int i=0;i<totalrows;i++){
-            int timeinterval = (i+1)*interval;
+            int timeinterval = (i)*interval;
             Vector<Double> data = new Vector<Double>();
             
             //Add interval

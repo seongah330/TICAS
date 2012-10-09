@@ -171,7 +171,7 @@ public class IDataCollections extends DispatchPtr {
     *
     * @return void
     **/
-    public IDataCollection getItem(Variant index) throws COMException
+    public IDataCollection getItem(int index) throws COMException
     {
         IDataCollection res = new IDataCollection();
           DispatchPtr dispPtr = (DispatchPtr)get("Item", index);

@@ -361,7 +361,7 @@ public class FixedSimulation extends Thread implements IStepListener, ITravelTim
         }
     }
     
-    void setSignalListener(ISimEndSignal signalListener) {
+    public void setSignalListener(ISimEndSignal signalListener) {
         this.signalListener = signalListener;
     }
 
@@ -372,7 +372,7 @@ public class FixedSimulation extends Thread implements IStepListener, ITravelTim
         }
 //        System.out.println("Signal Rate");
         for(FixedMeter m : fixedmeter){
-            m.setRate(sample);
+            m.setFixedRate(sample);
 //            System.out.println(m.meter.getId() + " : "+m.getLastRate());
         }
     }

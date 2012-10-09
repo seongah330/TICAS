@@ -33,7 +33,8 @@ import edu.umn.natsrl.infra.simobjects.SimObjects;
 import edu.umn.natsrl.infra.simobjects.SimulationSeveralResult;
 import edu.umn.natsrl.sfim.SectionInfoDialog;
 import edu.umn.natsrl.ticas.plugin.PluginFrame;
-import edu.umn.natsrl.ticas.plugin.vissimcalibration2.Simulation.ISimEndSignal;
+import edu.umn.natsrl.ticas.Simulation.Simulation.ISimEndSignal;
+import edu.umn.natsrl.ticas.Simulation.SimulationConfig;
 import edu.umn.natsrl.util.FileHelper;
 import edu.umn.natsrl.util.PropertiesWrapper;
 import edu.umn.natsrl.vissimcom.ComError;
@@ -70,7 +71,8 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
     private Vector<Section> sections = new Vector<Section>();
     private PropertiesWrapper prop;
     private PluginFrame simFrame;
-    private Simulation sim;
+//    private Simulation sim;
+    private BasicSimulation sim;
     private Date startTime;
     private PrintStream backupOut;
     private PrintStream backupErr;
@@ -91,11 +93,11 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             this.cbxVissimVersion.addItem(v);
         }
         
-        MeteringConfig.loadConfig();
+        SimulationConfig.loadConfig();
         DecimalFormat df = new DecimalFormat();
         df.setDecimalSeparatorAlwaysShown(false);
-        this.tbxCaseFile.setText(MeteringConfig.CASE_FILE);
-        this.tbxRandom.setText(df.format(MeteringConfig.RANDOM_SEED));
+        this.tbxCaseFile.setText(SimulationConfig.CASE_FILE);
+        this.tbxRandom.setText(df.format(SimulationConfig.RANDOM_SEED));
         /*this.tbxKjam.setText(df.format(MeteringConfig.Kjam));
         this.tbxKc.setText(df.format(MeteringConfig.Kc));
         this.tbxKd_Rate.setText(df.format(MeteringConfig.Kd_Rate));
@@ -138,9 +140,9 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             this.chxRunwithsingleRandom.setEnabled(false);
             startTime = new Date();
             
-            MeteringConfig.CASE_FILE = this.tbxCaseFile.getText();
-            MeteringConfig.RANDOM_SEED = this.SimRandom.NextSeed();
-            MeteringConfig.logtimeinterval = cbxTimeInterval.getSelectedIndex();
+            SimulationConfig.CASE_FILE = this.tbxCaseFile.getText();
+            SimulationConfig.RANDOM_SEED = this.SimRandom.NextSeed();
+            SimulationConfig.logtimeinterval = cbxTimeInterval.getSelectedIndex();
             //MeteringConfig.Kjam = Integer.parseInt(this.tbxKjam.getText());
             //MeteringConfig.Kc = Integer.parseInt(this.tbxKc.getText());
             //MeteringConfig.Kd_Rate = Double.parseDouble(this.tbxKd_Rate.getText());
@@ -154,11 +156,12 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             //MeteringConfig.setMaxWaitTimeF2F(Integer.parseInt(this.tbxMaxWaittingTimeF2F.getText()));
             //MeteringConfig.setMaxWaitTime(Integer.parseInt(this.tbxMaxWaittingTime.getText()));
             //MeteringConfig.MAX_RED_TIME = Integer.parseInt(this.tbxMaxRedTime.getText());
-            MeteringConfig.UseMetering = false;
-            MeteringConfig.saveConfig();
+            SimulationConfig.UseMetering = false;
+            SimulationConfig.saveConfig();
             
             Section section = (Section)this.cbxSections.getSelectedItem();
-            sim = new Simulation(MeteringConfig.CASE_FILE, MeteringConfig.RANDOM_SEED, section, true, (VISSIMVersion)this.cbxVissimVersion.getSelectedItem() );
+            sim = new BasicSimulation(SimulationConfig.CASE_FILE, SimulationConfig.RANDOM_SEED, section, (VISSIMVersion)this.cbxVissimVersion.getSelectedItem() );
+            sim.setDebugInterval(SimulationConfig.getInterval());
             sim.setSignalListener(this);
             sim.start();
             
@@ -166,23 +169,11 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             this.btnBrowse.setEnabled(false);
             this.tbxCaseFile.setEditable(false);
             this.tbxRandom.setEditable(false);
-            /*this.tbxKc.setEditable(false);
-            this.tbxKjam.setEditable(false);
-            this.tbxKd_Rate.setEditable(false);
-            this.tbxMaxWaittingTime.setEditable(false);
-            this.tbxMaxWaittingTimeF2F.setEditable(false);
-            this.tbxMaxRedTime.setEditable(false);
-            this.tbxKb.setEditable(false);
-            this.tbxKstop.setEditable(false);
-            this.tbxStopDuration.setEditable(false);
-            this.tbxStopTrend.setEditable(false);
-            this.tbxStopUpstreamCount.setEditable(false);
-            this.tbxAb.setEditable(false);*/
             
             System.out.println("[ Simulation Configurations ]");        
-            System.out.println("  - Case File = " + MeteringConfig.CASE_FILE);
-            System.out.println("  - Random Seed = " + MeteringConfig.RANDOM_SEED);
-            System.out.println("  - DataLog Time Interval = " + MeteringConfig.getInterval() + "sec");
+            System.out.println("  - Case File = " + SimulationConfig.CASE_FILE);
+            System.out.println("  - Random Seed = " + SimulationConfig.RANDOM_SEED);
+            System.out.println("  - DataLog Time Interval = " + SimulationConfig.getInterval() + "sec");
             System.out.println("----------------------------------------------");
             
         } catch(Exception ex) {
@@ -227,11 +218,11 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
         if(this.SimRandom.isSingle()){
             simFrame.afterSimulation((Section)this.cbxSections.getSelectedItem(), new Period(sTime, eTime, 30));
         }else{
-            System.out.println("Save Simulation File("+MeteringConfig.RANDOM_SEED+")");
+            System.out.println("Save Simulation File("+SimulationConfig.RANDOM_SEED+")");
             SimulationSeveralResult ssr = new SimulationSeveralResult((Section)this.cbxSections.getSelectedItem(), new Period(sTime, eTime, 30));
             ssr.saveResult();
             System.out.println("------------------------------------------------------------------------");
-            System.out.println("Random Seed - " + MeteringConfig.RANDOM_SEED + "Simulation Complete.");
+            System.out.println("Random Seed - " + SimulationConfig.RANDOM_SEED + "Simulation Complete.");
             System.out.println("------------------------------------------------------------------------");
         }
         
@@ -1009,7 +1000,7 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             for(String value : SimRandom.getSeedList())
                 System.out.print(value+" ");
             System.out.println();
-            System.out.println("  - DataLog Time Interval = " + MeteringConfig.getInterval() + "sec");
+            System.out.println("  - DataLog Time Interval = " + cbxTimeInterval.getSelectedItem().toString());
             System.out.println("----------------------------------------------");
             runSimulation();
         }

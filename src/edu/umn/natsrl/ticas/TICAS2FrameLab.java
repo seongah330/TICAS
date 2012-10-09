@@ -60,6 +60,7 @@ import edu.umn.natsrl.ticas.plugin.datareader.DataReader;
 import edu.umn.natsrl.ticas.plugin.detecterdatareader.DetecterDataReader;
 import edu.umn.natsrl.ticas.plugin.fixedmetering.FixedMeteringSimulation;
 import edu.umn.natsrl.ticas.plugin.rampmeterevaluator.RampMeterEvaluatorPlugin;
+import edu.umn.natsrl.ticas.plugin.simulation.basicmetering.BasicMetering;
 import edu.umn.natsrl.ticas.plugin.srte.TICASPluginSRTE;
 import edu.umn.natsrl.ticas.plugin.srte.TestFrame;
 import edu.umn.natsrl.ticas.plugin.vissimcalibration2.VissimCalibration2;
@@ -122,8 +123,8 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
 
             @Override
             public void run() {
+                ticas.CheckVersion();
                 // setup TMO object after 10ms
-                System.out.println("set Start");
                 tmoInit.setup();
                                
                 // clear all chaches older than 365 days
@@ -148,8 +149,8 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         /*
         * temporary empty - soobin Jeon
         */
+        sd.setAlwaysOnTop(false);
         sd.setVisible(true);
-
     }
     
     private final String OPTION_FILE = "ticas.cfg";
@@ -443,6 +444,9 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         
         PluginInfo simFixedMetering = new PluginInfo("Fixed Metering Simulation", PluginType.TOOL, FixedMeteringSimulation.class);       
         addSimulationPlugins(simFixedMetering);
+        
+        PluginInfo simBasicMetering = new PluginInfo("Local Responsible Metering Simulation", PluginType.TOOL, BasicMetering.class);       
+        addSimulationPlugins(simBasicMetering);
         
         if(addMeteringPlugin) {
             PluginInfo meteringPlugin = new PluginInfo("K_Adaptive Metering Simulation", PluginType.SIMULATION, MeteringSimulation.class);
@@ -903,6 +907,23 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         if(so instanceof Section) {
             return (Section)this.cbxSections.getSelectedItem();            
         } else return null;
+    }
+
+    private void CheckVersion() {
+        if(TICASVersion.loadConfig() == null ||
+                !TICASVersion.version.equals(TICASVersion.currentVersion)){
+            initDataFiles();
+            TICASVersion.saveConfig();
+            
+            JOptionPane.showMessageDialog(null,TICASVersion.toStr());
+        }
+    }
+
+    private void initDataFiles() {
+        System.out.println("Reset Geo Data.....");
+        new File("infra.dat").delete();
+        System.out.println("Clear All Cache.....");
+        tmo.clearAllCache();
     }
     
     /**
@@ -2184,8 +2205,8 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                         .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel24)
                             .addGroup(jPanel14Layout.createSequentialGroup()
-                                .addComponent(cbxPlugins, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cbxPlugins, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnRunSimulationPlugin))
                             .addComponent(jLabel19)
                             .addComponent(jLabel27)))

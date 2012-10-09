@@ -100,7 +100,7 @@ public class RampMeter extends InfraObject {
     }    
 
     public void setQueue(String names) {
-        this.setProperty(InfraProperty.queue, names);
+        this.setProperty(InfraProperty.queue, AddProperty(names,this.getQueue()));
     }
 
     private void setDetector(Element element) {
@@ -115,5 +115,21 @@ public class RampMeter extends InfraObject {
             else if("G".equals(category)) setGreen(name);
             else if("M".equals(category)) setMerge(name);
         }
+    }
+
+    private String AddProperty(String adddata, String[] beforedatas) {
+        String input = "";
+        if(beforedatas != null){
+            for(int i = 0;i<beforedatas.length;i++){
+                input += beforedatas[i];
+                if(i < beforedatas.length-1)
+                    input += " ";
+            }
+            input += " " + adddata;
+        }else{
+            input += adddata;
+        }
+        
+        return input;
     }
 }

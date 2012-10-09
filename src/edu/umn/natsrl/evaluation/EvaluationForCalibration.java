@@ -346,7 +346,7 @@ public class EvaluationForCalibration extends TimerTask {
         Col = AddStation(CumStationReal,CumStationSim,Col,sheet,RNodeLabel)+1;
         
         System.out.println("Writing Excel File..");
-        if(Col > 256){
+        if(Col > 234){
             StringErrorStream sos = new StringErrorStream(rd);
             sos.getMessage("Calibration Fail\nError Message\n  - Too many data.","Use csv mode.\n  - Change Output Format with 'CSV' in Real Data Extraction Tab.\n    If it happen again, reduce Random Seed.");
             workbook.close();
@@ -586,7 +586,7 @@ public class EvaluationForCalibration extends TimerTask {
                 variable = vtype.getType();
             }
  
-            ColTitle = "Rseed("+String.valueOf(s.RANDOMSEED)+")";
+            ColTitle = "Rseed("+String.valueOf(s.RANDOMSEED)+")"+s.getTotalFlow().length;
             
             DataCol.add(DataColAddRow(new String[]{RTitle,variable,ColTitle},getDataByVType(vtype,s)));
             DataCol.get(DataCol.size()-1).add(String.valueOf(getMAE(getDataByVType(vtype,real),getDataByVType(vtype,s))));

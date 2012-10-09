@@ -171,7 +171,7 @@ public class IEvaluation extends DispatchPtr {
     *
     * @param AttValue
     **/
-    public void setAttValue(String Attribute,Variant newValue2) throws COMException
+    public void setAttValue(String Attribute,Object newValue2) throws COMException
     {
         put("AttValue", Attribute, newValue2);
     }

@@ -25,7 +25,8 @@ import org.jawin.GUID;
  */
 public enum VISSIMVersion {
     VISSIM540x64("{0157c47c-cb54-4788-9613-C444C7F0117C}"),
-    VISSIM540x86("{325df941-0b2d-40b1-B6C5-133E632203CD}");
+    VISSIM540x86("{cd13ec64-8a38-4363-8335-8BE904343F07}");
+//    VISSIM540x86("{325df941-0b2d-40b1-B6C5-133E632203CD}");
 
     private GUID CLSID;
     VISSIMVersion(String guid){

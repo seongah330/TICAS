@@ -144,12 +144,6 @@ public class SimDetector extends SimObject {
     private Double calculateScan(double k) {
         double s = 0;
         double fieldlength = this.detector.getFieldLength();
-        /*
-         * temp variable
-         */
-//        if(this.detector.getDetectorId() == 1052 ||this.detector.getDetectorId() == 1059){
-//            System.out.println("Did : " + this.detector.getId() + "-"+this.detector.getFieldLength());
-//        }
         
         s = ( k * fieldlength  / FEET_PER_MILE * MAX_SCANS );
         s = ( s > MAX_SCANS ? MAX_SCANS : s);
@@ -225,7 +219,7 @@ public class SimDetector extends SimObject {
         if (trafficType.isDensity()) {
             return this.getDensity();
         }
-        if (trafficType.isFlow()) {
+        if (trafficType.isFlow() || trafficType.isAverageFlow()) {
             return this.getFlow();
         }
         if (trafficType.isOccupancy()) {
