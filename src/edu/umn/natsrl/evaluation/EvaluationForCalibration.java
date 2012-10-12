@@ -17,6 +17,7 @@
  */
 package edu.umn.natsrl.evaluation;
 
+import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.infra.section.SectionHelper;
@@ -114,6 +115,28 @@ public class EvaluationForCalibration extends TimerTask {
             sos.getMessage("Calibration Fail","Data Load Failed, Check Data File");
             ex.printStackTrace();
             return;
+        }
+        
+        /**
+         * Data Period Correcting check
+         */
+        if(StationStateReal.get(0) != null && StationStateSims.get(0).get(0) != null){
+            CStation sims = (CStation)StationStateSims.get(0).get(0);
+            System.err.println(sims.getDataLength() + " = "+StationStateReal.get(0).getDataLength());
+            if(StationStateReal.get(0).getDataLength() != sims.getDataLength()){
+                if(option.getPeriods().length < 1){
+                    sos.getMessage("Calibration Fail\n - There is no Period","");
+                    return;
+                }
+                
+                Period p = option.getPeriods()[0];
+                double shour = sims.getDataLength() * p.interval / 3600;
+                double rhour = StationStateReal.get(0).getDataLength() * p.interval / 3600;
+                sos.getMessage("Calibration Fail\n - Time Period is not correct.","Selected Simulation Period : "+shour+" hours"
+                        +"\n  - Selected RealData Period : "+rhour + " hours"
+                        +"\n  - Please revise the Start and End Time of \'Real Data\' at \"Date and Time\" Tab");
+                return;
+            }
         }
         
         try {
@@ -861,6 +884,10 @@ public class EvaluationForCalibration extends TimerTask {
                     return getSpeed();
             }
         }
+        
+        public int getDataLength(){
+        return this.TotalFlow.length;
+    }
         
     }
     

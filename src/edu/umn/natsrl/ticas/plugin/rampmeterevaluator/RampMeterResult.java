@@ -56,6 +56,4 @@ public class RampMeterResult {
     public ArrayList<RampMeterNode> getRamps(){
         return Ramps;
     }
-    
-    
 }

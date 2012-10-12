@@ -22,14 +22,14 @@ package edu.umn.natsrl.ticas.plugin.rampmeterevaluator;
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
 public enum RampMeterEvaluatorMode {
-    FlowData("Flow Data",1,1),
-    VolumeData("Volume Data",2,1),
-    RampBasedFlow("Flow(RampBased)",1,3),
-    RampBasedVolume("Volume(RampBased)",2,3),
-    RampBasedAFlow("Flow(RampBased_Analysis)",1,4),
-    RampBasedAVolume("Volume(RampBased_Analysis)",2,4),
-    EachFlowData("Flow(EachDay)",1,2),
-    EachVolumeData("Volume(EachDay)",2,2);
+    FlowData("Analysis_Output Files(Green,Storage,WaitTime)_DataType(Flow)",1,1),
+    VolumeData("Analysis_Output Files(Green,Storage,WaitTime)_DataType(Volume)",2,1),
+    RampBasedFlow("RampBased Data Extraction_Output File(Single File)_DataType(Flow)",1,3),
+    RampBasedVolume("RampBased Data Extraction_Output File(Single File)_DataType(Volume)",2,3),
+//    RampBasedAFlow("Flow(RampBased_Analysis)",1,4),
+//    RampBasedAVolume("Volume(RampBased_Analysis)",2,4),
+    EachFlowData("Each Date Data Extraction_Output Files(Each Date)_DataType(Flow)",1,2),
+    EachVolumeData("Each Date Data Extraction_Output Files(Each Date)_DataType(Volume)",2,2);
     
     
     private String name = null;

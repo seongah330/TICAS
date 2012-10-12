@@ -42,7 +42,7 @@ public class SimulationResultSaveDialog extends javax.swing.JDialog {
         super(parent, true);
         initComponents();        
         this.section = section;
-        this.period = period;                
+        this.period = period;               
     }
     
     private void saveResult()
@@ -58,6 +58,7 @@ public class SimulationResultSaveDialog extends javax.swing.JDialog {
         } catch(Exception ex) {
             ex.printStackTrace();
         }
+        
         SimulationResult sr = null;
         if(this.SimRandom.hasSimulationKey())
             sr = new SimulationResult(name, desc, section, period,false,SimulationSeveralResult.getKey(this.SimRandom.getName(), this.SimRandom.getSimulationKey()),this.SimRandom.getLength());

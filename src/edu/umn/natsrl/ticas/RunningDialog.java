@@ -46,13 +46,13 @@ public class RunningDialog extends javax.swing.JDialog {
         initComponents();
         
         outBack = System.out;
-        errBack = System.err;
+//        errBack = System.err;
         
         Point loc = this.getLocation();
         loc.y -= 200;
         this.setLocation(loc);
         System.setOut(new PrintStream(sos));
-        System.setErr(new PrintStream(sos));
+//        System.setErr(new PrintStream(sos));
         
         if(!RunningDialog.expanded) {
             hideLog();
@@ -109,7 +109,7 @@ public class RunningDialog extends javax.swing.JDialog {
     public void dispose()
     {
         System.setOut(outBack);
-        System.setErr(errBack);
+//        System.setErr(errBack);
         if(this.currenttimer != null){
             currenttimer.cancel();
             currenttimer = null;

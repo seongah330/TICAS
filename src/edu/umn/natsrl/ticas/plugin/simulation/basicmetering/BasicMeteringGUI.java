@@ -186,10 +186,10 @@ public class BasicMeteringGUI extends javax.swing.JPanel implements ISimEndSigna
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Simulation Parameters", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 12))); // NOI18N
 
         jLabel3.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
-        jLabel3.setText("Section");
+        jLabel3.setText("Select Real Freeway Section");
 
         jLabel1.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
-        jLabel1.setText("Case File");
+        jLabel1.setText("Select Simulation Case File (Needs to Match with Real Section)");
 
         jLabel2.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel2.setText("Random Number");
@@ -698,7 +698,7 @@ public class BasicMeteringGUI extends javax.swing.JPanel implements ISimEndSigna
     }
     
     private void setTable(BasicMeterGroup bg){
-        String[] columns = new String[]{"MeterID","UpStream Station","DownStream Station","Dcap","Kcr","Alplha","Beta","Gamma","Kqd"};
+        String[] columns = new String[]{"MeterID","UpStream Station","DownStream Station","Dcap(Veh/hr/lane)","Kcr(Veh/mile)","Alplha","Beta","Gamma","Kqd"};
         
         DefaultTableModel tmodel = new DefaultTableModel();
         tmodel.setColumnIdentifiers(columns);

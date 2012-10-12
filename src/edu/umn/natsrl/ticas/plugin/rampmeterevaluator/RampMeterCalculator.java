@@ -23,7 +23,9 @@ import edu.umn.natsrl.infra.infraobjects.Detector;
 import edu.umn.natsrl.infra.infraobjects.Entrance;
 import edu.umn.natsrl.infra.section.SectionHelper;
 import edu.umn.natsrl.infra.section.SectionHelper.EntranceState;
+import edu.umn.natsrl.infra.simobjects.SimObjects;
 import edu.umn.natsrl.infra.types.TrafficType;
+import edu.umn.natsrl.ticas.SimulationResult;
 import java.util.ArrayList;
 
 /**
@@ -35,6 +37,8 @@ public class RampMeterCalculator {
     RampMeterEvaluatorMode mode;
     Section section;
     int interval = 30;
+    
+    SimulationResult sr = null;
     /**
      * New RampMeter Calculator
      * @param s Section
@@ -46,6 +50,11 @@ public class RampMeterCalculator {
         mode = m;
         section = s;
         interval = Interval;
+    }
+    
+    public RampMeterCalculator(Section s, ArrayList<Period> p, RampMeterEvaluatorMode m,int Interval,SimulationResult _sr){
+        this(s,p,m,Interval);
+        sr = _sr;
     }
     
     /**
@@ -87,7 +96,17 @@ public class RampMeterCalculator {
         
         SectionHelper sectionHelper = new SectionHelper(section);
         ArrayList<EntranceState> entrances = sectionHelper.getEntranceStates();
-        section.loadData(p,false);
+        
+        /**
+         * if not simulation
+         */
+        if(sr == null){
+            section.loadData(p,false);
+        }else{
+            SimObjects.getInstance().reset();
+            sr.setTrafficDataToDetectors();
+            section.loadData(p,true,null);
+        }
         
         for(EntranceState es : entrances){
             if(es.getRNode() == null)

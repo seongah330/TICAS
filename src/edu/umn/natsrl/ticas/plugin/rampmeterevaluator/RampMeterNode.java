@@ -118,7 +118,6 @@ public class RampMeterNode {
             green_vol = green.getVolume();
             green_flow = green.getFlow();
         }
-            
         if(period.interval != realinterval)
             length = length / (realinterval/period.interval);
         

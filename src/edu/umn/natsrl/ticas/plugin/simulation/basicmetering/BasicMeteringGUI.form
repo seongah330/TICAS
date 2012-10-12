@@ -200,7 +200,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Verdana" size="10" style="1"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Section"/>
+                    <Property name="text" type="java.lang.String" value="Select Real Freeway Section"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel1">
@@ -208,7 +208,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Verdana" size="10" style="1"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Case File"/>
+                    <Property name="text" type="java.lang.String" value="Select Simulation Case File (Needs to Match with Real Section)"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel2">

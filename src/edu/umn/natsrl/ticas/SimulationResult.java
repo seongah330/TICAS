@@ -32,6 +32,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
@@ -420,7 +421,16 @@ public class SimulationResult implements Comparable {
     @Override
     public int compareTo(Object o) {        
         SimulationResult r = (SimulationResult)o;        
-        return this.name.compareTo(r.name);
+//        return this.name.compareTo(r.name);
+        Calendar current = Calendar.getInstance();
+        Calendar com = Calendar.getInstance();
+        current.setTime(this.getCreated());
+        com.setTime(r.getCreated());
+        
+        if(current.getTimeInMillis() > com.getTimeInMillis())
+            return -1;
+        else
+            return 1;
         
     }
     
@@ -437,7 +447,25 @@ public class SimulationResult implements Comparable {
     }
 
     public Period getPeriod() {
-        return period;
+        return period.clone();
+    }
+    public Period getPeriod(int start_hour, int start_min){
+        if( ( start_hour >= 0 && start_hour < 24) && ( start_min >= 0 && start_min < 60)) {
+            Date sDate = period.startDate;
+            Date eDate = period.endDate;
+            int diff = (int)(eDate.getTime() - sDate.getTime());
+            Calendar c;
+            c = Calendar.getInstance();
+            
+            c.set(Calendar.HOUR_OF_DAY, start_hour);
+            c.set(Calendar.MINUTE, start_min);
+            c.set(Calendar.SECOND, 0);
+            sDate = c.getTime();
+            c.add(Calendar.MILLISECOND, diff);
+            eDate = c.getTime();
+            this.period = new Period(sDate, eDate, 30);
+        }
+        return period.clone();
     }
 
     public Section getSection() {
@@ -455,7 +483,16 @@ public class SimulationResult implements Comparable {
     }
     @Override
     public String toString() {
-        return this.name;
+        Calendar c = Calendar.getInstance();
+        c.setTime(this.getCreated());
+        String created = String.format("%02d-%02d-%02d", c.get(Calendar.YEAR),  c.get(Calendar.MONTH)+1,  c.get(Calendar.DATE));
+        String rseed = "";
+        if(!this.IsListData()){
+            rseed = "Single Data";
+        }else{
+            rseed = this.DataLength + " seeds";
+        }
+        return created + " - "+this.getSection()+" - "+this.name + " - (Random Seed info : "+rseed+")";
     }
 
 

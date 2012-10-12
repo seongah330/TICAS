@@ -23,11 +23,14 @@ import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.TMO;
 import edu.umn.natsrl.infra.section.SectionManager;
 import edu.umn.natsrl.ticas.DateChecker;
+import edu.umn.natsrl.ticas.Simulation.SimulationUtil;
+import edu.umn.natsrl.ticas.SimulationResult;
 import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.*;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
@@ -43,14 +46,15 @@ public class RampMeterEvaluator extends javax.swing.JPanel {
     private PrintStream backupErr;
     
     private boolean isStart = false;
-    
+    PluginFrame sframe;
     /**
      * Creates new form RampMeterEvaluator
      */
     public RampMeterEvaluator(PluginFrame simFrame) {
         initComponents();
         init();
-        simFrame.setSize(740, 580);
+        sframe = simFrame;
+        simFrame.setSize(900, 580);
     }
 
     /**
@@ -75,10 +79,15 @@ public class RampMeterEvaluator extends javax.swing.JPanel {
         natsrlCalendar = new edu.umn.natsrl.gadget.calendar.NATSRLCalendar();
         jPanel3 = new javax.swing.JPanel();
         cbxeMode = new javax.swing.JComboBox();
-        btnStart = new javax.swing.JButton();
-        cbxSection = new javax.swing.JComboBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
+        jPanel8 = new javax.swing.JPanel();
+        cbxsimulationresult = new javax.swing.JComboBox();
+        jLabel28 = new javax.swing.JLabel();
+        cbxUseSimulationData = new javax.swing.JCheckBox();
+        btnStart = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
+        cbxSection = new javax.swing.JComboBox();
 
         setPreferredSize(new java.awt.Dimension(800, 500));
 
@@ -178,10 +187,71 @@ public class RampMeterEvaluator extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Evaluate", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 0, 12))); // NOI18N
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Data Extraction Type", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 0, 12))); // NOI18N
 
         cbxeMode.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         cbxeMode.setPreferredSize(new java.awt.Dimension(200, 22));
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(cbxeMode, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(cbxeMode, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jTextArea1.setColumns(20);
+        jTextArea1.setRows(5);
+        jScrollPane1.setViewportView(jTextArea1);
+
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Extract Data from Simulation Results", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 10), java.awt.Color.black)); // NOI18N
+
+        cbxsimulationresult.setPreferredSize(new java.awt.Dimension(400, 20));
+
+        jLabel28.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
+        jLabel28.setText("Simulation Output Files");
+
+        cbxUseSimulationData.setText("Extract Data from Simulation Results");
+        cbxUseSimulationData.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxUseSimulationDataActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addComponent(cbxUseSimulationData)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel28))
+                    .addComponent(cbxsimulationresult, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cbxUseSimulationData)
+                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel28)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cbxsimulationresult, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         btnStart.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnStart.setLabel("Start");
@@ -191,36 +261,26 @@ public class RampMeterEvaluator extends javax.swing.JPanel {
             }
         });
 
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Select Section for Real Data", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 0, 12))); // NOI18N
+
         cbxSection.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         cbxSection.setPreferredSize(new java.awt.Dimension(200, 22));
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnStart, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbxeMode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbxSection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(cbxSection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cbxeMode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
-                .addComponent(btnStart)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(cbxSection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 11, Short.MAX_VALUE))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -228,12 +288,17 @@ public class RampMeterEvaluator extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel8, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnStart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 397, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -243,11 +308,18 @@ public class RampMeterEvaluator extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnStart, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
+                        .addGap(8, 8, 8)))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -263,21 +335,39 @@ public class RampMeterEvaluator extends javax.swing.JPanel {
         },10);
     }//GEN-LAST:event_btnStartActionPerformed
 
+    private void cbxUseSimulationDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxUseSimulationDataActionPerformed
+        // TODO add your handling code here:
+        setVisibleOption(this.cbxUseSimulationData.isSelected());
+        if(this.cbxUseSimulationData.isSelected()){
+            new Timer().schedule(new TimerTask(){
+                @Override
+                public void run() {
+                    loadSimulationResults();
+                }
+            },5);
+        }
+    }//GEN-LAST:event_cbxUseSimulationDataActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnStart;
     private javax.swing.JComboBox cbxInterval;
     private javax.swing.JComboBox cbxSection;
+    private javax.swing.JCheckBox cbxUseSimulationData;
     private javax.swing.JComboBox cbxeMode;
     private javax.swing.JComboBox cbxehour;
     private javax.swing.JComboBox cbxemin;
     private javax.swing.JComboBox cbxshour;
+    private javax.swing.JComboBox cbxsimulationresult;
     private javax.swing.JComboBox cbxsmin;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
     private edu.umn.natsrl.gadget.calendar.NATSRLCalendar natsrlCalendar;
@@ -298,6 +388,7 @@ public class RampMeterEvaluator extends javax.swing.JPanel {
         }
         
         loadSection();
+        setVisibleOption(false);
     }
     
     /**
@@ -322,11 +413,51 @@ public class RampMeterEvaluator extends javax.swing.JPanel {
         ButtonCheck();
         redirectOutput();
         
-        Section section = (Section)this.cbxSection.getSelectedItem();
+        Section section = null;
+        ArrayList<Period> period_forAnal = null;
+        ArrayList<Period> period_forRamp = null;
+        SimulationResult sr = null;
+        if(this.cbxUseSimulationData.isSelected()){
+            sr = (SimulationResult)this.cbxsimulationresult.getSelectedItem();
+            if(sr.IsListData()){
+                System.out.println("Error : Selected Simulation Data is not Metering Simulation Data..");
+                ButtonCheck();
+                return;
+            }
+            section = sr.getSection();
+            
+            int start_hour=-1, start_min = -1;
+            try {
+                start_hour = Integer.parseInt(this.cbxshour.getSelectedItem().toString());//Integer.parseInt(sh);
+                start_min = Integer.parseInt(this.cbxsmin.getSelectedItem().toString());//Integer.parseInt(sm);
+            } catch(Exception ex) {}
+//            Period p = sr.getPeriod();
+            period_forAnal = new ArrayList();
+            period_forRamp = new ArrayList();
+            period_forAnal.add(sr.getPeriod(start_hour,start_min));
+            period_forRamp.add(sr.getPeriod(start_hour,start_min));
+        }else{
+            Calendar[] selectedDates = this.natsrlCalendar.getSelectedDates();
+            if(selectedDates.length < 1){
+                JOptionPane.showMessageDialog(sframe, "Select \'date and time\'");
+                ButtonCheck();
+                return;
+            }
+            try{
+                section = (Section)this.cbxSection.getSelectedItem();
+            }catch(Exception e){
+                System.out.println("Error : Select Section..");
+                ButtonCheck();
+                return;
+            }
+            period_forAnal = getPeriod();
+            period_forRamp = getPeriod();
+        }
+        
         int interval = ((Interval) this.cbxInterval.getSelectedItem()).second;
         RampMeterEvaluatorMode mode = (RampMeterEvaluatorMode)this.cbxeMode.getSelectedItem();
-        RampMeterCalculator ramp = new RampMeterCalculator(section,getPeriod(),mode,interval);
-        RampMeterCalculator analysis = new RampMeterCalculator(section,getPeriod(),mode,3600);
+        RampMeterCalculator ramp = new RampMeterCalculator(section,period_forRamp,mode,interval,sr);
+        RampMeterCalculator analysis = new RampMeterCalculator(section,period_forAnal,mode,3600,sr);
         RampMeterWriter writer = new RampMeterWriter(mode);
 //        ramp.Process();
         
@@ -340,7 +471,6 @@ public class RampMeterEvaluator extends javax.swing.JPanel {
                 ArrayList<RampMeterResult> anals = analysis.Process();
                 writer.WriteResult(results,anals);
             }
-            
             restoreOutput();
             ButtonCheck();
         }catch(Exception e){
@@ -348,6 +478,33 @@ public class RampMeterEvaluator extends javax.swing.JPanel {
             restoreOutput();
             ButtonCheck();
         }
+    }
+    
+    /**
+     * load simulation results from local disk
+     * set data to table
+     */
+    private void loadSimulationResults() {
+        this.cbxsimulationresult.setEnabled(false);
+        if(this.cbxsimulationresult != null)
+            this.cbxsimulationresult.removeAllItems();
+        cbxsimulationresult.addItem("Loading Datas.....");
+        
+        ArrayList<SimulationResult> res = SimulationUtil.loadSimulationResults();
+        
+        if(this.cbxsimulationresult != null)
+            this.cbxsimulationresult.removeAllItems();
+        
+        
+        for(SimulationResult s : res)
+        {
+            if(s != null) {
+                cbxsimulationresult.addItem(s);
+            } else {
+                System.out.println("Loaded is null");
+            }           
+        }           
+        this.cbxsimulationresult.setEnabled(true);
     }
 
     private ArrayList<Period> getPeriod() {
@@ -412,6 +569,14 @@ public class RampMeterEvaluator extends javax.swing.JPanel {
             this.btnStart.setEnabled(true);
         }
     }   
+
+    private void setVisibleOption(boolean selected) {
+        natsrlCalendar.setEnabled(!selected);
+        this.cbxSection.setEnabled(!selected);
+        this.cbxsimulationresult.setEnabled(selected);
+        this.cbxehour.setEnabled(!selected);
+        this.cbxemin.setEnabled(!selected);
+    }
     
     /**
      * String Output Stream class for output redirection

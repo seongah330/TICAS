@@ -22,20 +22,25 @@
  */
 package edu.umn.natsrl.ticas;
 
+import edu.umn.natsrl.infra.TMO;
 import edu.umn.natsrl.util.PropertiesWrapper;
 import java.io.File;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Chongmyung Park
  */
 public class TICASVersion {
-    public static final String version = " 3.265";            
+    public static final String version = " 3.266";    
+    public static final boolean ISINIT = false;
     public static String currentVersion;
     
     private static String versionFoler = "config";
     private static String versionFile = "version.config" ;
     private final static String VERSION_LOC = "VERSION";
+    
+    static TMO tmo = TMO.getInstance();
     
     private static PropertiesWrapper prop = new PropertiesWrapper();
     
@@ -70,5 +75,24 @@ public class TICASVersion {
 
     private static String versionInfo() {
         return "";
+    }
+    
+    public static void CheckVersion() {
+        if(TICASVersion.loadConfig() == null ||
+                !TICASVersion.version.equals(TICASVersion.currentVersion)){
+            if(ISINIT){
+                initDataFiles();
+            }
+            TICASVersion.saveConfig();
+            
+            JOptionPane.showMessageDialog(null,TICASVersion.toStr());
+        }
+    }
+
+    public static void initDataFiles() {
+        System.out.println("Reset Geo Data.....");
+        new File("infra.dat").delete();
+        System.out.println("Clear All Cache.....");
+        tmo.clearAllCache();
     }
 }
