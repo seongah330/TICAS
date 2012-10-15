@@ -520,6 +520,8 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         try {            
                 //Simulation Data Reset
                 SimObjects.getInstance().reset();
+                RandomSeed rseed = RandomSeed.getInstance();
+                rseed.Clear();
             if(this.cbxPlugins.getItemCount() == 0) {
                 JOptionPane.showMessageDialog(rootPane, "Plugin must be selected");
                 return;
