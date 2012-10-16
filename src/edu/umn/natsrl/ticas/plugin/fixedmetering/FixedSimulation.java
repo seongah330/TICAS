@@ -29,6 +29,7 @@ import edu.umn.natsrl.vissimcom.ComError;
 import edu.umn.natsrl.vissimcom.IStepListener;
 import edu.umn.natsrl.vissimcom.ITravelTimeListener;
 import edu.umn.natsrl.vissimcom.VISSIMController;
+import edu.umn.natsrl.vissimcom.VISSIMHelper;
 import edu.umn.natsrl.vissimcom.VISSIMVersion;
 import java.io.File;
 import java.io.IOException;
@@ -77,8 +78,8 @@ public class FixedSimulation extends Thread implements IStepListener, ITravelTim
             version = v;
             
             loadSignalGroupFromCasefile(this.caseFile);
-            loadDetectorsFromCasefile(this.caseFile);
-            loadSimulationDuration(this.caseFile);
+            detectors = loadDetectorFromCasefile(this.caseFile);
+            this.simDuration = VISSIMHelper.loadSimulationDuration(this.caseFile);
         }catch(IOException ex){
             ex.printStackTrace();
         }
@@ -162,27 +163,13 @@ public class FixedSimulation extends Thread implements IStepListener, ITravelTim
      * @return 
      */
     private void loadSignalGroupFromCasefile(String caseFile) throws IOException {        
-        String contents = FileHelper.readTextFile(caseFile);
+        ArrayList<String> sgs = VISSIMHelper.loadSignalGroupsFromCasefile(caseFile);
         
-        if (contents == null || contents.isEmpty()) {
+        if(sgs == null){
             System.out.println("Cannot find signal head(meter) in case file");
             System.exit(-1);
         }
-
-        ArrayList<String> sgs = new ArrayList<String>();
-
-        // get detector id from text
-        String regx = "SIGNAL_GROUP ([0-9]+)  NAME \"(.*?)\"";
-        Pattern p = Pattern.compile(regx);
-        Matcher matcher = p.matcher(contents);
-        while (matcher.find()) {
-            String dname = matcher.group(2).trim();
-            if (!dname.isEmpty()) {
-//                System.out.println("SIGNAL : " + dname);
-                sgs.add(dname);
-            }
-        }
-
+        
         for(String signal : sgs) {
             String name = signal;
             boolean isDual = false;
@@ -202,55 +189,6 @@ public class FixedSimulation extends Thread implements IStepListener, ITravelTim
         }
     }
 
-    /**
-     * Loades detector list from VISSIM casefile
-     * @param contents
-     * @return 
-     */
-    private void loadDetectorsFromCasefile(String caseFile) throws IOException {
-        
-        String contents = FileHelper.readTextFile(caseFile);
-        
-        if (contents == null || contents.isEmpty()) {
-            return;
-        }
-        ArrayList<String> dets = new ArrayList<String>();
-
-        // get detector id from text
-        String regx = "DETECTOR (.*?) NAME";
-        Pattern p = Pattern.compile(regx);
-        Matcher matcher = p.matcher(contents);
-        while (matcher.find()) {
-            String dname = matcher.group(1);
-            if (!dname.isEmpty()) {
-                dets.add(dname.trim());
-            }
-        }
-        
-        for(String det : dets) {
-            detectors.add(simObjects.getDetector(""+det));
-//            System.out.println("Detectors : D"+ det);
-        }
-    }
-    private void loadSimulationDuration(String caseFile) throws IOException {        
-        String contents = FileHelper.readTextFile(caseFile);
-        
-        if (contents == null || contents.isEmpty()) {
-            System.out.println("Cannot find signal head(meter) in case file");
-            System.exit(-1);
-        }
-        String[] regx = {"SIMULATION_DURATION ([0-9]+)","SIMULATION_DURATION  ([0-9]+)"};
-        int duration = -1;
-        // get detector id from text
-        for(String reg : regx){
-            duration = fineDuration(reg,contents);
-            if(duration > 0)
-                break;
-        }
-        
-        this.simDuration = duration;
-    }
-    
     private int fineDuration(String regx, String contents) {
         Pattern p = Pattern.compile(regx);
         Matcher matcher = p.matcher(contents);
@@ -397,6 +335,15 @@ public class FixedSimulation extends Thread implements IStepListener, ITravelTim
 
     void setVISSIMVersion(VISSIMVersion selectedItem) {
         version = selectedItem;
+    }
+
+    private ArrayList<SimDetector> loadDetectorFromCasefile(String caseFile) {
+        ArrayList<SimDetector> simDets = new ArrayList<SimDetector>();
+        ArrayList<String> dets = VISSIMHelper.loadDetectorsFromCasefile(caseFile);
+        for(String det : dets) {
+            simDets.add(simObjects.getDetector(det));
+        }
+        return simDets;
     }
     
     public static interface ISimEndSignal {

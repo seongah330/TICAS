@@ -28,6 +28,8 @@ import edu.umn.natsrl.vissimcom.ComError;
 import edu.umn.natsrl.vissimcom.IStepListener;
 import edu.umn.natsrl.vissimcom.ITravelTimeListener;
 import edu.umn.natsrl.vissimcom.VISSIMController;
+import edu.umn.natsrl.vissimcom.VISSIMDetector;
+import edu.umn.natsrl.vissimcom.VISSIMHelper;
 import edu.umn.natsrl.vissimcom.VISSIMVersion;
 import java.io.File;
 import java.io.IOException;
@@ -83,10 +85,9 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
             this.seed = seed;
             this.section = section;
             version = v;
-            
             loadSignalGroupFromCasefile(this.caseFile);
-            loadDetectorsFromCasefile(this.caseFile);
-            loadSimulationDuration(this.caseFile);
+            detectors = loadDetectorFromCasefile(this.caseFile);
+            this.simDuration = VISSIMHelper.loadSimulationDuration(this.caseFile);
             sectionHelper = new SectionHelper(section, detectors,meters);
 
         }catch(IOException ex){
@@ -186,33 +187,14 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         DisplayMeterState();
     }
     
-    /**
-     * Loads signal group list from VISSIM case file
-     * @param contents
-     * @return 
-     */
-    private void loadSignalGroupFromCasefile(String caseFile) throws IOException {        
-        String contents = FileHelper.readTextFile(caseFile);
+    private void loadSignalGroupFromCasefile(String casefile) throws IOException{
+        ArrayList<String> sgs = VISSIMHelper.loadSignalGroupsFromCasefile(caseFile);
         
-        if (contents == null || contents.isEmpty()) {
+        if(sgs == null){
             System.out.println("Cannot find signal head(meter) in case file");
             System.exit(-1);
         }
-
-        ArrayList<String> sgs = new ArrayList<String>();
-
-        // get detector id from text
-        String regx = "SIGNAL_GROUP ([0-9]+)  NAME \"(.*?)\"";
-        Pattern p = Pattern.compile(regx);
-        Matcher matcher = p.matcher(contents);
-        while (matcher.find()) {
-            String dname = matcher.group(2).trim();
-            if (!dname.isEmpty()) {
-//                System.out.println("SIGNAL : " + dname);
-                sgs.add(dname);
-            }
-        }
-
+        
         for(String signal : sgs) {
             String name = signal;
             boolean isDual = false;
@@ -230,70 +212,6 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
                 meters.add(sd);
             }
         }
-    }
-
-    /**
-     * Loades detector list from VISSIM casefile
-     * @param contents
-     * @return 
-     */
-    private void loadDetectorsFromCasefile(String caseFile) throws IOException {
-        
-        String contents = FileHelper.readTextFile(caseFile);
-        
-        if (contents == null || contents.isEmpty()) {
-            return;
-        }
-        ArrayList<String> dets = new ArrayList<String>();
-
-        // get detector id from text
-        String regx = "DETECTOR (.*?) NAME";
-        Pattern p = Pattern.compile(regx);
-        Matcher matcher = p.matcher(contents);
-        while (matcher.find()) {
-            String dname = matcher.group(1);
-            if (!dname.isEmpty()) {
-                dets.add(dname.trim());
-            }
-        }
-        
-        for(String det : dets) {
-            detectors.add(simObjects.getDetector(""+det));
-            System.out.println("Detectors : D"+ det);
-        }
-    }
-    private void loadSimulationDuration(String caseFile) throws IOException {        
-        String contents = FileHelper.readTextFile(caseFile);
-        
-        if (contents == null || contents.isEmpty()) {
-            System.out.println("Cannot find signal head(meter) in case file");
-            System.exit(-1);
-        }
-        String[] regx = {"SIMULATION_DURATION ([0-9]+)","SIMULATION_DURATION  ([0-9]+)"};
-        int duration = -1;
-        // get detector id from text
-        for(String reg : regx){
-            duration = fineDuration(reg,contents);
-            if(duration > 0)
-                break;
-        }
-        
-        this.simDuration = duration;
-    }
-    
-    private int fineDuration(String regx, String contents) {
-        Pattern p = Pattern.compile(regx);
-        Matcher matcher = p.matcher(contents);
-        
-        while (matcher.find()) {
-            String dname = matcher.group(1).trim();
-            if (!dname.isEmpty()) {
-                System.out.println("SIGNAL : " + dname);
-                return Integer.parseInt(dname);
-            }
-        }
-        
-        return -1;
     }
     
     public ArrayList<SimMeter> getSimMeter(){
@@ -370,7 +288,9 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
      * @param meter
      */
     private void updateRampmeter(SimMeter meter) {
-        if (meter == null || !meter.isEnabled()) return;        
+        if (meter == null || !meter.isEnabled()){
+            return; 
+        }       
         meter.setCurrentSimTime(vc.getCurrentTime());
         meter.updateLamp(vc);
     }
@@ -436,6 +356,15 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
             }
         }
     }
+
+    private ArrayList<SimDetector> loadDetectorFromCasefile(String caseFile) {
+        ArrayList<SimDetector> simDets = new ArrayList<SimDetector>();
+        ArrayList<String> dets = VISSIMHelper.loadDetectorsFromCasefile(caseFile);
+        for(String det : dets) {
+            simDets.add(simObjects.getDetector(det));
+        }
+        return simDets;
+    }
     
     public static interface ISimEndSignal {
         public void signalEnd(int code);
@@ -463,26 +392,5 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     }
     public void setDebugEntranceInfo(boolean is){
         this.isDebug_EntranceInfo = is;
-    }
-    
-    //Metering
-    private void setRate(double rnext) {
-        for(SimMeter meter : meters){
-            double lastRate = rnext;
-            float redTime = calculateRedTime(meter,rnext);
-            redTime = Math.round(redTime * 10) / 10f;
-            meter.setRate((byte)1);
-            meter.setRedTime(redTime);
-        }
-    }
-    
-    /**
-    * Return red time that converted from rate
-    * @param rate
-    * @return red time in seconds
-    */
-    private float calculateRedTime(SimMeter meter, double rate) {
-        float cycle = 3600 / (float)rate;
-        return Math.max(cycle - meter.GREEN_YELLOW_TIME, SimulationConfig.MIN_RED_TIME);
     }
 }

@@ -24,6 +24,7 @@ import edu.umn.natsrl.infra.TMO;
 import edu.umn.natsrl.infra.section.SectionManager;
 import edu.umn.natsrl.infra.simobjects.SimMeter;
 import edu.umn.natsrl.sfim.SectionInfoDialog;
+import edu.umn.natsrl.ticas.Simulation.SimulationUtil;
 import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import edu.umn.natsrl.ticas.plugin.fixedmetering.FixedSimulation.ISimEndSignal;
 import edu.umn.natsrl.util.FileHelper;
@@ -625,7 +626,7 @@ public class FixedMeteringSimulationGUI extends javax.swing.JPanel implements IS
         c.add(Calendar.SECOND, duration);
         Date eTime = c.getTime();
         simFrame.afterSimulation((Section)this.cbxSections.getSelectedItem(), new Period(sTime, eTime, 30));
-        
+        SimulationUtil.SaveSimulation((Section)this.cbxSections.getSelectedItem(),new Period(sTime, eTime, 30),simFrame);
         System.out.println("Restore output redirection ... ");
         isSimulationStart(false);
         this.restoreOutput();

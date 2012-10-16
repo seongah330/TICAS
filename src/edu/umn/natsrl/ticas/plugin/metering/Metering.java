@@ -656,12 +656,12 @@ public class Metering {
                 + ", Kc=" + String.format("%.2f", Kc) + "(" + cooridnated + ")"
                 + ", Kd=" + String.format("%.2f", Kd)
                 + ", redTime=" + String.format("%.2f", redTime)
-                + ", k=" + String.format("%.2f", Kt)
-                + ", alpha=" + String.format("%.2f", alpha)
-                + ", Rmin=" + String.format("%.2f", Rmin)
-                + ", Rt=" + String.format("%.2f", Rt)
-                + ", ent_demand=" + String.format("%.2f", d)
-                + ", ent_flow=" + String.format("%.2f", q));
+                + ", k=" + String.format("%.2f", Kt));
+//                + ", alpha=" + String.format("%.2f", alpha)
+//                + ", Rmin=" + String.format("%.2f", Rmin)
+//                + ", Rt=" + String.format("%.2f", Rt)
+//                + ", ent_demand=" + String.format("%.2f", d)
+//                + ", ent_flow=" + String.format("%.2f", q));
         ///////////////////////////////////////////////////////////////////////
 
 

@@ -15,42 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package edu.umn.natsrl.ticas.plugin.vissimcalibration2;
-
-import edu.umn.natsrl.infra.Section;
-import edu.umn.natsrl.ticas.Simulation.Simulation;
-import edu.umn.natsrl.ticas.Simulation.SimulationImpl;
-import edu.umn.natsrl.vissimcom.VISSIMVersion;
+package edu.umn.natsrl.vissimcom;
 
 /**
  *
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
-public class BasicSimulation extends Simulation implements SimulationImpl{
+public enum VISSIMDetector {
+    DETECTOR(1,"Detector"),
+    DATACOLLECTOR(2, "DATA COLLECTOR"),
+    NULL(3, "NULL");
     
-    public BasicSimulation(String caseFile, int seed, Section section, VISSIMVersion v) {
-        super(caseFile,seed,section,v);
-    }
-
-    @Override
-    public void RunningInitialize() {
-        super.RunningInitialize();
-        super.setDebugEntranceInfo(false);
-    }
-
-    @Override
-    public void ExecuteBeforeRun() {
-        super.ExecuteBeforeRun();
-    }
-
-    @Override
-    public void ExecuteAfterRun() {
-        super.ExecuteAfterRun();
-    }
-
-    @Override
-    public void DebugMassage() {
-        super.DebugMassage();
+    int srl;
+    String str;
+    
+    VISSIMDetector(int k, String str){
+        srl = k;
+        this.str = str;
     }
     
+    @Override
+    public String toString(){
+        return str;
+    }
+    
+    public boolean isDETECTOR(){return this==DETECTOR;}
+    public boolean isDATACOLLECTOR(){return this==DATACOLLECTOR;}
+    public boolean isNULL(){return this==NULL;}
 }

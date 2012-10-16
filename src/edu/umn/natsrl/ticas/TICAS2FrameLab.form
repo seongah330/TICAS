@@ -1601,10 +1601,8 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="1" attributes="0">
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="cbxUseSimulationData" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="cbxSimulationForCalibration" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
+                              <Component id="cbxUseSimulationData" alignment="0" min="-2" max="-2" attributes="0"/>
+                              <Component id="cbxSimulationForCalibration" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="jLabel28" min="-2" max="-2" attributes="0"/>

@@ -98,38 +98,6 @@ public class VISSIMHelper {
         return sgs;
     }    
     
-    /**
-     * Loades detector list from VISSIM casefile
-     * @param contents
-     * @return 
-     */
-    public static ArrayList<String> loadDetectorsFromCasefile(String caseFile) {
-        
-        String contents;
-        try {
-            contents = FileHelper.readTextFile(caseFile);
-        } catch (IOException ex) {
-            return null;
-        }
-        
-        if (contents == null || contents.isEmpty()) {
-            return null;
-        }
-
-        ArrayList<String> detectors = new ArrayList<String>();
-
-        // get detector id from text
-        String regx = "DETECTOR (.*?) NAME";
-        Pattern p = Pattern.compile(regx);
-        Matcher matcher = p.matcher(contents);
-        while (matcher.find()) {
-            String dname = matcher.group(1);
-            if (!dname.isEmpty()) {
-                detectors.add(dname.trim());
-            }
-        }
-
-        return detectors;
-    }    
+    
     
 }

@@ -17,10 +17,15 @@
  */
 package edu.umn.natsrl.ticas.Simulation;
 
+import edu.umn.natsrl.infra.Period;
+import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.ticas.SimulationResult;
+import edu.umn.natsrl.ticas.SimulationResultSaveDialog;
+import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -49,5 +54,16 @@ public class SimulationUtil {
         Collections.sort(res);
         
         return res;
+    }
+    
+    public static void SaveSimulation(Section simSection, Period simPeriod,PluginFrame simFrame) {
+        if(simSection == null || simPeriod == null) {
+            JOptionPane.showMessageDialog(simFrame, "Empty simulation result");
+            return;
+        }
+        // Detectors must have data, before this routine
+        SimulationResultSaveDialog srd = new SimulationResultSaveDialog(simFrame, simSection, simPeriod);
+        srd.setLocationRelativeTo(simFrame);
+        srd.setVisible(true);
     }
 }

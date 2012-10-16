@@ -29,6 +29,7 @@ import edu.umn.natsrl.ticas.Simulation.SectionHelper.EntranceState;
 import edu.umn.natsrl.ticas.Simulation.SectionHelper.StationState;
 import edu.umn.natsrl.ticas.Simulation.Simulation.ISimEndSignal;
 import edu.umn.natsrl.ticas.Simulation.SimulationConfig;
+import edu.umn.natsrl.ticas.Simulation.SimulationUtil;
 import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import edu.umn.natsrl.util.ExcelAdapter;
 import edu.umn.natsrl.util.FileHelper;
@@ -638,7 +639,7 @@ public class BasicMeteringGUI extends javax.swing.JPanel implements ISimEndSigna
         c.add(Calendar.SECOND, duration);
         Date eTime = c.getTime();
         simFrame.afterSimulation((Section)this.cbxSections.getSelectedItem(), new Period(sTime, eTime, 30));
-        
+        SimulationUtil.SaveSimulation((Section)this.cbxSections.getSelectedItem(),new Period(sTime, eTime, 30),simFrame);
         System.out.println("Restore output redirection ... ");
         this.restoreOutput();
     }

@@ -72,12 +72,15 @@ public class VISSIMController {
     private INet net;
     private ISignalControllers signalControllers;
     private ISignalController signalControllerForDetector;
+    
+    private int detectorLength = 0;
     private IDetectors detectors;
     private IDetector[] detectorList;
-    private Detector[] queueDetectorList;
     
     private IDataCollections datacollections;
     private IDataCollection[] datacollectionList;
+    
+    private Detector[] queueDetectorList;
     
     private boolean[] detectorPulse;
     private int[] speedLimits;
@@ -101,11 +104,11 @@ public class VISSIMController {
     // these arrays are used for notifing to listener temporarily
     String[] travelTimeNames;
     double[] travelTimeValues;
-    int[] detectorIds;
-    int[] detectorVolumes;
-    int[] detectorFlows;
-    float[] detectorSpeeds;
-    float[] detectorDensities;
+//    int[] detectorIds;
+//    int[] detectorVolumes;
+//    int[] detectorFlows;
+//    float[] detectorSpeeds;
+//    float[] detectorDensities;
     /** Event Listener */
     private Vector<ITrafficListener> readTrafficListeners = new Vector<ITrafficListener>();
     private Vector<ITravelTimeListener> readTravelTimeListeners = new Vector<ITravelTimeListener>();
@@ -166,62 +169,46 @@ public class VISSIMController {
                     Logger.getLogger(VISSIMController.class.getName()).log(Level.SEVERE, null, ex);
                 }*/
                 second = (float) step / simResolution;
-
                 // Second = step / resolution
                 simulation.RunSingleStep();
-
                 // every 30s routine
                 if (second % RUNNING_STEP == 0) {
 
                     /**
                     * DataCollection Test
                     */
-//                    for(int i=0;i<this.datacollectionList.length;i++){
-//                        IDataCollection d = datacollectionList[i];
-//                        System.out.println("DCID("+d.getID()+") : "+getDouble(d.GetResult("NVEHICLES", "SUM", 0))+"-"+getDouble(d.GetResult("SPEED", "MEAN", 0)));
-////                            System.out.println("DCID("+d.getID()+") : "+getInt(d.getAttValue("ID")));
-//                    }
+                    if(VISSIMHelper.detectorOption.isDATACOLLECTOR()){
+                        for(int i=0;i<this.datacollectionList.length;i++){
+                            IDataCollection d = datacollectionList[i];
+                            double v = getDouble(d.GetResult("NVEHICLES", "SUM", 0));
+                            double u = getDouble(d.GetResult("SPEED", "MEAN", 0));
+                            double occ = -1;
+                            if(queueDetectorList[i] != null){
+                                occ = getDouble(d.GetResult("OCCUPANCYRATE", "SUM", 0));
+                            }
+//                            System.out.println("DCID("+d.getID()+") : "+v+"-"+u+"-"+occ+"-"+queueDetectorList[i]);
+                            
+                            AddDetectorData(d.getID(),(int)v,u,occ,speedLimits[i],queueDetectorList[i],VISSIMHelper.detectorOption);
+    //                            System.out.println("DCID("+d.getID()+") : "+getInt(d.getAttValue("ID")));
+                        }
+                    }
                     /********************************
                      * read traffic data
                      *********************************/
-                    // for all detectors    
-                    for (int i = 0; i < this.detectorList.length; i++) {
-                        // calculate traffic data
-                        int detector_id = this.detectorList[i].getID();
-                        int v = this.detectorData[i].getVolume();
-                        
-                        int q = v * FLOW_CONSTANT;
+                    else if(VISSIMHelper.detectorOption.isDETECTOR()){
+                        // for all detectors    
+                        for (int i = 0; i < this.detectorList.length; i++) {
+                            // calculate traffic data
+                            int detector_id = this.detectorList[i].getID();
+                            AddDetectorData(detector_id,detectorData[i].getVolume(),detectorData[i].getSpeed(),detectorData[i].getOccupancy(),
+                                    speedLimits[i],queueDetectorList[i],VISSIMHelper.detectorOption);
 
-                        double u = (v == 0 ? speedLimits[i]+5 : this.detectorData[i].getSpeed() / v);
-                        double k = (u <= 0 ? 0 : q / u);
-//                        if(detector_id == 1020 || detector_id == 1021){
-//                            System.out.println("DID("+detector_id+") : "+v+"-"+u);
-//                        }
-                        double occupancy = -1;
-//                        System.out.print("detector_id : " + detector_id + " -- ");
-//                        System.out.println("v="+v+", u="+u+", k="+k+", occ=" + occupancy);
-                        if (queueDetectorList[i] != null) {
-//                            Detector d = TMO.getInstance().getInfra().getDetector("D" + this.detectorList[i].getID());
-                            double total_occupancy = this.detectorData[i].getOccupancy();
-                            occupancy = Math.min(total_occupancy / RUNNING_STEP * 100, 100);
-//                            double scanData = occupancy * InfraConstants.MAX_SCANS / 100;
-//                            double sk = occupancy * 5280 / d.getFieldLength() / 100;                            
-//                            double su = q / sk;
-                            
                         }
 
-                        if (k > 300) {
-                            System.out.println("WARNING!! VISSIMController > too high density : " + k);
+                        // reset detector data of for past 30s
+                        for (int i = 0; i < this.detectorList.length; i++) {
+                            this.detectorData[i].reset();
                         }
-//                        SimDetector simDetector = simObjects.getDetector("D"+detector_id);
-                        SimDetector simDetector = simObjects.getDetector(""+detector_id);
-                        simDetector.addData(v, q, u, k, occupancy);
-
-                    }
-
-                    // reset detector data of for past 30s
-                    for (int i = 0; i < this.detectorList.length; i++) {
-                        this.detectorData[i].reset();
                     }
 
                 } // end of every 30s routine
@@ -250,34 +237,22 @@ public class VISSIMController {
                 
                 // Read data using threads (Java COM is very slow)
                 //System.out.println("dLen=" + detectorList.length + " threadStep="+threadStep);
-                for (int i = 0, k=0; i < this.detectorList.length; i += threadStep, k++) {
-                    int to = Math.min(i + threadStep - 1, this.detectorList.length - 1);
-                    //System.out.println("i="+i+" k="+k + " to="+to);
-                    collectThreads[k] = new CollectDataThread(i, to);
-                    collectThreads[k].start();
-                }
+                if(VISSIMHelper.detectorOption.isDETECTOR()){
+                    for (int i = 0, k=0; i < this.detectorList.length; i += threadStep, k++) {
+                        int to = Math.min(i + threadStep - 1, this.detectorList.length - 1);
+                        //System.out.println("i="+i+" k="+k + " to="+to);
+                        collectThreads[k] = new CollectDataThread(i, to);
+                        collectThreads[k].start();
+                    }
 
-                for (int i = 0; i < collectThreads.length; i++) {
-                    try {
-                        collectThreads[i].join();
-                    } catch (InterruptedException ex) {}
+                    for (int i = 0; i < collectThreads.length; i++) {
+                        try {
+                            collectThreads[i].join();
+                        } catch (InterruptedException ex) {}
+                    }
                 }
                 //System.out.println("  * All threads are joined");
 
-                // read detector data from VISSIM every step 
-//                for (int i = 0; i < this.detectorList.length; i++) {
-//
-//                    if(queueDetectorList[i] != null) {
-//                        detectorData[i].addOccupancy(detectorList[i].getAttValue("OCCUPANCY").getDouble());
-//                    }
-//                    
-//                    // if any vehicle was over the detector
-//                    if (detectorList[i].getAttValue("IMPULSE").getInt() == 1) {
-//                        detectorData[i].addVolume();
-//                        detectorData[i].addSpeed(detectorList[i].getAttValue("SPEED").getDouble());
-//                    }
-//
-//                }
 
                 // execute all VSSIM step listeners
                 for (int freq : this.vcStepListeners.keySet()) {
@@ -298,7 +273,42 @@ public class VISSIMController {
             return -1;
         }
     }
+    
+    private void AddDetectorData(int detector_id, int volume, double speed, double occ, int speedLimit, Detector queuedetector, VISSIMDetector detectorOption) {
+        int v = volume;
 
+        int q = v * FLOW_CONSTANT;
+
+        double u = 0;
+        if(detectorOption.isDETECTOR()){
+            u = (v == 0 ? speedLimit+5 : speed / v);
+        }else if(detectorOption.isDATACOLLECTOR()){
+            u = speed;
+        }
+        double k = (u <= 0 ? 0 : q / u);
+//                        if(detector_id == 1020 || detector_id == 1021){
+//                            System.out.println("DID("+detector_id+") : "+v+"-"+u);
+//                        }
+        double occupancy = -1;
+//                        System.out.print("detector_id : " + detector_id + " -- ");
+//                        System.out.println("v="+v+", u="+u+", k="+k+", occ=" + occupancy);
+        if (queuedetector != null) {
+//                            Detector d = TMO.getInstance().getInfra().getDetector("D" + this.detectorList[i].getID());
+            double total_occupancy = occ;
+            occupancy = Math.min(total_occupancy / RUNNING_STEP * 100, 100);
+//                            double scanData = occupancy * InfraConstants.MAX_SCANS / 100;
+//                            double sk = occupancy * 5280 / d.getFieldLength() / 100;                            
+//                            double su = q / sk;
+
+        }
+
+        if (k > 300) {
+            System.out.println("WARNING!! VISSIMController > too high density : " + k);
+        }
+//                        SimDetector simDetector = simObjects.getDetector("D"+detector_id);
+        SimDetector simDetector = simObjects.getDetector(""+detector_id);
+        simDetector.addData(v, q, u, k, occupancy);
+    }
 
     class CollectDataThread extends Thread {
         int fromIdx;
@@ -318,10 +328,6 @@ public class VISSIMController {
             for (int i = fromIdx; i <= toIdx; i++) {
                 count ++;
                 try {
-//                    if (queueDetectorList[i] != null) {
-//                        System.out.println("queue not null");
-//                        detectorData[i].addOccupancy(getDouble(detectorList[i].getAttValue("OCCUPANCY")));
-//                    }
 
                     /*Modification 2012/1/21 //soobin Jeon 
                      * IMPULSE formula of jawin COM interface differ with jacozoom.
@@ -337,6 +343,10 @@ public class VISSIMController {
                         detectorPulse[i] = true;
                         detectorData[i].addVolume();
                         detectorData[i].addSpeed(getDouble(detectorList[i].getAttValue("SPEED")));
+                    if (queueDetectorList[i] != null) {
+                        detectorData[i].addOccupancy(getDouble(detectorList[i].getAttValue("OCCUPANCY")));
+                    }
+
                     }else if(impulse == 0 && detectorPulse[i]){
                         detectorPulse[i] = false;
                     }
@@ -369,15 +379,17 @@ public class VISSIMController {
     /**
      * Set light of meter to green or red
      */
-    public void setMeterStatus(String meterName, MeterLight status) {
+    public boolean setMeterStatus(String meterName, MeterLight status) {
         try {
             ISignalGroup sg = meterTable.get(meterName);
             if (sg == null) {
-                return;
+                return false;
             }
             sg.setAttValue("STATE", status.id);
+            return true;
         } catch (COMException ex) {
             ex.printStackTrace();
+            return false;
         }
     }
 
@@ -456,6 +468,11 @@ public class VISSIMController {
             // set resolution and period
             simResolution = simulation.getResolution();
             simPeriod = (int) simulation.getPeriod();
+            
+            if(VISSIMHelper.detectorOption.isDATACOLLECTOR()){
+                simPeriod ++;
+                simulation.setPeriod(simPeriod);
+            }
 
             // how many execution steps do we need?
             totalExecutionStep = (int) simPeriod * simResolution;
@@ -475,49 +492,63 @@ public class VISSIMController {
                 IDesiredSpeedDecision d = desiredSpeedDecisions.getItem(i);
                 desiredSpeedDecisionList.put(d.getName(), d);
             }
+            
             // make detector list as hashmap
+            /**
+             * Detector
+             */
             detectors = signalControllerForDetector.getDetectors();
             detectorList = new IDetector[detectors.getCount()];
-            detectorPulse = new boolean[detectorList.length];
-            queueDetectorList = new Detector[detectors.getCount()];
-            detectorData = new DetectorData[detectors.getCount()];
-            speedLimits = new int[detectorList.length];
-
+            System.out.println("D Detector-"+detectors.getCount());
+            
             /**
-             * DataCollectin
+             * DataCollection
              */
             IEvaluation eval = vissim.getEvaluation();
             eval.setAttValue("DATACOLLECTION", true);
             this.datacollections = net.getDataCollections();
             datacollectionList = new IDataCollection[datacollections.getCount()];
-            
             System.out.println("D Collector-"+datacollections.getCount());
-            for(int i=0;i<datacollections.getCount();i++){
-                datacollectionList[i] = datacollections.getItem(i+1);
-//                System.out.println("DCollection : "+datacollectionList[i].getID() + "="+datacollectionList[i].getName());
-            }
             
+            /**
+             * set Lists
+             */
             Infra infra = TMO.getInstance().getInfra();
-            for (int i = 1; i <= detectors.getCount(); i++) {
-                IDetector d = detectors.getItem(i);
-                detectorList[i - 1] = d;
-                detectorData[i - 1] = new DetectorData();
+            if(VISSIMHelper.detectorOption.isDETECTOR()){
+                this.detectorLength = detectorList.length;
+                
+                queueDetectorList = new Detector[detectorLength];
+                detectorData = new DetectorData[detectorLength];
+                speedLimits = new int[detectorLength];
 
-//                Detector det = infra.getDetector("D"+d.getID());
-                Detector det = infra.getDetector(""+d.getID());
-//                System.out.println("did : "+d.getID()+" det : "+det.getId()+" "+det.getIdFulltext()+" "+det.getLabel());
-                if (det.getLaneType() == LaneType.QUEUE) {
-                    queueDetectorList[i - 1] = det;
-                } else {
-                    queueDetectorList[i - 1] = null;
+                for (int i = 0; i < detectors.getCount(); i++) {
+                    IDetector d = detectors.getItem(i+1);
+                    detectorList[i] = d;
+                    insertDetectorInfra(d.getID(),i,infra);
                 }
+                detectorPulse = new boolean[detectorList.length];
+                int threadN = detectorLength / threadStep;
+                if(detectorLength % threadStep != 0) threadN++;
+                this.collectThreads = new CollectDataThread[threadN];
+                
+            }else if(VISSIMHelper.detectorOption.isDATACOLLECTOR()){
+                this.detectorLength = datacollectionList.length;
+                
+                queueDetectorList = new Detector[detectorLength];
+                detectorData = new DetectorData[detectorLength];
+                speedLimits = new int[detectorLength];
 
-                if (det.getStation() != null) {
-                    speedLimits[i - 1] = det.getStation().getSpeedLimit();
-                } else {
-                    speedLimits[i - 1] = 0;
+                for(int i=0;i<datacollections.getCount();i++){
+                    IDataCollection d = datacollections.getItem(i+1);
+                    datacollectionList[i] = d;
+                    insertDetectorInfra(d.getID(),i,infra);
                 }
+            }else{
+                return -1;
             }
+
+            System.out.println(datacollections.getCount()+ " : "+detectors.getCount());
+            
 
             // make travel time list as hash map
             travelTimes = net.getTravelTimes();
@@ -528,17 +559,13 @@ public class VISSIMController {
 
             travelTimeNames = new String[this.travelTimeList.length];
             travelTimeValues = new double[this.travelTimeList.length];
-            detectorIds = new int[this.detectorList.length];
-            detectorVolumes = new int[this.detectorList.length];
-            detectorFlows = new int[this.detectorList.length];
-            detectorSpeeds = new float[this.detectorList.length];
-            detectorDensities = new float[this.detectorList.length];
+//            detectorIds = new int[this.detectorList.length];
+//            detectorVolumes = new int[this.detectorList.length];
+//            detectorFlows = new int[this.detectorList.length];
+//            detectorSpeeds = new float[this.detectorList.length];
+//            detectorDensities = new float[this.detectorList.length];
 
             initializeFromCaseFile();
-            
-            int threadN = this.detectorList.length / threadStep;
-            if(this.detectorList.length % threadStep != 0) threadN++;
-            this.collectThreads = new CollectDataThread[threadN];
 
             simulation.RunSingleStep();
             simStep++;
@@ -547,6 +574,22 @@ public class VISSIMController {
         } catch (Exception ex) {
             ex.printStackTrace();
             return ComError.getError(ex.toString()).getErrorType();
+        }
+    }
+    
+    private void insertDetectorInfra(int Id,int cnt,Infra infra) {
+        detectorData[cnt] = new DetectorData();
+        Detector det = infra.getDetector(""+Id);
+        if (det.getLaneType() == LaneType.QUEUE) {
+            queueDetectorList[cnt] = det;
+        } else {
+            queueDetectorList[cnt] = null;
+        }
+
+        if (det.getStation() != null) {
+            speedLimits[cnt] = det.getStation().getSpeedLimit();
+        } else {
+            speedLimits[cnt] = 0;
         }
     }
 

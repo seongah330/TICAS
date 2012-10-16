@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  * @author Chongmyung Park
  */
 public class VISSIMHelper {
-    
+    public static VISSIMDetector detectorOption = VISSIMDetector.NULL;
     /**
      * Loads desired speed decision list from VISSIM case file
      * @param contents
@@ -115,21 +115,88 @@ public class VISSIMHelper {
         if (contents == null || contents.isEmpty()) {
             return null;
         }
-
-        ArrayList<String> detectors = new ArrayList<String>();
-
-        // get detector id from text
-        String regx = "DETECTOR (.*?) NAME";
-        Pattern p = Pattern.compile(regx);
-        Matcher matcher = p.matcher(contents);
-        while (matcher.find()) {
-            String dname = matcher.group(1);
-            if (!dname.isEmpty()) {
-                detectors.add(dname.trim());
-            }
+        
+        ArrayList<String> detectors;
+        
+        /**
+         * find DataCollector
+         */
+        detectors = loadDetectorDatas(contents,"COLLECTION_POINT");
+        if(detectors != null){
+//            System.out.println("COLL : "+detectors.size());
+            detectorOption = VISSIMDetector.DATACOLLECTOR;
+            return detectors;
+        }
+        
+        /**
+         * find Detector
+         */
+        detectors = loadDetectorDatas(contents,"DETECTOR");
+        if(detectors == null){
+            detectorOption = VISSIMDetector.NULL;
+            return null;
+        }else{
+            detectorOption = VISSIMDetector.DETECTOR;
+//            System.out.println("DET : "+detectors.size());
         }
 
         return detectors;
     }    
     
+    private static ArrayList<String> loadDetectorDatas(String contents, String strx) {
+        ArrayList<String> detectors = new ArrayList<String>();
+
+        // get detector id from text
+        String regx = strx + " (.*?) [a-zA-Z]";
+//        System.out.println(regx);
+        Pattern p = Pattern.compile(regx);
+        Matcher matcher = p.matcher(contents);
+        
+        while (matcher.find()) {
+            String dname = matcher.group(1);
+            if (!dname.isEmpty()) {
+//                System.out.println(dname.trim());
+                detectors.add(dname.trim());
+            }
+        }
+        
+        if(detectors.isEmpty())
+            return null;
+        
+        return detectors;
+    }
+    
+    public static int loadSimulationDuration(String caseFile) throws IOException {        
+        String contents = FileHelper.readTextFile(caseFile);
+        
+        if (contents == null || contents.isEmpty()) {
+            System.out.println("Cannot find signal head(meter) in case file");
+            System.exit(-1);
+        }
+        String[] regx = {"SIMULATION_DURATION ([0-9]+)","SIMULATION_DURATION  ([0-9]+)"};
+        int duration = -1;
+        // get detector id from text
+        for(String reg : regx){
+            duration = fineDuration(reg,contents);
+            if(duration > 0)
+                break;
+        }
+        
+        return duration;
+    }
+    
+    public static int fineDuration(String regx, String contents) {
+        Pattern p = Pattern.compile(regx);
+        Matcher matcher = p.matcher(contents);
+        
+        while (matcher.find()) {
+            String dname = matcher.group(1).trim();
+            if (!dname.isEmpty()) {
+                System.out.println("SIGNAL : " + dname);
+                return Integer.parseInt(dname);
+            }
+        }
+        
+        return -1;
+    }    
 }

@@ -422,7 +422,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             PluginInfo simEvaluator = new PluginInfo("Basic Simulation", PluginType.SIMULATION, VissimCalibration2.class);
             addSimulationPlugins(simEvaluator);            
         }
-        
+            
         PluginInfo simFixedMetering = new PluginInfo("Fixed Metering Simulation", PluginType.TOOL, FixedMeteringSimulation.class);       
         addSimulationPlugins(simFixedMetering);
         
@@ -2131,9 +2131,8 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(cbxUseSimulationData)
-                        .addComponent(cbxSimulationForCalibration))
+                    .addComponent(cbxUseSimulationData)
+                    .addComponent(cbxSimulationForCalibration)
                     .addGroup(jPanel8Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel28)))

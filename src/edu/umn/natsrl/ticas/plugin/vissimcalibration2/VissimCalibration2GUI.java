@@ -35,6 +35,8 @@ import edu.umn.natsrl.sfim.SectionInfoDialog;
 import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import edu.umn.natsrl.ticas.Simulation.Simulation.ISimEndSignal;
 import edu.umn.natsrl.ticas.Simulation.SimulationConfig;
+import edu.umn.natsrl.ticas.Simulation.SimulationUtil;
+import edu.umn.natsrl.ticas.SimulationResultSaveDialog;
 import edu.umn.natsrl.util.FileHelper;
 import edu.umn.natsrl.util.PropertiesWrapper;
 import edu.umn.natsrl.vissimcom.ComError;
@@ -237,6 +239,7 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             System.out.println("Simulation Complete.");
             System.out.println("------------------------------------------------------------------------");
             this.restoreOutput();
+            SimulationUtil.SaveSimulation((Section)this.cbxSections.getSelectedItem(),new Period(sTime, eTime, 30),simFrame);
         }
     }
     
@@ -910,8 +913,8 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
 
         jSplitPane1.setLeftComponent(jPanel3);
 
-        tbxLog.setColumns(20);
         tbxLog.setEditable(false);
+        tbxLog.setColumns(20);
         tbxLog.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         tbxLog.setLineWrap(true);
         tbxLog.setRows(5);
@@ -940,7 +943,7 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 506, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(btnClearLog, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 156, Short.MAX_VALUE)
@@ -978,50 +981,6 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnBrowseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBrowseActionPerformed
-        String path = ".";
-        String prevPath = this.tbxCaseFile.getText();
-        if(!prevPath.isEmpty()) path = new File(prevPath).getAbsolutePath();
-        String caseFile = FileHelper.chooseFileToOpen(prevPath, "Select VISSIM Case File", FileHelper.FileFilterForVISSIM);
-        if(caseFile != null) this.tbxCaseFile.setText(caseFile);
-    }//GEN-LAST:event_btnBrowseActionPerformed
-
-    private void btnRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRunActionPerformed
-        if(this.cbxRandomSeedList.getSelectedIndex() == 0 && !this.chxRunwithsingleRandom.isSelected()){
-            JOptionPane.showMessageDialog(this, "Select Random option");
-            return;
-        }
-        this.redirectOutput();
-        
-        if(runinitRandomSeed()){
-            System.out.println("[ Simulation ]");        
-            System.out.println("  - Selected Random Seed List = " + this.cbxRandomSeedList.getSelectedItem().toString());
-            System.out.print("  - Random Seed List = ");
-            for(String value : SimRandom.getSeedList())
-                System.out.print(value+" ");
-            System.out.println();
-            System.out.println("  - DataLog Time Interval = " + cbxTimeInterval.getSelectedItem().toString());
-            System.out.println("----------------------------------------------");
-            runSimulation();
-        }
-    }//GEN-LAST:event_btnRunActionPerformed
-
-    private void cbxSectionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxSectionsActionPerformed
-        
-}//GEN-LAST:event_cbxSectionsActionPerformed
-
-    private void btnSectionInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSectionInfoActionPerformed
-        this.openSectionInfoDialog();
-}//GEN-LAST:event_btnSectionInfoActionPerformed
-
-    private void btnOpenSectionEditorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenSectionEditorActionPerformed
-        this.openSectionEditor();
-}//GEN-LAST:event_btnOpenSectionEditorActionPerformed
-
-    private void chkShowVehiclesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkShowVehiclesActionPerformed
-        setVissimVisible(this.chkShowVehicles.isSelected());
-}//GEN-LAST:event_chkShowVehiclesActionPerformed
-
     private void formComponentRemoved(java.awt.event.ContainerEvent evt) {//GEN-FIRST:event_formComponentRemoved
 //        this.restoreOutput();
     }//GEN-LAST:event_formComponentRemoved
@@ -1031,7 +990,7 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
     }//GEN-LAST:event_btnClearLogActionPerformed
 
     private void btnSaveLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveLogActionPerformed
-        String filepath = FileHelper.chooseFileToSave(".", "Select file to save", FileHelper.FileFilterForText);        
+        String filepath = FileHelper.chooseFileToSave(".", "Select file to save", FileHelper.FileFilterForText);
         if(filepath != null) {
             filepath = FileHelper.checkExtension(filepath, FileHelper.FileFilterForText);
             try {
@@ -1042,139 +1001,182 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
         }
     }//GEN-LAST:event_btnSaveLogActionPerformed
 
-private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-// TODO add your handling code here:
-    int rseed = Integer.parseInt(this.txtRnumber.getText());
-    if(rseed > 9999){
-        JOptionPane.showMessageDialog(simFrame, "Random seed should be less than 9999");
-        return;
-    }
-    this.currentrseed.AddSeed(rseed);
-    ReflashSeedList();
-}//GEN-LAST:event_jButton1ActionPerformed
-
-private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-// TODO add your handling code here:
-    try{
-        this.currentrseed.RemoveSeed(this.lSeedList.getSelectedIndex());
-        ReflashSeedList();
-    }catch(Exception e){
-        e.printStackTrace();
-    }
-    
-}//GEN-LAST:event_jButton2ActionPerformed
-
-private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-// TODO add your handling code here:
-    if(this.txtGname.getText().equals("")){
-        JOptionPane.showMessageDialog(simFrame, "Set Group Name");
-        return;
-    }
-    
-    //add Name
-    this.currentrseed.setName(this.txtGname.getText());
-    
-    if(this.currentrseed.IsEmpty()){
-        JOptionPane.showMessageDialog(simFrame, "Add Seed List");
-        return;
-    }
-    if(this.randomseeds.IsRandomSeed(this.txtGname.getText())){
-        if(JOptionPane.showConfirmDialog(simFrame, "Do you want to rewrite this group(\""+this.txtGname.getText()+"\")?", "Confirm", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        // TODO add your handling code here:
+        if(JOptionPane.showConfirmDialog(simFrame, "Do you want to clear group list?", "Confirm", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {
             return;
         }
-    }
-    
-    
-    this.randomseeds.UpdateRandomSeed(currentrseed);
-    
-    this.CleanSeedList();
-    this.ReflashGroupList();
-    this.txtGname.setText("");
-}//GEN-LAST:event_jButton3ActionPerformed
-
-private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-// TODO add your handling code here:
-    try{
-        RandomSeed gseed = this.randomseeds.getRandomSeedInstance(this.lGroupList.getSelectedValue().toString());
-        if(gseed != null){
-            this.currentrseed.Clear();
-            this.currentrseed.setInstance(gseed);
-            this.txtGname.setText(currentrseed.getName());
-        }
-        else
-            System.out.println("null!!!");
-        this.ReflashSeedList();
-    }catch(Exception e){
-        e.printStackTrace();
-    }
-    
-}//GEN-LAST:event_jButton4ActionPerformed
-
-private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-// TODO add your handling code here:
-    CleanSeedList();
-}//GEN-LAST:event_jButton5ActionPerformed
-
-private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-// TODO add your handling code here:
-    if(JOptionPane.showConfirmDialog(simFrame, "Do you want to delete the selected group?", "Confirm", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {
-            return;
-    }
-    try{
-        RandomSeed gseed = this.randomseeds.getRandomSeedInstance(this.lGroupList.getSelectedValue().toString());
-        if(gseed != null)
-            this.randomseeds.RemoveRandomSeed(gseed);
-        else
-            System.out.println("null!!!");
+        this.randomseeds.clearGroup();
         this.ReflashGroupList();
-    }catch(Exception e){
-        e.printStackTrace();
-    }
-}//GEN-LAST:event_jButton6ActionPerformed
+    }//GEN-LAST:event_jButton7ActionPerformed
 
-private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-// TODO add your handling code here:
-    if(JOptionPane.showConfirmDialog(simFrame, "Do you want to clear group list?", "Confirm", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        // TODO add your handling code here:
+        if(JOptionPane.showConfirmDialog(simFrame, "Do you want to delete the selected group?", "Confirm", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {
             return;
-    }
-    this.randomseeds.clearGroup();
-    this.ReflashGroupList();
-}//GEN-LAST:event_jButton7ActionPerformed
+        }
+        try{
+            RandomSeed gseed = this.randomseeds.getRandomSeedInstance(this.lGroupList.getSelectedValue().toString());
+            if(gseed != null)
+            this.randomseeds.RemoveRandomSeed(gseed);
+            else
+            System.out.println("null!!!");
+            this.ReflashGroupList();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_jButton6ActionPerformed
 
-private void txtRnumberKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtRnumberKeyPressed
-// TODO add your handling code here:
-    if(evt.getKeyCode() == KeyEvent.VK_ENTER){
-        jButton1ActionPerformed(null);
-        this.txtRnumber.setText("");
-    }
-}//GEN-LAST:event_txtRnumberKeyPressed
+    private void lGroupListKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lGroupListKeyPressed
+        // TODO add your handling code here:
+        if(evt.getKeyCode() == KeyEvent.VK_DELETE){
+            jButton6ActionPerformed(null);
+        }
+    }//GEN-LAST:event_lGroupListKeyPressed
 
-private void lSeedListKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lSeedListKeyPressed
-// TODO add your handling code here:
-    if(evt.getKeyCode() == KeyEvent.VK_DELETE){
-        jButton2ActionPerformed(null);
-    }
-}//GEN-LAST:event_lSeedListKeyPressed
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // TODO add your handling code here:
+        CleanSeedList();
+    }//GEN-LAST:event_jButton5ActionPerformed
 
-private void lGroupListKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lGroupListKeyPressed
-// TODO add your handling code here:
-    if(evt.getKeyCode() == KeyEvent.VK_DELETE){
-        jButton6ActionPerformed(null);
-    }
-}//GEN-LAST:event_lGroupListKeyPressed
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+        try{
+            RandomSeed gseed = this.randomseeds.getRandomSeedInstance(this.lGroupList.getSelectedValue().toString());
+            if(gseed != null){
+                this.currentrseed.Clear();
+                this.currentrseed.setInstance(gseed);
+                this.txtGname.setText(currentrseed.getName());
+            }
+            else
+            System.out.println("null!!!");
+            this.ReflashSeedList();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
 
-private void chxRunwithsingleRandomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chxRunwithsingleRandomActionPerformed
-// TODO add your handling code here:
-    if(this.chxRunwithsingleRandom.isSelected()){
-        this.cbxRandomSeedList.setEnabled(false);
-        this.tbxRandom.setEnabled(true);
-        this.SimRandom.setSingle(true);
-    }else{
-        this.cbxRandomSeedList.setEnabled(true);
-        this.tbxRandom.setEnabled(false);
-        this.SimRandom.setSingle(false);
-    }
-}//GEN-LAST:event_chxRunwithsingleRandomActionPerformed
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+        if(this.txtGname.getText().equals("")){
+            JOptionPane.showMessageDialog(simFrame, "Set Group Name");
+            return;
+        }
+
+        //add Name
+        this.currentrseed.setName(this.txtGname.getText());
+
+        if(this.currentrseed.IsEmpty()){
+            JOptionPane.showMessageDialog(simFrame, "Add Seed List");
+            return;
+        }
+        if(this.randomseeds.IsRandomSeed(this.txtGname.getText())){
+            if(JOptionPane.showConfirmDialog(simFrame, "Do you want to rewrite this group(\""+this.txtGname.getText()+"\")?", "Confirm", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {
+                return;
+            }
+        }
+
+        this.randomseeds.UpdateRandomSeed(currentrseed);
+
+        this.CleanSeedList();
+        this.ReflashGroupList();
+        this.txtGname.setText("");
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        try{
+            this.currentrseed.RemoveSeed(this.lSeedList.getSelectedIndex());
+            ReflashSeedList();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        int rseed = Integer.parseInt(this.txtRnumber.getText());
+        if(rseed > 9999){
+            JOptionPane.showMessageDialog(simFrame, "Random seed should be less than 9999");
+            return;
+        }
+        this.currentrseed.AddSeed(rseed);
+        ReflashSeedList();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void lSeedListKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_lSeedListKeyPressed
+        // TODO add your handling code here:
+        if(evt.getKeyCode() == KeyEvent.VK_DELETE){
+            jButton2ActionPerformed(null);
+        }
+    }//GEN-LAST:event_lSeedListKeyPressed
+
+    private void txtRnumberKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtRnumberKeyPressed
+        // TODO add your handling code here:
+        if(evt.getKeyCode() == KeyEvent.VK_ENTER){
+            jButton1ActionPerformed(null);
+            this.txtRnumber.setText("");
+        }
+    }//GEN-LAST:event_txtRnumberKeyPressed
+
+    private void chxRunwithsingleRandomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chxRunwithsingleRandomActionPerformed
+        // TODO add your handling code here:
+        if(this.chxRunwithsingleRandom.isSelected()){
+            this.cbxRandomSeedList.setEnabled(false);
+            this.tbxRandom.setEnabled(true);
+            this.SimRandom.setSingle(true);
+        }else{
+            this.cbxRandomSeedList.setEnabled(true);
+            this.tbxRandom.setEnabled(false);
+            this.SimRandom.setSingle(false);
+        }
+    }//GEN-LAST:event_chxRunwithsingleRandomActionPerformed
+
+    private void btnRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRunActionPerformed
+        if(this.cbxRandomSeedList.getSelectedIndex() == 0 && !this.chxRunwithsingleRandom.isSelected()){
+            JOptionPane.showMessageDialog(this, "Select Random option");
+            return;
+        }
+        this.redirectOutput();
+
+        if(runinitRandomSeed()){
+            System.out.println("[ Simulation ]");
+            System.out.println("  - Selected Random Seed List = " + this.cbxRandomSeedList.getSelectedItem().toString());
+            System.out.print("  - Random Seed List = ");
+            for(String value : SimRandom.getSeedList())
+            System.out.print(value+" ");
+            System.out.println();
+            System.out.println("  - DataLog Time Interval = " + cbxTimeInterval.getSelectedItem().toString());
+            System.out.println("----------------------------------------------");
+            runSimulation();
+        }
+    }//GEN-LAST:event_btnRunActionPerformed
+
+    private void chkShowVehiclesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkShowVehiclesActionPerformed
+        setVissimVisible(this.chkShowVehicles.isSelected());
+    }//GEN-LAST:event_chkShowVehiclesActionPerformed
+
+    private void btnBrowseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBrowseActionPerformed
+        String path = ".";
+        String prevPath = this.tbxCaseFile.getText();
+        if(!prevPath.isEmpty()) path = new File(prevPath).getAbsolutePath();
+        String caseFile = FileHelper.chooseFileToOpen(prevPath, "Select VISSIM Case File", FileHelper.FileFilterForVISSIM);
+        if(caseFile != null) this.tbxCaseFile.setText(caseFile);
+    }//GEN-LAST:event_btnBrowseActionPerformed
+
+    private void btnOpenSectionEditorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOpenSectionEditorActionPerformed
+        this.openSectionEditor();
+    }//GEN-LAST:event_btnOpenSectionEditorActionPerformed
+
+    private void btnSectionInfoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSectionInfoActionPerformed
+        this.openSectionInfoDialog();
+    }//GEN-LAST:event_btnSectionInfoActionPerformed
+
+    private void cbxSectionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxSectionsActionPerformed
+
+    }//GEN-LAST:event_cbxSectionsActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

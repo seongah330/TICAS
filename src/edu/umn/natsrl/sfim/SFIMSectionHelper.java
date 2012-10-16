@@ -27,7 +27,7 @@ import edu.umn.natsrl.infra.simobjects.SimMeter;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
 import edu.umn.natsrl.infra.simobjects.SimStation;
 import edu.umn.natsrl.infra.types.TrafficType;
-import edu.umn.natsrl.vissimctrl.VISSIMHelper;
+import edu.umn.natsrl.vissimcom.VISSIMHelper;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;

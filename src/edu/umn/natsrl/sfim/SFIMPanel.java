@@ -27,11 +27,12 @@ import edu.umn.natsrl.sfim.comm.CommProtocol;
 import edu.umn.natsrl.sfim.comm.InfoCommLink;
 import edu.umn.natsrl.sfim.comm.InfoController;
 import edu.umn.natsrl.sfim.comm.InfoTimingPlan;
+import edu.umn.natsrl.ticas.Simulation.SimulationUtil;
 import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import edu.umn.natsrl.util.FileHelper;
 import edu.umn.natsrl.util.StreamLogger;
 import edu.umn.natsrl.util.StringOutputStream;
-import edu.umn.natsrl.vissimctrl.VISSIMHelper;
+import edu.umn.natsrl.vissimcom.VISSIMHelper;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -72,7 +73,7 @@ public class SFIMPanel extends javax.swing.JPanel {
     private StringOutputStream sosErr;
     private TMO tmo = TMO.getInstance();
     private Vector<Section> sections = new Vector<Section>();
-    private long sTime = 0;
+    private Date sTime;
     private PluginFrame simFrame;
     private String curDirectory = ".";
     
@@ -214,7 +215,7 @@ public class SFIMPanel extends javax.swing.JPanel {
         
         this.tabMain.setSelectedIndex(1);
         port = START_PORT;
-        sTime = new Date().getTime();
+        sTime = new Date();
         final SFIMSectionHelper sectionHelper = new SFIMSectionHelper((Section)this.cbxSections.getSelectedItem(), this.tbxCaseFile.getText());
 
         new Timer().schedule(new TimerTask() {
@@ -531,13 +532,32 @@ public class SFIMPanel extends javax.swing.JPanel {
     }
 
     public void signalSimulationEnd() {
-        int elapsedSeconds = (int)( (new Date().getTime() - sTime) / 1000 );
-        int h = elapsedSeconds / 3600;
-        int m = ( elapsedSeconds % 3600 ) / 60;
-        int s = ( elapsedSeconds % 3600 ) % 60;
-        System.out.println("!! Run time="+String.format("%02d", h)+":"+String.format("%02d", m)+":"+String.format("%02d", s));        
+//        int elapsedSeconds = (int)( (new Date().getTime() - sTime) / 1000 );
+//        int h = elapsedSeconds / 3600;
+//        int m = ( elapsedSeconds % 3600 ) / 60;
+//        int s = ( elapsedSeconds % 3600 ) % 60;
+//        System.out.println("!! Run time="+String.format("%02d", h)+":"+String.format("%02d", m)+":"+String.format("%02d", s));        
+        int samples = manager.getSamples();
+        
+        if(samples < 5) {
+            JOptionPane.showMessageDialog(simFrame, "Too short simulation");
+            simFrame.afterSimulation(null, null);
+            this.simFrame.setVisible(false);            
+        }
+        int duration = samples * 30;
+        
+        Calendar c = Calendar.getInstance();
+        c.setTime(sTime);
+        c.set(Calendar.SECOND, 0);
+        Date startTime = c.getTime();
+        c.add(Calendar.SECOND, duration);
+        Date eTime = c.getTime();
+        
         this.stop();
-        if(simFrame != null) simFrame.afterSimulation(this.getSection(), this.getPeriod());
+        if(simFrame != null){
+            simFrame.afterSimulation(this.getSection(), this.getPeriod());
+            SimulationUtil.SaveSimulation((Section)this.cbxSections.getSelectedItem(),new Period(startTime, eTime, 30),simFrame);
+        }
     }
 
     void setSimulationFrame(PluginFrame frame) {

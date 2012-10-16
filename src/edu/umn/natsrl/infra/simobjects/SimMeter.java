@@ -103,8 +103,13 @@ public class SimMeter extends SimObject {
             // if not metering, set green
             if (this.status != SimConfig.METER_STATUS_CENTRAL) {
                 // set lamp green
-                for(String mid : this.meterId) {
-                    updater.setMeterStatus(mid, MeterLight.GREEN);
+                if(currentLight == null || !currentLight.isGreen()){
+                    for(String mid : this.meterId) {
+                        boolean check = updater.setMeterStatus(mid, MeterLight.GREEN);
+                        if(check){
+                            currentLight = MeterLight.GREEN;
+                        }
+                    }
                 }
                 return;
             }
