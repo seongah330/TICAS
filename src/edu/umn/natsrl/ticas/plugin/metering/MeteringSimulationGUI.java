@@ -185,7 +185,7 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
 
     @Override
     public void signalEnd(int code) {
-        if(code == 0) {
+        if(code == -1) {
             this.chkShowVehicles.setEnabled(true);
             this.chkShowVehicles.setSelected(false);            
             setVissimVisible(false);
@@ -235,6 +235,9 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
         SectionManager sm = tmo.getSectionManager();
         this.sections.clear();
         sm.loadSections();
+        if(sm.getSections() == null){
+            return;
+        }
         this.sections.addAll(sm.getSections());
 
         this.cbxSections.removeAllItems();

@@ -159,7 +159,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
     private Vector<Section> sections = new Vector<Section>();
     private Vector<PluginInfo> pluginInfos = new Vector<PluginInfo>();
     private final int width = 990;
-    private final int height = 760;
+    private final int height = 780;
     private ContourPanel speedContourSetting = new ContourPanel(11, 55, true);
     private ContourPanel totalFlowContourSetting = new ContourPanel(11, 6000, false);
     private ContourPanel occupancyContourSetting = new ContourPanel(11, 100, false);
@@ -543,16 +543,6 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             this.simSection = sf.getSection();
             this.simPeriod = sf.getPeriod();
 
-//            RandomSeed crsd = RandomSeed.getInstance();
-//            if(crsd.IsEndSeed())
-//                this.btnSaveSimResult.setEnabled(true);
-//            else{
-                if(this.simSection == null || this.simPeriod == null) {
-                    this.btnSaveSimResult.setEnabled(false);
-                } else {
-                    this.btnSaveSimResult.setEnabled(true);                
-                }
-//            }
             this.setLocation(sf.getLocation());
             this.setVisible(true);        
     }
@@ -645,20 +635,6 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         rd.setTimer(t);
         rd.setVisible(true);            
 
-    }
-    
-    /**
-     * Save simulation result
-     */
-    private void saveSimulationResult() {
-        if(simSection == null || simPeriod == null) {
-            JOptionPane.showMessageDialog(rootPane, "Empty simulation result");
-            return;
-        }
-        // Detectors must have data, before this routine
-        SimulationResultSaveDialog srd = new SimulationResultSaveDialog(this, simSection, simPeriod);
-        srd.setLocationRelativeTo(this);
-        srd.setVisible(true);        
     }
     
     /**
@@ -1406,6 +1382,12 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         jButton5 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        btnEvaluate = new javax.swing.JButton();
+        jCheckBox6 = new EvaluationCheckBox("TICAS", OptionType.OPEN_CONTOUR);
+        chkWithoutVirtualStations = new EvaluationCheckBox("TICAS", OptionType.WITHOUT_VIRTUAL_STATIONS);
+        CbxmissingstationdataZero = new EvaluationCheckBox("TICAS", OptionType.FIXING_MISSING_DATA_ZERO);
+        CbxFixmissingstationdata = new EvaluationCheckBox("TICAS", OptionType.FIXING_MISSING_DATA);
+        jLabel19 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         natsrlCalendar = new edu.umn.natsrl.gadget.calendar.NATSRLCalendar();
         jLabel10 = new javax.swing.JLabel();
@@ -1423,27 +1405,13 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         jLabel5 = new javax.swing.JLabel();
         cbxDuration = new javax.swing.JComboBox();
         jLabel6 = new javax.swing.JLabel();
-        jPanel6 = new javax.swing.JPanel();
-        jCheckBox6 = new EvaluationCheckBox("TICAS", OptionType.OPEN_CONTOUR);
-        chkWithoutVirtualStations = new EvaluationCheckBox("TICAS", OptionType.WITHOUT_VIRTUAL_STATIONS);
-        CbxFixmissingstationdata = new EvaluationCheckBox("TICAS", OptionType.FIXING_MISSING_DATA);
-        CbxmissingstationdataZero = new EvaluationCheckBox("TICAS", OptionType.FIXING_MISSING_DATA_ZERO);
-        btnEvaluate = new javax.swing.JButton();
         jPanel8 = new javax.swing.JPanel();
         cbxsimulationresult = new javax.swing.JComboBox();
         jLabel28 = new javax.swing.JLabel();
         cbxUseSimulationData = new javax.swing.JCheckBox();
         cbxSimulationForCalibration = new javax.swing.JCheckBox();
-        jPanel7 = new javax.swing.JPanel();
-        tbSimulation = new javax.swing.JTabbedPane();
-        jPanel12 = new javax.swing.JPanel();
-        jPanel14 = new javax.swing.JPanel();
-        btnRunSimulationPlugin = new javax.swing.JButton();
         cbxPlugins = new javax.swing.JComboBox();
-        jLabel24 = new javax.swing.JLabel();
-        btnSaveSimResult = new javax.swing.JButton();
-        jLabel27 = new javax.swing.JLabel();
-        jLabel19 = new javax.swing.JLabel();
+        btnRunSimulationPlugin = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jTabbedPane2 = new javax.swing.JTabbedPane();
         panContourSettingSpeed = new javax.swing.JPanel();
@@ -1726,7 +1694,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                                 .addComponent(tbxLaneCapacity, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(tbxCongestionThresholdSpeed, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(tbxCriticalDensity, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(41, Short.MAX_VALUE))
+                .addContainerGap(34, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1794,8 +1762,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                     .addComponent(chkWOHOV)
                     .addComponent(chkWOWAVE)
                     .addComponent(chkONLYHOV)
-                    .addComponent(chkWOAUX))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(chkWOAUX)))
         );
 
         jPanel11.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
@@ -1839,6 +1806,42 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         jLabel2.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel2.setText("Output Format");
 
+        btnEvaluate.setFont(new java.awt.Font("Verdana", 1, 14)); // NOI18N
+        btnEvaluate.setForeground(new java.awt.Color(255, 0, 0));
+        btnEvaluate.setText("Extract");
+        btnEvaluate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEvaluateActionPerformed(evt);
+            }
+        });
+
+        jCheckBox6.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
+        jCheckBox6.setSelected(true);
+        jCheckBox6.setText("Open contour after extraction");
+
+        chkWithoutVirtualStations.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
+        chkWithoutVirtualStations.setText("Without virtual stations");
+
+        CbxmissingstationdataZero.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
+        CbxmissingstationdataZero.setText("Interpolate '0' missing station data");
+        CbxmissingstationdataZero.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CbxmissingstationdataZeroActionPerformed(evt);
+            }
+        });
+
+        CbxFixmissingstationdata.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
+        CbxFixmissingstationdata.setSelected(true);
+        CbxFixmissingstationdata.setText("Interpolate missing station data");
+        CbxFixmissingstationdata.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CbxFixmissingstationdataActionPerformed(evt);
+            }
+        });
+
+        jLabel19.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
+        jLabel19.setText("Output Option");
+
         javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
         jPanel11.setLayout(jPanel11Layout);
         jPanel11Layout.setHorizontalGroup(
@@ -1846,45 +1849,70 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             .addGroup(jPanel11Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
                     .addGroup(jPanel11Layout.createSequentialGroup()
-                        .addComponent(chkExcel)
+                        .addComponent(tbxOutputFolder, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkCSV)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(chkContour)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel16)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel21)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cbxOutputDirection, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jLabel1)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel11Layout.createSequentialGroup()
-                            .addComponent(tbxOutputFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 293, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnEvaluate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel11Layout.createSequentialGroup()
+                        .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addGroup(jPanel11Layout.createSequentialGroup()
+                                .addComponent(chkExcel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkCSV)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(chkContour)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel16)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel21)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbxOutputDirection, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel1))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jCheckBox6)
+                    .addComponent(chkWithoutVirtualStations)
+                    .addComponent(CbxmissingstationdataZero)
+                    .addComponent(CbxFixmissingstationdata)
+                    .addComponent(jLabel19)))
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel11Layout.createSequentialGroup()
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(chkExcel)
-                    .addComponent(chkCSV)
-                    .addComponent(chkContour)
-                    .addComponent(jLabel16)
-                    .addComponent(cbxOutputDirection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel21))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tbxOutputFolder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton5))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel11Layout.createSequentialGroup()
+                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel11Layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jCheckBox6)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkWithoutVirtualStations)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(CbxFixmissingstationdata)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(CbxmissingstationdataZero, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel11Layout.createSequentialGroup()
+                        .addGap(4, 4, 4)
+                        .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel19))
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(chkExcel)
+                            .addComponent(chkCSV)
+                            .addComponent(chkContour)
+                            .addComponent(jLabel16)
+                            .addComponent(cbxOutputDirection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel21))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(tbxOutputFolder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton5))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnEvaluate)))
                 .addContainerGap())
         );
 
@@ -2027,70 +2055,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jCheckBox6.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
-        jCheckBox6.setSelected(true);
-        jCheckBox6.setText("Open contour after extraction");
-
-        chkWithoutVirtualStations.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
-        chkWithoutVirtualStations.setText("Without virtual stations");
-
-        CbxFixmissingstationdata.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
-        CbxFixmissingstationdata.setSelected(true);
-        CbxFixmissingstationdata.setText("Interpolate missing station data");
-        CbxFixmissingstationdata.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CbxFixmissingstationdataActionPerformed(evt);
-            }
-        });
-
-        CbxmissingstationdataZero.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
-        CbxmissingstationdataZero.setText("Interpolate '0' missing station data");
-        CbxmissingstationdataZero.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CbxmissingstationdataZeroActionPerformed(evt);
-            }
-        });
-
-        btnEvaluate.setFont(new java.awt.Font("Verdana", 1, 14)); // NOI18N
-        btnEvaluate.setForeground(new java.awt.Color(255, 0, 0));
-        btnEvaluate.setText("Extract");
-        btnEvaluate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEvaluateActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
-        jPanel6.setLayout(jPanel6Layout);
-        jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnEvaluate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(chkWithoutVirtualStations)
-                        .addComponent(jCheckBox6)
-                        .addComponent(CbxFixmissingstationdata, javax.swing.GroupLayout.Alignment.TRAILING))
-                    .addComponent(CbxmissingstationdataZero, javax.swing.GroupLayout.DEFAULT_SIZE, 259, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addComponent(jCheckBox6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkWithoutVirtualStations)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(CbxFixmissingstationdata)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(CbxmissingstationdataZero)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnEvaluate)
-                .addContainerGap())
-        );
-
-        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Extract Data from Simulation Results", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 10), java.awt.Color.black)); // NOI18N
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Simulation & Simulation Data Extraction", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 10), java.awt.Color.black)); // NOI18N
 
         cbxsimulationresult.setPreferredSize(new java.awt.Dimension(400, 20));
 
@@ -2111,84 +2076,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
-        jPanel8.setLayout(jPanel8Layout);
-        jPanel8Layout.setHorizontalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel8Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel8Layout.createSequentialGroup()
-                        .addComponent(cbxUseSimulationData)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cbxSimulationForCalibration)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel28))
-                    .addComponent(cbxsimulationresult, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        jPanel8Layout.setVerticalGroup(
-            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
-                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cbxUseSimulationData)
-                    .addComponent(cbxSimulationForCalibration)
-                    .addGroup(jPanel8Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel28)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cbxsimulationresult, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
-        javax.swing.GroupLayout tbDataPerformanceLayout = new javax.swing.GroupLayout(tbDataPerformance);
-        tbDataPerformance.setLayout(tbDataPerformanceLayout);
-        tbDataPerformanceLayout.setHorizontalGroup(
-            tbDataPerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tbDataPerformanceLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addGroup(tbDataPerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(tbDataPerformanceLayout.createSequentialGroup()
-                        .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(tbDataPerformanceLayout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(295, 295, 295))
-        );
-        tbDataPerformanceLayout.setVerticalGroup(
-            tbDataPerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(tbDataPerformanceLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(tbDataPerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(tbDataPerformanceLayout.createSequentialGroup()
-                        .addGroup(tbDataPerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 384, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(tbDataPerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap())
-        );
-
-        mainTab.addTab("Data Extraction", tbDataPerformance);
-
-        tbSimulation.setFocusable(false);
-        tbSimulation.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        tbSimulation.addChangeListener(new javax.swing.event.ChangeListener() {
-            public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                tbSimulationStateChanged(evt);
-            }
-        });
+        cbxPlugins.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
 
         btnRunSimulationPlugin.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         btnRunSimulationPlugin.setText("Run Simulation");
@@ -2198,100 +2086,84 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             }
         });
 
-        cbxPlugins.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-
-        jLabel24.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
-        jLabel24.setText("Simulation Options");
-
-        btnSaveSimResult.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        btnSaveSimResult.setText("Save Simulation Result");
-        btnSaveSimResult.setEnabled(false);
-        btnSaveSimResult.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSaveSimResultActionPerformed(evt);
-            }
-        });
-
-        jLabel27.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel27.setText("Extracting data with simulation results uses the metrics of 'Real Data Extraction' tab.");
-
-        jLabel19.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel19.setText("After saving simulation result, you can extract data from simulation results on 'Simulation Results' tab.");
-
-        javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
-        jPanel14.setLayout(jPanel14Layout);
-        jPanel14Layout.setHorizontalGroup(
-            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel14Layout.createSequentialGroup()
-                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel14Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel24)
-                            .addGroup(jPanel14Layout.createSequentialGroup()
-                                .addComponent(cbxPlugins, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel8Layout.createSequentialGroup()
+                                .addComponent(cbxUseSimulationData)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnRunSimulationPlugin))
-                            .addComponent(jLabel19)
-                            .addComponent(jLabel27)))
-                    .addComponent(btnSaveSimResult, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(238, Short.MAX_VALUE))
+                                .addComponent(cbxSimulationForCalibration)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel28))
+                            .addComponent(cbxsimulationresult, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(14, 14, 14))
+                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addComponent(cbxPlugins, javax.swing.GroupLayout.PREFERRED_SIZE, 290, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnRunSimulationPlugin)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
-        jPanel14Layout.setVerticalGroup(
-            jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel14Layout.createSequentialGroup()
-                .addGap(18, 18, 18)
-                .addComponent(jLabel24)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cbxPlugins, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnRunSimulationPlugin, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(28, 28, 28)
-                .addComponent(jLabel19)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel27)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnSaveSimResult, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(23, Short.MAX_VALUE))
-        );
-
-        javax.swing.GroupLayout jPanel12Layout = new javax.swing.GroupLayout(jPanel12);
-        jPanel12.setLayout(jPanel12Layout);
-        jPanel12Layout.setHorizontalGroup(
-            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel12Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        jPanel12Layout.setVerticalGroup(
-            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel12Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(340, Short.MAX_VALUE))
-        );
-
-        tbSimulation.addTab("New Simulation", jPanel12);
-
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
-        jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(tbSimulation)
-                .addContainerGap())
-        );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(tbSimulation)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cbxUseSimulationData)
+                    .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(cbxSimulationForCalibration)
+                        .addComponent(jLabel28)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cbxsimulationresult, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
-        mainTab.addTab("Simulation", jPanel7);
+        javax.swing.GroupLayout tbDataPerformanceLayout = new javax.swing.GroupLayout(tbDataPerformance);
+        tbDataPerformance.setLayout(tbDataPerformanceLayout);
+        tbDataPerformanceLayout.setHorizontalGroup(
+            tbDataPerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tbDataPerformanceLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(tbDataPerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(tbDataPerformanceLayout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        tbDataPerformanceLayout.setVerticalGroup(
+            tbDataPerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(tbDataPerformanceLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(tbDataPerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(tbDataPerformanceLayout.createSequentialGroup()
+                        .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(tbDataPerformanceLayout.createSequentialGroup()
+                        .addGroup(tbDataPerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(8, 8, 8)
+                        .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))))
+        );
+
+        mainTab.addTab("Data Extraction & Simulation", tbDataPerformance);
 
         jTabbedPane2.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
 
@@ -2328,14 +2200,14 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkConfigUseMRFInput)
-                .addContainerGap(152, Short.MAX_VALUE))
+                .addContainerGap(132, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(chkConfigUseMRFInput)
-                .addContainerGap(487, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
@@ -2358,7 +2230,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jTabbedPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 542, Short.MAX_VALUE))
+                    .addComponent(jTabbedPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 567, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
                 .addComponent(btnSaveConfig, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -2449,17 +2321,17 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 306, Short.MAX_VALUE)
                         .addComponent(jLabel8))
-                    .addComponent(mainTab, javax.swing.GroupLayout.PREFERRED_SIZE, 940, Short.MAX_VALUE))
+                    .addComponent(mainTab, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(mainTab, javax.swing.GroupLayout.PREFERRED_SIZE, 655, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(mainTab, javax.swing.GroupLayout.PREFERRED_SIZE, 680, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel8)
                 .addContainerGap())
@@ -2480,69 +2352,6 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         TICASOption.save(getOption(true), OPTION_FILE);
         JOptionPane.showMessageDialog(this, "Configuration has been saved", "Info", JOptionPane.PLAIN_MESSAGE);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
-
-    private void cbxStartHourActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxStartHourActionPerformed
-        int slt1 = this.cbxStartHour.getSelectedIndex();
-        int slt2 = this.cbxEndHour.getSelectedIndex();
-        if (slt1 > slt2) {
-            this.cbxEndHour.setSelectedIndex(slt1);
-        }
-}//GEN-LAST:event_cbxStartHourActionPerformed
-
-    private void cbxEndHourActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxEndHourActionPerformed
-        int slt1 = this.cbxStartHour.getSelectedIndex();
-        int slt2 = this.cbxEndHour.getSelectedIndex();
-        if (slt1 > slt2) {
-            this.cbxStartHour.setSelectedIndex(slt2);
-        }
-}//GEN-LAST:event_cbxEndHourActionPerformed
-
-    private void cbxDurationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxDurationActionPerformed
-        selectDuration();
-}//GEN-LAST:event_cbxDurationActionPerformed
-
-    private void chkLVMTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkLVMTActionPerformed
-        //        this.tbxCriticalDensity.setEnabled(this.chkLVMT.isSelected());
-        //        this.tbxLaneCapacity.setEnabled(this.chkLVMT.isSelected());
-}//GEN-LAST:event_chkLVMTActionPerformed
-
-    private void chkCMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCMActionPerformed
-        //        this.tbxCongestionThresholdSpeed.setEnabled(this.chkCM.isSelected() || this.chkCMH.isSelected());
-}//GEN-LAST:event_chkCMActionPerformed
-
-    private void chkCMHActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCMHActionPerformed
-        //        this.tbxCongestionThresholdSpeed.setEnabled(this.chkCM.isSelected() || this.chkCMH.isSelected());
-}//GEN-LAST:event_chkCMHActionPerformed
-
-    private void chkWithLaneConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkWithLaneConfigActionPerformed
-        setEnableDetector(this.chkWithLaneConfig.isSelected() || this.chkWithoutLaneConfig.isSelected());
-}//GEN-LAST:event_chkWithLaneConfigActionPerformed
-
-    private void chkWithoutLaneConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkWithoutLaneConfigActionPerformed
-        setEnableDetector(this.chkWithLaneConfig.isSelected() || this.chkWithoutLaneConfig.isSelected());
-}//GEN-LAST:event_chkWithoutLaneConfigActionPerformed
-
-    private void chkContourActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkContourActionPerformed
-        //        if(this.chkContour.isSelected()) {
-        //            JOptionPane.showMessageDialog(mainPanel, "If you want to change setting for contour, see 'contour setting' tab");
-        //        }
-}//GEN-LAST:event_chkContourActionPerformed
-
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        selectOutputPath();
-}//GEN-LAST:event_jButton5ActionPerformed
-
-    private void btnEvaluateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEvaluateActionPerformed
-        try {
-            if(this.cbxUseSimulationData.isSelected()){
-                evaluateWithSimulationResult((SimulationResult)this.cbxsimulationresult.getSelectedItem());
-            }else{
-                evalute();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }//GEN-LAST:event_btnEvaluateActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         TICAS2AboutBox tb = new TICAS2AboutBox(this, true);
@@ -2582,44 +2391,20 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         }                
     }//GEN-LAST:event_menuItemRouteEditorManualActionPerformed
 
-    private void btnSaveConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveConfigActionPerformed
-        TICASOption.save(getOption(false), OPTION_FILE);
-        JOptionPane.showMessageDialog(this, "Configuration has been saved", "Info", JOptionPane.PLAIN_MESSAGE);
-}//GEN-LAST:event_btnSaveConfigActionPerformed
-
-    private void cbxSectionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxSectionsActionPerformed
-        changedSection();
-    }//GEN-LAST:event_cbxSectionsActionPerformed
-
     private void mainTabStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_mainTabStateChanged
 
     }//GEN-LAST:event_mainTabStateChanged
 
-private void CbxFixmissingstationdataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CbxFixmissingstationdataActionPerformed
-// TODO add your handling code here:
-    if(this.CbxFixmissingstationdata.isSelected()){
-        if(this.CbxmissingstationdataZero.isSelected())
-            this.CbxmissingstationdataZero.setSelected(false);
-    }
-}//GEN-LAST:event_CbxFixmissingstationdataActionPerformed
-
-private void CbxmissingstationdataZeroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CbxmissingstationdataZeroActionPerformed
-// TODO add your handling code here:
-    if(this.CbxmissingstationdataZero.isSelected()){
-        if(this.CbxFixmissingstationdata.isSelected())
-            this.CbxFixmissingstationdata.setSelected(false);
-    }
-}//GEN-LAST:event_CbxmissingstationdataZeroActionPerformed
-
-    private void tbSimulationStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tbSimulationStateChanged
-    }//GEN-LAST:event_tbSimulationStateChanged
-
-    private void btnSaveSimResultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveSimResultActionPerformed
-        this.saveSimulationResult();
-    }//GEN-LAST:event_btnSaveSimResultActionPerformed
+    private void btnSaveConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveConfigActionPerformed
+        TICASOption.save(getOption(false), OPTION_FILE);
+        JOptionPane.showMessageDialog(this, "Configuration has been saved", "Info", JOptionPane.PLAIN_MESSAGE);
+    }//GEN-LAST:event_btnSaveConfigActionPerformed
 
     private void btnRunSimulationPluginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRunSimulationPluginActionPerformed
+        // TODO add your handling code here:
         runSimulationPlugin();
+        cbxUseSimulationData.setSelected(false);
+        SimulationModeAction(this.cbxUseSimulationData.isSelected());
     }//GEN-LAST:event_btnRunSimulationPluginActionPerformed
 
     private void cbxSimulationForCalibrationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxSimulationForCalibrationActionPerformed
@@ -2632,13 +2417,95 @@ private void CbxmissingstationdataZeroActionPerformed(java.awt.event.ActionEvent
         SimulationModeAction(this.cbxUseSimulationData.isSelected());
     }//GEN-LAST:event_cbxUseSimulationDataActionPerformed
 
+    private void cbxDurationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxDurationActionPerformed
+        selectDuration();
+    }//GEN-LAST:event_cbxDurationActionPerformed
+
+    private void cbxEndHourActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxEndHourActionPerformed
+        int slt1 = this.cbxStartHour.getSelectedIndex();
+        int slt2 = this.cbxEndHour.getSelectedIndex();
+        if (slt1 > slt2) {
+            this.cbxStartHour.setSelectedIndex(slt2);
+        }
+    }//GEN-LAST:event_cbxEndHourActionPerformed
+
+    private void cbxStartHourActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxStartHourActionPerformed
+        int slt1 = this.cbxStartHour.getSelectedIndex();
+        int slt2 = this.cbxEndHour.getSelectedIndex();
+        if (slt1 > slt2) {
+            this.cbxEndHour.setSelectedIndex(slt1);
+        }
+    }//GEN-LAST:event_cbxStartHourActionPerformed
+
+    private void CbxFixmissingstationdataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CbxFixmissingstationdataActionPerformed
+        // TODO add your handling code here:
+        if(this.CbxFixmissingstationdata.isSelected()){
+            if(this.CbxmissingstationdataZero.isSelected())
+            this.CbxmissingstationdataZero.setSelected(false);
+        }
+    }//GEN-LAST:event_CbxFixmissingstationdataActionPerformed
+
+    private void CbxmissingstationdataZeroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CbxmissingstationdataZeroActionPerformed
+        // TODO add your handling code here:
+        if(this.CbxmissingstationdataZero.isSelected()){
+            if(this.CbxFixmissingstationdata.isSelected())
+            this.CbxFixmissingstationdata.setSelected(false);
+        }
+    }//GEN-LAST:event_CbxmissingstationdataZeroActionPerformed
+
+    private void btnEvaluateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEvaluateActionPerformed
+        try {
+            if(this.cbxUseSimulationData.isSelected()){
+                evaluateWithSimulationResult((SimulationResult)this.cbxsimulationresult.getSelectedItem());
+            }else{
+                evalute();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_btnEvaluateActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        selectOutputPath();
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void chkContourActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkContourActionPerformed
+        //        if(this.chkContour.isSelected()) {
+            //            JOptionPane.showMessageDialog(mainPanel, "If you want to change setting for contour, see 'contour setting' tab");
+            //        }
+    }//GEN-LAST:event_chkContourActionPerformed
+
+    private void chkWithoutLaneConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkWithoutLaneConfigActionPerformed
+        setEnableDetector(this.chkWithLaneConfig.isSelected() || this.chkWithoutLaneConfig.isSelected());
+    }//GEN-LAST:event_chkWithoutLaneConfigActionPerformed
+
+    private void chkWithLaneConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkWithLaneConfigActionPerformed
+        setEnableDetector(this.chkWithLaneConfig.isSelected() || this.chkWithoutLaneConfig.isSelected());
+    }//GEN-LAST:event_chkWithLaneConfigActionPerformed
+
+    private void chkCMHActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCMHActionPerformed
+        //        this.tbxCongestionThresholdSpeed.setEnabled(this.chkCM.isSelected() || this.chkCMH.isSelected());
+    }//GEN-LAST:event_chkCMHActionPerformed
+
+    private void chkCMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkCMActionPerformed
+        //        this.tbxCongestionThresholdSpeed.setEnabled(this.chkCM.isSelected() || this.chkCMH.isSelected());
+    }//GEN-LAST:event_chkCMActionPerformed
+
+    private void chkLVMTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkLVMTActionPerformed
+        //        this.tbxCriticalDensity.setEnabled(this.chkLVMT.isSelected());
+        //        this.tbxLaneCapacity.setEnabled(this.chkLVMT.isSelected());
+    }//GEN-LAST:event_chkLVMTActionPerformed
+
+    private void cbxSectionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxSectionsActionPerformed
+        changedSection();
+    }//GEN-LAST:event_cbxSectionsActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox CbxFixmissingstationdata;
     private javax.swing.JCheckBox CbxmissingstationdataZero;
     private javax.swing.JButton btnEvaluate;
     private javax.swing.JButton btnRunSimulationPlugin;
     private javax.swing.JButton btnSaveConfig;
-    private javax.swing.JButton btnSaveSimResult;
     private javax.swing.JComboBox cbxDuration;
     private javax.swing.JComboBox cbxEndHour;
     private javax.swing.JComboBox cbxEndMin;
@@ -2699,8 +2566,6 @@ private void CbxmissingstationdataZeroActionPerformed(java.awt.event.ActionEvent
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
-    private javax.swing.JLabel jLabel24;
-    private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -2720,13 +2585,9 @@ private void CbxmissingstationdataZeroActionPerformed(java.awt.event.ActionEvent
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
-    private javax.swing.JPanel jPanel12;
-    private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JTabbedPane jTabbedPane2;
     private org.jdesktop.swingx.JXMapKit jmKit;
@@ -2740,7 +2601,6 @@ private void CbxmissingstationdataZeroActionPerformed(java.awt.event.ActionEvent
     private javax.swing.JPanel panContourSettingTotalFlow;
     private javax.swing.JPanel panRouteCreation;
     private javax.swing.JPanel tbDataPerformance;
-    private javax.swing.JTabbedPane tbSimulation;
     private javax.swing.JTextField tbxCongestionThresholdSpeed;
     private javax.swing.JTextField tbxCriticalDensity;
     private javax.swing.JTextField tbxLaneCapacity;

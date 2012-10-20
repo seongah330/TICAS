@@ -517,6 +517,9 @@ public class FixedMeteringSimulationGUI extends javax.swing.JPanel implements IS
         SectionManager sm = tmo.getSectionManager();
         this.sections.clear();
         sm.loadSections();
+        if(sm.getSections() == null){
+            return;
+        }
         this.sections.addAll(sm.getSections());
 
         this.cbxSections.removeAllItems();

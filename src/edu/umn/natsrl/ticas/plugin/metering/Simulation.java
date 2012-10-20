@@ -108,7 +108,7 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         vc.initializeTravelTimeMeasuring();
         vc.addTravelTimeListener(this);
         vc.addStepListener(1, this);
-        this.signalListener.signalEnd(0);
+        this.signalListener.signalEnd(-1);
         
         Metering metering = new Metering(section, meters, detectors);
         int totalExecutionStep = vc.getTotalExecutionStep();
