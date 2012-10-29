@@ -649,7 +649,7 @@ public class SectionHelper {
             
             // ramp length in mile
             double L = this.meter.getMeter().getStorage() / 5280D;
-            
+            System.out.println("Storage :" + L);
             // if dual type, length should be double
             if(this.meter.getMeterType() == MeterType.DUAL) {
                 L *= 2;

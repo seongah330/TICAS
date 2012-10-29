@@ -29,6 +29,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
@@ -46,6 +47,7 @@ public class FileHelper {
     public final static FileNameExtensionFilter FileFilterForConfig = new FileNameExtensionFilter("Configuration File (*.config)", "config");
     public final static FileNameExtensionFilter FileFilterForProperties = new FileNameExtensionFilter("Property File (*.properties)", "properties");    
     public final static FileNameExtensionFilter FileFilterForXML = new FileNameExtensionFilter("XML File (*.xml)", "xml");    
+    public final static FileNameExtensionFilter FileFilterForVISSIMDATA = new FileNameExtensionFilter("VISSIM Result File (*.rsz,*.vlz)", "rsz","vlz");    
     
     public static String chooseFileToSave() {
         return chooseFileToSave(".", "Save as...");
@@ -185,6 +187,22 @@ public class FileHelper {
         reader.close();
 
         return sb.toString();
+    }
+    
+    public static ArrayList<String> readTextFileLines(String fullPathFilename) throws IOException{
+        ArrayList<String> datas = new ArrayList();
+        StringBuilder sb = new StringBuilder(1024);
+        BufferedReader reader = new BufferedReader(new FileReader(fullPathFilename));
+
+        char[] chars = new char[1024];
+        String s;
+        while ((s = reader.readLine()) != null) {
+            datas.add(s);
+        }
+
+        reader.close();
+        
+        return datas;
     }
 
     public static void writeBinaryFile(byte[] contents, String fullPathFilename) throws IOException {

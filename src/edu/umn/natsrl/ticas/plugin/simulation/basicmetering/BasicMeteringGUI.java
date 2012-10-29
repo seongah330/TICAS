@@ -672,7 +672,7 @@ public class BasicMeteringGUI extends javax.swing.JPanel implements ISimEndSigna
     }    
 
     private void showMap() {
-        if(currentSection == null)
+        if(currentSection == null || currentSection.getRNodes().isEmpty())
             return;
         this.simMapHelper.showSection(currentSection);
         this.simMapHelper.setCenter(currentSection.getRNodes().get(0));

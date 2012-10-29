@@ -66,6 +66,7 @@ import edu.umn.natsrl.ticas.plugin.srte.TICASPluginSRTE;
 import edu.umn.natsrl.ticas.plugin.srte.TestFrame;
 import edu.umn.natsrl.ticas.plugin.vissimcalibration2.VissimCalibration2;
 import edu.umn.natsrl.ticas.plugin.traveltimeIndexer.TTIndexterPlugin;
+import edu.umn.natsrl.ticas.plugin.vissimtoexcel.VISSIMtoExcel;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -461,6 +462,9 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         
         PluginInfo DdataReader = new PluginInfo("Detector Data Reader", PluginType.TOOL, DetecterDataReader.class);       
         addTools(DdataReader);        
+        
+//        PluginInfo VSSIMDatatoExcel = new PluginInfo("VISSIM Data to Excel", PluginType.TOOL, VISSIMtoExcel.class);       
+//        addTools(VSSIMDatatoExcel);        
         
 //        if(VideoChecker){
 //            PluginInfo videochecker = new PluginInfo("Video Checker", PluginType.TOOL, VideoChecker.class);       
@@ -1908,9 +1912,9 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(tbxOutputFolder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton5))
+                        .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton5, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(tbxOutputFolder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnEvaluate)))
                 .addContainerGap())
