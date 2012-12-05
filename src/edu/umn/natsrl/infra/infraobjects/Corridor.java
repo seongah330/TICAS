@@ -38,6 +38,8 @@ public class Corridor extends InfraObject implements Comparable {
     private Vector<Exit> exits = new Vector<Exit>();
     private Vector<String> rnode_list = new Vector<String>();
     private Vector<String> station_list = new Vector<String>();
+    private Vector<DMSImpl> dms = new Vector<DMSImpl>();
+    private String name = null;
 
     public Corridor(Element element) {
         super(element);
@@ -67,6 +69,7 @@ public class Corridor extends InfraObject implements Comparable {
     {
         this.dir = Direction.get(this.getProperty("dir"));
         this.id = this.getProperty("route") + " ("+this.dir.toString()+")";
+        this.name = this.getProperty("route");
         this.infraType = InfraType.CORRIDOR;
     }
 
@@ -84,6 +87,12 @@ public class Corridor extends InfraObject implements Comparable {
         if(n.isAvailableStation()) this.stations.remove((Station)n);
         if(n.isEntrance()) this.entrances.remove((Entrance)n);
         if(n.isExit()) this.exits.remove((Exit)n);
+    }
+    
+    public void addDMSImpl(DMSImpl dimpl) {
+        if(dimpl == null)
+            return;
+        dms.add(dimpl);
     }
 
     public Vector<String> getRNodeList() {
@@ -108,6 +117,9 @@ public class Corridor extends InfraObject implements Comparable {
 
     public Vector<Station> getStations() {
         return stations;
+    }
+    public Vector<DMSImpl> getDMS(){
+        return dms;
     }
 
     public Station getStation(String station_id)
@@ -144,8 +156,10 @@ public class Corridor extends InfraObject implements Comparable {
     public boolean isCD() {
         return this.id.contains(" CD");
     }
-
-
+    
+    public String getName(){
+        return this.name;
+    }
 
     public enum Direction {
         NB, SB, EB, WB, ALL;

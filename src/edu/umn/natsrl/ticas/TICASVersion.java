@@ -32,7 +32,7 @@ import javax.swing.JOptionPane;
  * @author Chongmyung Park
  */
 public class TICASVersion {
-    public static final String version = " 3.271";    
+    public static final String version = " 3.275b";    
     public static final boolean ISINIT = true;
     public static String currentVersion;
     

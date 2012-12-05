@@ -37,6 +37,10 @@ public enum InfraProperty {
     forks, // new : like downstream but It is another stream name
     lon,
     lat,
+    //for DMS
+    description,
+    width_pixels,
+    height_pixels,
     downstream, //delete -> forks
     label, n_type, attach_side, transition, station_id, 
     lanes, shift, s_limit, storage, max_wait,// rnode

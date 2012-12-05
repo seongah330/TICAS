@@ -20,6 +20,7 @@ package edu.umn.natsrl.infra;
 
 import edu.umn.natsrl.infra.section.SectionInfo;
 import edu.umn.natsrl.infra.infraobjects.Corridor;
+import edu.umn.natsrl.infra.infraobjects.DMSImpl;
 import edu.umn.natsrl.infra.infraobjects.Detector;
 import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.infra.interfaces.IDetectorChecker;
@@ -29,6 +30,7 @@ import edu.umn.natsrl.infra.simobjects.SimObject;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
 import edu.umn.natsrl.infra.types.InfraType;
 import edu.umn.natsrl.infra.types.TransitionType;
+import edu.umn.natsrl.util.DistanceUtil;
 import edu.umn.natsrl.util.PropertiesWrapper;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -41,6 +43,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 import javax.swing.JOptionPane;
 
 /**
@@ -56,6 +59,7 @@ public class Section implements Serializable {
     
     private PropertiesWrapper prop;
     private transient List<RNode> section = new ArrayList<RNode>();    
+    private List<DMSImpl> dms = new ArrayList<DMSImpl>();
     private transient TMO tmo;
     private transient Infra infra;
     private final String section_dir = InfraConstants.SECTION_DIR;
@@ -115,7 +119,9 @@ public class Section implements Serializable {
             s.infra = s.tmo.getInfra();
             s.rnode_ids = prop.getStringList(Section.K_SECTION_RNODES);
             s.constructSection();
-            s.organizeStations();
+            s.organizeDMS();
+//            s.organizeStations_OLD();
+            s.organizeStationsandDMSs();
             return s;
         } catch (Exception ex) {
             //ex.printStackTrace();
@@ -126,16 +132,26 @@ public class Section implements Serializable {
     /**
      * Sets up-down stream station and distance information to each station
      */
-    public void organizeStations()
+    public void organizeStationsandDMSs()
     {
         List<RNode> list = getSectionRoute();
         if(list.size() < 1) return;        
         
         // first node must be station
         Station prevStation = (Station)section.get(0);
+        prevStation.setStationFeetPoint(this.name,0);
+        
+        //set if there is Frist DMS in front of FristStation, set First DMS feet Point
+        if(prevStation.getUpstreamDMS(this.name) != null){
+            DMSImpl firstDMS = prevStation.getUpstreamDMS(this.name);
+            int dis = DistanceUtil.getDistanceInFeet(prevStation, firstDMS);
+            firstDMS.setFeetPoint(this.name, (-1*dis));
+        }
         
         // distance between exit and entrance
         int distanceExitAndEntrance = 0;               
+        
+        int CumulativedistanceInFeet = 0;
         
         for(int i=1; i<list.size(); i++)
         {
@@ -147,11 +163,39 @@ public class Section implements Serializable {
                 prevStation.setDownstreamStation(this.name, s);
                 
                 // distance between this station and previous(upstream) station
-                int distanceInFeet = TMO.getDistanceInFeet(prevStation, rn);
+                int distanceInFeet = 0;
+                
+                //Find DMS between prevStation and Current Station
+                List<DMSImpl> indms = findDMSinStations(prevStation,s);
+                
+                //is there DMS between prevStation and Current Station
+                if(indms.size() > 0){
+                    for(int k=0;k<indms.size();k++){
+                        DMSImpl comdms = indms.get(k);
+                        if(k == 0){
+                            distanceInFeet += DistanceUtil.getDistanceInFeet(prevStation, comdms);
+                        }else{
+                            distanceInFeet += comdms.calculateDistanceToOtherDMS(indms.get(k-1));
+                        }
+                        
+                        comdms.setFeetPoint(this.name, CumulativedistanceInFeet+distanceInFeet);
 
+                        if(k == indms.size()-1){
+                            distanceInFeet += DistanceUtil.getDistanceInFeet(s, comdms);
+                        }
+                    }
+                    CumulativedistanceInFeet = CumulativedistanceInFeet + distanceInFeet - distanceExitAndEntrance;
+                }else{
+                    distanceInFeet = DistanceUtil.getDistanceInFeet(prevStation, rn);
+                    CumulativedistanceInFeet += (distanceInFeet - distanceExitAndEntrance);                
+                }
+
+                s.setStationFeetPoint(this.name,CumulativedistanceInFeet);
+                
                 // substract distance between exit and entrance from distance
                 prevStation.setDistanceToDownstreamStation(this.name, distanceInFeet - distanceExitAndEntrance);
                 s.setDistanceToUpstreamStation(this.name, distanceInFeet - distanceExitAndEntrance);
+                
                 
                 // reset distance between exit and entrance
                 distanceExitAndEntrance = 0;
@@ -171,6 +215,194 @@ public class Section implements Serializable {
                 
                 // already read n(i+1), so increase i
                 i++;
+            }
+        }
+        
+        //set DMS Up and Down Distance
+        for(DMSImpl cdms : getDMS()){
+            if(cdms.getDownstreamDMS(this.name) != null){
+                DMSImpl ddms = cdms.getDownstreamDMS(this.name);
+                int cdis = cdms.getFeetPoint(this.name);
+                int ddis = ddms.getFeetPoint(this.name);
+                int distance = ddis - cdis;
+                cdms.setDistancetoDownstreamDMS(this.name, distance);
+                ddms.setDistancetoUpstreamDMS(this.name, distance);
+            }
+        }
+        
+        //set Station to DMS distance
+        for(Station cst : this.getStations()){
+            int stf = cst.getStationFeetPoint(this.name);
+            if(cst.getUpstreamDMS(this.name) != null){
+                int df = cst.getUpstreamDMS(this.name).getFeetPoint(this.name);
+                cst.setDistancetoUpstreamDMS(this.name, getDistanceAtoB(stf,df));
+            }
+            
+            if(cst.getDownstreamDMS(this.name) != null){
+                int df = cst.getDownstreamDMS(this.name).getFeetPoint(this.name);
+                cst.setDistancetoDownstreamDMS(this.name, getDistanceAtoB(stf,df));
+            }
+        }
+    }
+    
+    private int getDistanceAtoB(int a, int b){
+        return Math.abs(a - b);
+    }
+    
+    private List<DMSImpl> findDMSinStations(Station prevStation, Station current) {
+        //Set First Station at same corridor
+        Station fs = current.getCorridor().getStations().get(0);
+        
+        int psd = DistanceUtil.getDistanceInFeet(fs, prevStation);
+        int csd = DistanceUtil.getDistanceInFeet(fs, current);
+        
+//        System.out.println("Station distance "+prevStation.getStationId()+"("+psd+")"+" - "+current.getStationId()+"("+csd+")");
+        
+        List<DMSImpl> indms = new ArrayList<DMSImpl>();
+        List<DMSImpl> cdms = this.getDMS();
+        
+        for(DMSImpl d : cdms){
+            if(d.getDistanceFromFirstStation() > psd && d.getDistanceFromFirstStation() < csd){
+                indms.add(d);
+            }
+        }
+        
+//        for(DMSImpl d : indms){
+//            System.out.println("--"+d.getId()+"("+d.getDistanceFromFirstStation()+")");
+//        }
+        return indms;
+    }
+    
+    /**
+     * @deprecated 
+     * Sets up-down stream station and distance information to each station
+     */
+    public void organizeStations_OLD()
+    {
+        List<RNode> list = getSectionRoute();
+        if(list.size() < 1) return;        
+        
+        // first node must be station
+        Station prevStation = (Station)section.get(0);
+        prevStation.setStationFeetPoint(this.name,0);
+        // distance between exit and entrance
+        int distanceExitAndEntrance = 0;               
+        
+//        int CumulativedistanceInFeet = 0;
+        
+        for(int i=1; i<list.size(); i++)
+        {
+            RNode rn = list.get(i);
+
+            if(rn.isAvailableStation()) {                
+                // casting rnode to station
+                Station s = (Station)rn;
+                prevStation.setDownstreamStation(this.name, s);
+                
+                // distance between this station and previous(upstream) station
+                int distanceInFeet = TMO.getDistanceInFeet(prevStation, rn);
+
+                // substract distance between exit and entrance from distance
+                prevStation.setDistanceToDownstreamStation(this.name, distanceInFeet - distanceExitAndEntrance);
+                s.setDistanceToUpstreamStation(this.name, distanceInFeet - distanceExitAndEntrance);
+                
+//                CumulativedistanceInFeet += (distanceInFeet - distanceExitAndEntrance);
+//                s.setStationFeetPoint(this.name,CumulativedistanceInFeet);
+                
+                // reset distance between exit and entrance
+                distanceExitAndEntrance = 0;
+                
+                // uddate downstream station
+                prevStation = s;
+                
+            // rn is Exit to other corridor    
+            } else if(rn.isExit()){
+                
+                // if n(i) is not station, n(i) must be exit
+                // therefore n(i+1) is entrance
+                RNode entrance = list.get(i+1);
+                
+                // distance between exit and entrance
+                distanceExitAndEntrance = TMO.getDistanceInFeet(rn, entrance);                
+                
+                // already read n(i+1), so increase i
+                i++;
+            }
+        }
+    }
+        
+    private void organizeDMS() {
+        List<RNode> list = getSectionRoute();
+        if(list.size() < 1) return;        
+        
+        String cName = null;
+        int dmsStartPoint = 1;
+        boolean isDMSStart = false;
+//        System.out.println(this.name);
+        for(int i=0;i<list.size();i++){
+            RNode rn = (RNode)list.get(i);
+            
+            if(!rn.isAvailableStation()){
+                continue;
+            }
+            
+            Station cstation = (Station)rn;
+            
+            //Set First Station at same corridor
+            Station fs = cstation.getCorridor().getStations().get(0);
+            //get DMS list at same corridor
+            Vector<DMSImpl> dmslist = cstation.getCorridor().getDMS();
+            
+            //if there is no DMS in same Corridor
+            if(dmslist.size() < 1){
+                continue;
+            }
+            
+            //calculate distance between First Station and Current Station
+            int distanceFSandCS = TMO.getDistanceInFeet(fs, cstation);
+            boolean findUpstreamDMS = false;
+            for(int z = dmsStartPoint;z<dmslist.size();z++){
+                DMSImpl cdms = dmslist.get(z);
+                DMSImpl pdms = dmslist.get(z-1);
+                //set Upstream DMS in Station
+//                System.out.print("cs("+cstation.getStationId()+") : "+distanceFSandCS+" dms("+cdms.getId()+") : "+cdms.getDistanceFromFirstStation());
+                if(cdms.getDistanceFromFirstStation() > distanceFSandCS && pdms.getDistanceFromFirstStation() <= distanceFSandCS){
+                    //set Current Station Upstream DMS -> dms(i-1)
+                    cstation.setUpstreamDMS(this.name, pdms);
+                    cstation.setDownstreamDMS(this.name, cdms);
+                    
+                    if(!isDMSStart) isDMSStart = true;
+                    findUpstreamDMS = true;
+                }
+                
+                if(isDMSStart){
+                    AddDMS(pdms);
+                    dmsStartPoint = z;
+                    if(findUpstreamDMS) break;
+                }
+//                else{
+//                    System.out.println();
+//                }
+            }
+            
+            //if Corridor Changing,
+            if(cName != null && !cName.equals(cstation.getCorridor().getId())){
+                isDMSStart = false;
+                dmsStartPoint = 1;
+            }
+            cName = cstation.getCorridor().getId();
+        }
+        
+        //Adjust DMS
+        // first node must be station
+        for(int i = 0;i<dms.size();i++){
+            //set Upstream DMS
+            if(i != 0){
+                dms.get(i).setUpstreamDMS(this.name, dms.get(i-1));
+            }
+            //set Downstream DMS
+            if(i != dms.size()-1){
+                dms.get(i).setDownstreamDMS(this.name, dms.get(i+1));
             }
         }
     }
@@ -293,7 +525,9 @@ public class Section implements Serializable {
     public List<String> getStationIds() {
         List<String> ids = new ArrayList<String>();
         for(RNode n : section) {
-            if(n.isAvailableStation()) ids.add(n.getStationId());            
+            if(n.isAvailableStation()){
+                ids.add(n.getStationId());
+            }            
         }
         return ids;
     }     
@@ -386,6 +620,10 @@ public class Section implements Serializable {
     public List<RNode> getRNodes() {
         return section;
     }    
+    
+    public List<DMSImpl> getDMS() {
+        return this.dms;
+    }
     
     public List<RNode> getRNodes(IDetectorChecker detectorChecker) {
         return getFilteredSection(detectorChecker);
@@ -556,7 +794,7 @@ public class Section implements Serializable {
     public void setRnodeIds(List<String> rnode_ids) {
         this.rnode_ids = rnode_ids;
         this.constructSection();
-        this.organizeStations();        
+        this.organizeStationsandDMSs();        
     }
 
     
@@ -576,7 +814,7 @@ public class Section implements Serializable {
             Section s = (Section) input.readObject();
             s.tmo = TMO.getInstance();
             s.constructSection();
-            s.organizeStations();
+            s.organizeStationsandDMSs();
             return s;
         } catch (Exception e) {
             e.printStackTrace();
@@ -596,6 +834,16 @@ public class Section implements Serializable {
         }
         return null;
     }
-    
+
+    private void AddDMS(DMSImpl pdms) {
+        for(DMSImpl d : dms){
+            if(d.getId().equals(pdms.getId())){
+//                System.out.println();
+                return;
+            }
+        }
+//        System.out.println(", Insert : "+pdms.getId());
+        this.dms.add(pdms);
+    }
     
 }

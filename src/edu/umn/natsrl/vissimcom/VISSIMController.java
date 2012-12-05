@@ -493,28 +493,21 @@ public class VISSIMController {
                 desiredSpeedDecisionList.put(d.getName(), d);
             }
             
-            // make detector list as hashmap
-            /**
-             * Detector
-             */
-            detectors = signalControllerForDetector.getDetectors();
-            detectorList = new IDetector[detectors.getCount()];
-            System.out.println("D Detector-"+detectors.getCount());
-            
-            /**
-             * DataCollection
-             */
-            IEvaluation eval = vissim.getEvaluation();
-            eval.setAttValue("DATACOLLECTION", true);
-            this.datacollections = net.getDataCollections();
-            datacollectionList = new IDataCollection[datacollections.getCount()];
-            System.out.println("D Collector-"+datacollections.getCount());
             
             /**
              * set Lists
              */
             Infra infra = TMO.getInstance().getInfra();
             if(VISSIMHelper.detectorOption.isDETECTOR()){
+                // make detector list as hashmap
+                /**
+                 * Detector
+                 */
+
+                detectors = signalControllerForDetector.getDetectors();
+                detectorList = new IDetector[detectors.getCount()];
+                System.out.println("D Detector-"+detectors.getCount());
+                
                 this.detectorLength = detectorList.length;
                 
                 queueDetectorList = new Detector[detectorLength];
@@ -532,6 +525,15 @@ public class VISSIMController {
                 this.collectThreads = new CollectDataThread[threadN];
                 
             }else if(VISSIMHelper.detectorOption.isDATACOLLECTOR()){
+                /**
+                * DataCollection
+                */
+               IEvaluation eval = vissim.getEvaluation();
+               eval.setAttValue("DATACOLLECTION", true);
+               this.datacollections = net.getDataCollections();
+               datacollectionList = new IDataCollection[datacollections.getCount()];
+               System.out.println("D Collector-"+datacollections.getCount());
+            
                 this.detectorLength = datacollectionList.length;
                 
                 queueDetectorList = new Detector[detectorLength];
@@ -547,7 +549,7 @@ public class VISSIMController {
                 return -1;
             }
 
-            System.out.println(datacollections.getCount()+ " : "+detectors.getCount());
+//            System.out.println(datacollections.getCount()+ " : "+detectors.getCount());
             
 
             // make travel time list as hash map

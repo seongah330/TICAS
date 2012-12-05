@@ -39,8 +39,10 @@ import edu.umn.natsrl.infra.simobjects.SimMeter.MeterType;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
 import edu.umn.natsrl.infra.simobjects.SimStation;
 import edu.umn.natsrl.infra.types.TrafficType;
+import edu.umn.natsrl.util.DistanceUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Vector;
 
 
 /**
@@ -147,7 +149,7 @@ public class SectionHelper {
         double totalDistance = 0;
         double avgDensity = 0;
         while(true) {
-            StationState dStation = this.getDownstreamStationState(cursor.idx);
+            StationState dStation = cursor.getDownStreamStationState();
             double upDensity = cursor.getAggregatedDensity(prevStep);
             double downDensity = dStation.getAggregatedDensity(prevStep);
             double middleDensity = (upDensity + downDensity) / 2;
@@ -170,6 +172,9 @@ public class SectionHelper {
     private boolean isInMap(Station s) {
         Detector[] dets = s.getDetectors(SectionHelper.dc);
         for (Detector d : dets) {
+            if(d == null){
+                return false;
+            }
             for (SimDetector sd : detectors) {
                 if (sd.getDetectorId() == d.getDetectorId()) {
                     return true;
@@ -184,7 +189,8 @@ public class SectionHelper {
      *   - Build up section structure
      */
     private void init() {
-
+        Vector<Station> errorStation = new Vector<Station>();
+        
         for (RNode rn : section.getRNodesWithExitEntrance()) {
             State prev = null;
             if (!states.isEmpty()) {
@@ -193,12 +199,15 @@ public class SectionHelper {
 
             if (rn.isStation()) {
                 if (!isInMap((Station) rn)) {
+                    errorStation.add((Station)rn);
                     continue;
                 }
-                states.add(new StationState((Station) rn));
+                StationState nss = new StationState((Station) rn, section,simObjects);
+                states.add(nss);
+                stationStates.add(nss);
             }
             if(rn.isEntrance()){
-                EntranceState en = new EntranceState((Entrance) rn);
+                EntranceState en = new EntranceState((Entrance) rn, simObjects);
                 states.add(en);
                 entranceStates.add(en);
             }
@@ -229,12 +238,28 @@ public class SectionHelper {
 
             st.meter = m;
         }
+        
+        CheckStationError(errorStation);
+        
+        //Set up the Up and the Down Stream
+        for(int i = 0; i < stationStates.size();i++){
+            StationState current = stationStates.get(i);
+            if(i > 0){
+                StationState upstream = stationStates.get(i-1);
+                current.setUpstreamStationState(upstream);
+            }
+            
+            if(i < stationStates.size() - 1){
+                StationState downstream = stationStates.get(i+1);
+                current.setDownStreamStationState(downstream);
+            }
+        }
 
         // DEBUG
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < states.size(); i++) {
             State state = states.get(i);
-            sb.append("[" + String.format("%02d", state.idx) + "] ");
+            sb.append("[" + String.format("%02d", i) + "] ");
             if (state.type.isStation()) {
                 StationState ss = (StationState)state;
                 sb.append(((Station) state.rnode).getStationId() + " -> ");
@@ -250,6 +275,26 @@ public class SectionHelper {
             sb.append(" (distance to downstream = " + state.distanceToDownState + ")\n");
         }
         System.out.println(sb.toString());
+    }
+    
+    private void CheckStationError(Vector<Station> errorStation) {
+        /**
+         * Check Station Error
+         */
+        boolean ischeck = false;
+        for(Station es : errorStation){
+            if(es.getStationId() != null)
+                ischeck = true;
+        }
+        if(!errorStation.isEmpty() && ischeck){
+            System.out.println("!!Warning!!");
+            System.out.println("Station Information is not correct in CASEFILE");
+            System.out.println("Check Detector in CASEFILE below lists");
+            for(Station es : errorStation){
+                if(es.getStationId() != null)
+                    System.out.println("-- Station ID : "+es.getStationId()+", RNode : "+es.getId() );
+            }
+        }
     }
     
     /**
@@ -310,504 +355,5 @@ public class SectionHelper {
             }
         }
         return null;
-    }
-
-    /**
-     * State class to organize for metering
-     */
-    public class State {
-
-        StateType type;
-        public String id;
-        int idx;
-        int easting, northing;
-        State upstream;
-        State downstream;
-        RNode rnode;
-        double distanceToDownState = 0;
-
-        public State(String id, RNode rnode) {
-            this.id = id;
-            this.rnode = rnode;
-            if(rnode != null) {
-                this.easting = rnode.getEasting();
-                this.northing = rnode.getNorthing();
-            }
-            this.idx = states.size();
-        }
-
-        public boolean hasDetector(SimDetector sd) {
-            if (sd == null) {
-                return false;
-            }
-            return this.rnode.hasDetector(sd.getId());
-        }
-
-        public boolean hasDetector(SimDetector[] sds) {
-            if (sds == null) {
-                return false;
-            }
-            for (SimDetector sd : sds) {
-                if (this.rnode.hasDetector(sd.getId())) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
-    
-    
-    /**
-     * State class that represents station
-     */
-    public class StationState extends State {
-
-        SimStation station;
-        //EntranceState associatedEntrance;
-        int stationIdx = 0;
-        double aggregatedDensity = 0;
-        double aggregatedSpeed = 0;
-        
-        int MOVING_U_AVG_WINDOW = 2;
-        int MOVING_K_AVG_WINDOW = 2;
-        
-        int MAX_SPEED_ALPHA = 10;
-        int lastSpeedAggCount = 0;
-        double NEARBY_DISTANCE = 2000;  // 2000 feet
-                
-        public IDetectorChecker dc = SectionHelper.dc;
-
-                
-        public StationState(Station s) {            
-            super(s.getStationId(), s);
-            this.station = simObjects.getStation(s.getStationId());
-            type = StateType.STATION;
-            stationStates.add(this);
-            this.stationIdx = stationStates.size()-1;
-        }
-
-        /**
-         * Return aggregated density
-         * @return 
-         */
-        public double getAggregatedDensity() {
-            return getAggregatedDensity(0);
-        }        
-        public double getAggregatedDensity(int prevStep){
-            return getAverageDensity(prevStep,MOVING_K_AVG_WINDOW);
-        }
-        /**
-         * Returns aggregated density before given prevStep time step
-         * @return 
-         */
-        public double getAverageDensity(int prevStep,int howManySteps) {
-            double sum = 0;
-            int validCount = 0;
-            for(int i=0; i<howManySteps; i++) {
-                double k = station.getData(dc, TrafficType.DENSITY, prevStep+i);
-                //debug
-//                double k = station.getData(dc, TrafficType.DENSITY, prevStep+i);
-
-                if(k > 0) {
-                    sum += k;
-                    validCount++;
-                }
-            }
-            if(validCount == 0 || sum < 0) return 0;
-            
-            return sum/validCount;
-        }   
-        
-        public double getAggregatedSpeed() {
-            return getAggregatedSpeed(0);
-        }        
-
-        public double getAggregatedSpeed(int prevStep) {
-            return getAverageSpeed(prevStep, MOVING_U_AVG_WINDOW);
-        }
-
-        public double getAverageSpeed(int prevStep, int howManySteps)
-        {
-            double sum = 0;
-            int validCount = 0;
-            for(int i=0; i<howManySteps; i++) {
-                double u = station.getData(dc, TrafficType.SPEED, prevStep+i);
-                if(u > 0) {
-                    sum += u;
-                    validCount++;
-                }
-            }
-            if(validCount == 0 || sum < 0) return 0;
-            return sum/validCount;                        
-        }
-        
-        public double getAverageFlow(int prevStep, int howManySteps){
-            double sum = 0;
-            int validCount = 0;
-            for(int i=0; i<howManySteps; i++) {
-                double q = station.getData(dc, TrafficType.AVERAGEFLOW, prevStep+i);
-                if(q > 0) {
-                    sum += q;
-                    validCount++;
-                }
-            }
-            if(validCount == 0 || sum < 0) return 0;
-            return sum/validCount;   
-        }
-        
-        
-        /**
-         * Return aggregated speed
-         * @param lastSampleIndex
-         * @return 
-         */
-        public double getAggregatedSpeed2(int lastSampleIndex) {
-            double density = getAggregatedDensity();
-            double usum, u30s;
-            usum = u30s = station.getData(dc, TrafficType.SPEED);
-            int divide = 1;
-            int period = 1;
-
-            if (density < 10) {
-                this.lastSpeedAggCount = lastSampleIndex;
-                return getSpeedForLowK();
-
-            } else if (density < 15) {
-                period = 6;
-            } else if (density < 25) {
-                period = 4;
-            } else if (density < 40) {
-                period = 3;
-            } else if (density < 55) {
-                period = 4;
-            } else {
-                period = 6;
-            }
-
-            // trend check
-            if (density >= 15) {
-                double cU = u30s;
-                double pU = this.station.getData(dc, TrafficType.SPEED, 1);
-                double ppU = this.station.getData(dc, TrafficType.SPEED, 2);
-
-                // if it has trend (incrase or decrease trend)
-                if ((cU >= pU && pU >= ppU) || (cU <= pU && pU <= ppU)) {
-                    period = 2;
-                }
-            }
-
-            divide = 1;
-            int last = lastSampleIndex;
-            for (int i = 1; i < period; i++) {
-                if (lastSampleIndex - i < 0 || lastSampleIndex - i < this.lastSpeedAggCount) {
-                    break;
-                }
-                usum += this.station.getData(dc, TrafficType.SPEED, i);
-                last = lastSampleIndex - i;
-                divide++;
-            }
-
-            this.lastSpeedAggCount = last;
-
-            return checkMaxSpeed(usum / divide, station.getStation().getSpeedLimit());
-        }
-
-        private double checkMaxSpeed(double u, double speedLimit) {
-            int alpha = MAX_SPEED_ALPHA;
-
-            // max speed = speed limit
-            if (u > speedLimit) {
-                return speedLimit + alpha;
-            } else {
-                return u;
-            }
-        }
-
-        private int getSpeedForLowK() {
-            int speedLimit = this.rnode.getSpeedLimit();
-            if (this.downstream == null) {
-                return speedLimit;
-            }
-            RNode downNode = this.downstream.rnode;
-            if (downNode != null && downNode.getSpeedLimit() < speedLimit) {
-                return (downNode.getSpeedLimit() + speedLimit) / 2;
-            }
-
-            return speedLimit;
-        }
-
-        public double getVolume(){
-            return this.station.getData(dc,TrafficType.VOLUME);
-        }
-        public double getTotalVolume(int prevStep, int howManySteps){
-            double sum = 0;
-            int validCount = 0;
-            for(int i=0; i<howManySteps; i++) {
-                double v = station.getData(dc, TrafficType.VOLUME, prevStep+i);
-                if(v > 0) {
-                    sum += v;
-                    validCount++;
-                }
-            }
-            return sum;
-        }
-        public double getAverageLaneFlow(){
-            return this.station.getData(dc, TrafficType.AVERAGEFLOW);
-        }
-        public double getFlow(){
-            return this.station.getData(dc,TrafficType.FLOW);
-        }
-        public double getTotalFlow(int prevStep, int howManySteps){
-            double sum = 0;
-            int validCount = 0;
-            for(int i=0; i<howManySteps; i++) {
-                double q = station.getData(dc, TrafficType.FLOW, prevStep+i);
-                if(q > 0) {
-                    sum += q;
-                    validCount++;
-                }
-            }
-            return sum;
-        }
-        /**
-         * @deprecated 
-         * @return 
-         */
-        public double getSpeed() {
-            return this.station.getData(dc, TrafficType.SPEED);
-        }
-
-        /**
-         * @deprecated 
-         * @return 
-         */
-        public double getDensity() {
-            return this.station.getData(dc, TrafficType.DENSITY);
-//            return this.station.getDataForDebug(dc, TrafficType.DENSITY);
-        }
-    }
-    
-    /**
-     * State class that represents entrance
-     */
-    public class EntranceState extends State {
-        Entrance entrance;
-        SimMeter meter;
-        
-        ArrayList<Double> cumulativeDemand = new ArrayList<Double>();
-        ArrayList<Double> cumulativeMergingVolume = new ArrayList<Double>();
-        ArrayList<Double> rateHistory = new ArrayList<Double>();        
-        HashMap<Integer, Double> segmentDensityHistory = new HashMap<Integer, Double>(); // <dataCount, K>
-        double lastDemand = 0;
-        double lastVolumeOfRamp = 0;
-        
-        public EntranceState(Entrance e) {
-            super(e.getId(), e);
-            this.entrance = e;
-            type = StateType.ENTRANCE;
-        }
-        
-        /**
-         * Return output in this time interval
-         */        
-        public double getPassageVolume() {
-            return this.lastVolumeOfRamp;
-        }
-        
-        /**
-         * Return output before 'prevStep' time step
-         */        
-        public double getMergingVolume(int prevStep) {
-            int nIdx = cumulativeMergingVolume.size() - prevStep - 1;
-            int pIdx = cumulativeMergingVolume.size() - prevStep - 2;
-            //System.out.println(cumulativeFlow.size() + ", " + prevStep + ", " + pIdx + ", " + nIdx);
-            return cumulativeMergingVolume.get(nIdx) - cumulativeMergingVolume.get(pIdx);
-        }        
-        
-        /**
-         * Return demand in this time interval
-         */
-        public double getQueueVolume() {
-            return this.lastDemand;
-        }
-        
-        public double getCumulativeDemand(){
-            return this.cumulativeDemand.get(cumulativeDemand.size()-1);
-        }
-        public double getCumulativePassage(){
-            return this.cumulativeMergingVolume.get(cumulativeMergingVolume.size()-1);
-        }
-        
-        public double getRampDensity()
-        {
-            if(this.cumulativeDemand.isEmpty()) return 0;
-            
-            int currentIdx = this.cumulativeDemand.size()-1;            
-            double It = this.cumulativeDemand.get(currentIdx);
-            double Ot = this.cumulativeMergingVolume.get(currentIdx);
-            
-            // ramp length in mile
-            double L = this.meter.getMeter().getStorage() / 5280D;
-            System.out.println("Storage :" + L);
-            // if dual type, length should be double
-            if(this.meter.getMeterType() == MeterType.DUAL) {
-                L *= 2;
-            }                    
-            
-            // ramp density : ( cumulative input - cumulative output ) / ramp length
-            //                    vehicles in ramp at current time
-            double k = (It - Ot) / L;               
-//            if(this.meter.getId().equals("M62E35")){
-//             System.out.println(this.meter.getId()+" : k="+k+", ( LT("+It+") - Ot("+Ot+") ) / L("+L+")");   
-//            }
-//            if(k >= 100) {
-//                System.out.println(this.meter.getId() + " -> Kramp = " + k + "(i="+It+", o="+Ot+", i-o="+(It-Ot)+", L="+L+")" );                
-//            }
-            return k;
-        }
-        
-        /**
-         * Calculate demand and output
-         */
-        public void updateState() {
-            if(this.meter == null) return;
-            
-            
-            double p_volume = calculateRampVolume();
-            double demand = calculateRampDemand();
-            
-            double prevCd = 0;
-            double prevCq = 0;
-            
-            if(this.cumulativeDemand.size()>0) prevCd = this.cumulativeDemand.get(this.cumulativeDemand.size()-1);
-            if(this.cumulativeMergingVolume.size()>0) prevCq = this.cumulativeMergingVolume.get(this.cumulativeMergingVolume.size()-1);
-            
-            this.cumulativeDemand.add(prevCd + demand);
-            this.cumulativeMergingVolume.add(prevCq + p_volume);
-            
-            this.lastDemand = demand;                
-            this.lastVolumeOfRamp = p_volume;
-        }
-        
-        /**
-         * Return ramp demand
-         * @return 
-         */
-        private double calculateRampDemand() {
-            
-            if(this.meter == null) return 0;
-            
-            SimDetector[] qDets = this.meter.getQueue();           
-            
-            double demand = 0;
-            double p_flow = calculateRampVolume();
-
-            // queue detector is ok
-            if(qDets != null) {
-                for(int i=0; i<qDets.length; i++) {
-                    double d = (int)simObjects.getDetector(qDets[i].getId()).getData(TrafficType.VOLUME);
-                    if(d > 0) demand += d;
-                }
-                
-                return demand;
-            }
-                        
-            return p_flow;                                    
-        }
-        
-        /**
-         * Return ramp flow now
-         * @return ramp flow
-         */
-        private double calculateRampVolume() {
-            return calculateRampVolume(0);
-        }
-        
-        /**
-         * Return ramp flow before given prevStep intervals
-         * @param prevStep
-         * @return ramp flow
-         */
-        private double calculateRampVolume(int prevStep) {
-            if(this.meter == null) return 0;
-            SimDetector pDet = this.meter.getPassage();
-            SimDetector mDet = this.meter.getMerge();
-            SimDetector bpDet = this.meter.getByPass();            
-            
-            double p_volume = 0;           
-
-            // passage detector is ok
-            if(pDet != null) {
-                p_volume = simObjects.getDetector(pDet.getId()).getData(TrafficType.VOLUME, prevStep);
-            } else {
-                // merge detector is ok
-                if(mDet != null) {
-                    p_volume = simObjects.getDetector(mDet.getId()).getData(TrafficType.VOLUME, prevStep);                      
-                    // bypass detector is ok
-                    if(bpDet != null) {
-                        p_volume -= simObjects.getDetector(bpDet.getId()).getData(TrafficType.VOLUME, prevStep);
-                        if(p_volume < 0) p_volume = 0;
-                    }                                      
-                }   
-            }    
-
-            return p_volume;
-        }
-
-        public void saveSegmentDensityHistory(int dataCount, double Kt) {
-            this.segmentDensityHistory.put(dataCount, Kt);
-        }
-        
-        public Double getSegmentDensity(int dataCount)
-        {
-            return segmentDensityHistory.get(dataCount);            
-        }
-        
-        public String getID(){
-            if(hasMeter())
-                return meter.getId();
-            else
-                return null;
-        }
-        
-        public String getLabel(){
-            if(hasMeter())
-                return meter.getMeter().getLabel();
-            else return null;
-        }
-        
-        public boolean hasMeter(){
-            if(meter != null)
-                return true;
-            else
-                return false;
-        }
-        
-        public double getCurrentRate(){
-            if(meter != null)
-                return 0;
-            else
-                return meter.currentRate;
-        }
-        
-        public SimMeter getSimMeter(){
-            return this.meter;
-        }
-    }
-    
-    /**
-     * State class that represents exit
-     */
-    class ExitState extends State {
-
-        Exit exit;
-        
-        public ExitState(Exit e) {
-            super(e.getId(), e);
-            this.exit = e;
-            type = StateType.EXIT;
-        }     
-        
     }
 }

@@ -55,7 +55,7 @@ public final class SectionManager {
         {             
            Section s = Section.load(files[i].getAbsolutePath());
            if(s == null) continue;
-           loadRNodes(s);
+//           loadRNodes(s);
            if(s != null) sections.add(s);
            else {
                System.out.println("\""+files[i].getName()+"\" can not be loaded to section");
@@ -64,13 +64,20 @@ public final class SectionManager {
         }   
     }
 
+    /**
+     * @deprecated 
+     * @param s 
+     */
     private void loadRNodes(Section s) {
 
         // retrieve r_node  
         for(String nid : s.getStationIds())
         {
             RNode node = tmo.getInfra().find(nid);
-            if(node != null) s.addRNode(node);
+            if(node != null){
+                s.addRNode(node);
+                System.out.println(node.getId());
+            }
         }     
 
         // make link among stations

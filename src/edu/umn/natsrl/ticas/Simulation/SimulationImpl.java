@@ -16,9 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package edu.umn.natsrl.ticas.Simulation;
-
-import java.util.ArrayList;
-
 /**
  *
  * @author Soobin Jeon <j.soobin@gmail.com>

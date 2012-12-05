@@ -18,11 +18,10 @@
 package edu.umn.natsrl.ticas.Simulation;
 
 import edu.umn.natsrl.infra.Section;
+import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.infra.simobjects.SimDetector;
 import edu.umn.natsrl.infra.simobjects.SimMeter;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
-import edu.umn.natsrl.ticas.Simulation.SectionHelper.EntranceState;
-import edu.umn.natsrl.ticas.Simulation.SectionHelper.StationState;
 import edu.umn.natsrl.util.FileHelper;
 import edu.umn.natsrl.vissimcom.ComError;
 import edu.umn.natsrl.vissimcom.IStepListener;
@@ -51,17 +50,17 @@ import org.jawin.COMException;
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
 public class Simulation extends Thread implements IStepListener, ITravelTimeListener{
-    private Section section;
-    private String caseFile;
-    private int seed;
-    private VISSIMController vc;
-    private SimObjects simObjects = SimObjects.getInstance();
-    private ArrayList<SimMeter> meters = new ArrayList<SimMeter>();
-    private ArrayList<SimDetector> detectors = new ArrayList<SimDetector>();
-    private HashMap<String, ArrayList<Double>> travelTimes = new HashMap<String, ArrayList<Double>>();
+    protected Section section;
+    protected String caseFile;
+    protected int seed;
+    protected VISSIMController vc;
+    protected SimObjects simObjects = SimObjects.getInstance();
+    protected ArrayList<SimMeter> meters = new ArrayList<SimMeter>();
+    protected ArrayList<SimDetector> detectors = new ArrayList<SimDetector>();
+    protected HashMap<String, ArrayList<Double>> travelTimes = new HashMap<String, ArrayList<Double>>();
     
-    ArrayList<StationState> stationStates;
-    ArrayList<EntranceState> entrancestates;
+    protected ArrayList<StationState> stationStates;
+    protected ArrayList<EntranceState> entrancestates;
     
     private ISimEndSignal signalListener;            
     private int samples = 0;    
@@ -179,7 +178,7 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     }
 
     protected void ExecuteAfterRun() {
-        updateEntranceStates();
+        updateStates();
     }
     
     protected void DebugMassage(){
@@ -323,12 +322,18 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         return count % DebugInterval == 0;
     }
 
-    private void updateEntranceStates() {
+    private void updateStates() {
         if(entrancestates.isEmpty())
             return;
         
+        //Update Entrance
         for(EntranceState e : entrancestates){
             e.updateState();
+        }
+        
+        //Update Station
+        for(StationState cs : stationStates){
+            cs.updateState();
         }
     }
 
@@ -348,7 +353,7 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         if(this.isDebug_StationInfo){
             //for Station debuging
             for (int i = 0; i < stationStates.size(); i++) {
-                System.out.println(stationStates.get(i).id + " : T_Q="+String.format("%.1f",stationStates.get(i).getFlow())
+                System.out.println(stationStates.get(i).getID() + " : T_Q="+String.format("%.1f",stationStates.get(i).getFlow())
                         + " A_Q="+String.format("%.1f",stationStates.get(i).getAverageFlow(0, this.getDebugIntervalIndex()))
                         + " k=" +String.format("%.1f", stationStates.get(i).getAverageDensity(0,getDebugIntervalIndex()))
                         + " u=" + String.format("%.1f", stationStates.get(i).getAverageSpeed(0, getDebugIntervalIndex()))

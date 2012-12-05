@@ -18,11 +18,11 @@
 package edu.umn.natsrl.ticas.plugin.simulation.basicmetering;
 
 import edu.umn.natsrl.infra.simobjects.SimMeter;
+import edu.umn.natsrl.ticas.Simulation.EntranceState;
 import edu.umn.natsrl.ticas.Simulation.SectionHelper;
-import edu.umn.natsrl.ticas.Simulation.SectionHelper.EntranceState;
-import edu.umn.natsrl.ticas.Simulation.SectionHelper.StationState;
 import edu.umn.natsrl.ticas.Simulation.SimRampMeter;
 import edu.umn.natsrl.ticas.Simulation.SimulationConfig;
+import edu.umn.natsrl.ticas.Simulation.StationState;
 
 /**
  *
@@ -76,14 +76,14 @@ public class BasicMeter extends SimRampMeter{
     
     public String getUpStreamStationID(){
         if(error.isSUCCESS())
-            return upstream.id;
+            return upstream.getID();
         else
             return null;
     }
     
     public String getDownStreamStationID(){
         if(error.isSUCCESS())
-            return downstream.id;
+            return downstream.getID();
         else
             return null;
     }

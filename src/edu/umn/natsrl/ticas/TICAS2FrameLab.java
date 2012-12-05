@@ -61,6 +61,7 @@ import edu.umn.natsrl.ticas.plugin.datareader.DataReader;
 import edu.umn.natsrl.ticas.plugin.detecterdatareader.DetecterDataReader;
 import edu.umn.natsrl.ticas.plugin.fixedmetering.FixedMeteringSimulation;
 import edu.umn.natsrl.ticas.plugin.rampmeterevaluator.RampMeterEvaluatorPlugin;
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLSimulation;
 import edu.umn.natsrl.ticas.plugin.simulation.basicmetering.BasicMetering;
 import edu.umn.natsrl.ticas.plugin.srte.TICASPluginSRTE;
 import edu.umn.natsrl.ticas.plugin.srte.TestFrame;
@@ -151,7 +152,8 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         /*
         * temporary empty - soobin Jeon
         */
-        sd.setAlwaysOnTop(false);
+//        sd.setAlwaysOnTop(false);
+        
         sd.setVisible(true);
     }
     
@@ -434,6 +436,9 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             PluginInfo meteringPlugin = new PluginInfo("K_Adaptive Metering Simulation", PluginType.SIMULATION, MeteringSimulation.class);
             addSimulationPlugins(meteringPlugin);            
         }        
+        
+        PluginInfo vslPlugin = new PluginInfo("VSL Simulation", PluginType.SIMULATION, VSLSimulation.class);
+        addSimulationPlugins(vslPlugin);
         
         if(addSFIMPlugin) {
             PluginInfo sfimPlugin = new PluginInfo("IRIS_in_Loop Simulation", PluginType.SIMULATION, SfimTicasPlugin.class);

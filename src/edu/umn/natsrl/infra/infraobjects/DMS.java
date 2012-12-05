@@ -19,8 +19,12 @@
 package edu.umn.natsrl.infra.infraobjects;
 
 import edu.umn.natsrl.infra.InfraObject;
+import edu.umn.natsrl.infra.InfraProperty;
+import edu.umn.natsrl.infra.infraobjects.Corridor.Direction;
 import edu.umn.natsrl.infra.simobjects.SimDMS;
 import edu.umn.natsrl.infra.types.InfraType;
+import edu.umn.natsrl.map.CoordinateConversion;
+import org.w3c.dom.Element;
 
 /**
  * This class is not used now.
@@ -28,15 +32,26 @@ import edu.umn.natsrl.infra.types.InfraType;
  * @author Chongmyung Park
  */
 public class DMS extends InfraObject {
-    
+    public static int MAX_RANGE_TO_STATION = 800; //feet
     SimDMS simDMS;
+    
+    private int easting = 0;
+    private int northing = 0;
+    private int gid = 1;
+    private DMSImpl dmsImpl;
 
-    public DMS() {
+    public DMS(){
         this.infraType = InfraType.DMS;
+    }
+    public DMS(Element element) {
+        super(element);
+        this.infraType = InfraType.DMS;
+        this.id = this.getProperty("name");
+        setLocation();
     }
     
     public DMS(String id) {
-        this();
+        this.infraType = InfraType.DMS;
         this.id = id;
     }
     
@@ -44,5 +59,86 @@ public class DMS extends InfraObject {
         this.simDMS = simDMS;
         this.id = simDMS.name;
     }
+    
+    void setDMSImpl(DMSImpl dmsimpl) {
+        if(dmsimpl == null)
+            return;
+        this.dmsImpl = dmsimpl;
+    }
+    
+    public DMSImpl getDMSImpl(){
+        return dmsImpl;
+    }
+    
+    private void setLocation() {
+        CoordinateConversion converter = new CoordinateConversion();
+        String en = converter.latLon2UTM(getLat(), getLon());
+        String[] EN = en.split(" ");
+        if(EN.length > 3){
+            easting = Integer.parseInt(EN[2]);
+            northing = Integer.parseInt(EN[3]);
+        }
+    }
+    
+    public void setGID(int _gid) {
+        gid = _gid;
+    }
+    
+    /**
+     * get Group ID
+     * @return 
+     */
+    public int getGID(){
+        return gid;
+    }
+
+    /**
+     * @return 
+     */
+    public int getEasting() {
+        return easting;
+//        return getPropertyInt(InfraProperty.easting);
+    }
+
+    /**
+     * @return 
+     */
+    public int getNorthing() {
+        return northing;
+//        return getPropertyInt(InfraProperty.northing);
+    }
+    
+    public double getLon(){
+        return this.getPropertyDouble(InfraProperty.lon);
+    }
+    
+    public double getLat(){
+        return this.getPropertyDouble(InfraProperty.lat);
+    }
+    
+    public int getWidth_Pixels(){
+        return this.getPropertyInt(InfraProperty.width_pixels);
+    }
+    public int getHeight_Pixels(){
+        return this.getPropertyInt(InfraProperty.height_pixels);
+    }
+    public String getCorridorName(){
+        return getDescbySplit()[0];
+    }
+    public Direction getDirection(){
+        if(getDescbySplit().length < 2){
+            return Direction.ALL;
+        }else{
+            return Direction.get(getDescbySplit()[1]);
+        }
+    }
+    public String getDesc(){
+        return this.getProperty(InfraProperty.description);
+    }
+    public String[] getDescbySplit(){
+        return this.getProperty(InfraProperty.description).split(" ");
+    }
+
+    
 
 }

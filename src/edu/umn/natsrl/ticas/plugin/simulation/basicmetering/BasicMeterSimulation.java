@@ -18,10 +18,10 @@
 package edu.umn.natsrl.ticas.plugin.simulation.basicmetering;
 
 import edu.umn.natsrl.infra.Section;
-import edu.umn.natsrl.ticas.Simulation.SectionHelper.EntranceState;
-import edu.umn.natsrl.ticas.Simulation.SectionHelper.StationState;
+import edu.umn.natsrl.ticas.Simulation.EntranceState;
 import edu.umn.natsrl.ticas.Simulation.Simulation;
 import edu.umn.natsrl.ticas.Simulation.SimulationImpl;
+import edu.umn.natsrl.ticas.Simulation.StationState;
 import edu.umn.natsrl.vissimcom.VISSIMVersion;
 import java.util.ArrayList;
 

@@ -24,6 +24,7 @@ import edu.umn.natsrl.infra.infraobjects.RNode;
 import edu.umn.natsrl.infra.infraobjects.RampMeter;
 import edu.umn.natsrl.infra.infraobjects.Detector;
 import edu.umn.natsrl.infra.infraobjects.Corridor;
+import edu.umn.natsrl.infra.infraobjects.DMSImpl;
 import edu.umn.natsrl.infra.types.DetectorType;
 import edu.umn.natsrl.infra.types.InfraType;
 import edu.umn.natsrl.map.CoordinateConversion;
@@ -73,7 +74,8 @@ public class Infra implements Serializable {
             config.loadConfiguration(configXmlPath);
             this.organize_corridor();
             this.set_corridor_to_rnode();
-            this.set_rnodes();                        
+            this.set_rnodes();
+            set_dms();
             this.saveCache();
         }// else if(organizer != null) organizer.setup(this);
         
@@ -234,6 +236,7 @@ public class Infra implements Serializable {
                         
                         Corridor downstreamCorridor = drn.getCorridor();
                         if(co.equals(downstreamCorridor)) {
+//                            System.out.println(r_node.id+" : "+drn.id+"-correctCorridor");
                             r_node.setNextRNodeInSameCorridor(drn);
                         } else {
 //                            System.out.println(r_node.id+" : "+drn.id+"-otherCorridor");
@@ -275,6 +278,98 @@ public class Infra implements Serializable {
             }
         }       
     }    
+    
+    private void set_dms() {
+        System.out.print("Organizing DMS to RNode ....................");
+        for (Corridor co : this.getCorridors())
+        {
+            //find dms in corridor
+            Vector<DMS> cordms = new Vector<DMS>();
+            for(DMS dms : this.getDMSs()){
+                if(co.getName().equals(dms.getCorridorName()) && co.getDirection() == dms.getDirection()){
+                    cordms.add(dms);
+                }
+            }
+            //check DMS info
+            if(cordms.isEmpty())
+                continue;
+            
+            Vector<Station> stationlist = new Vector<Station>();
+            for(RNode r_node : co.getRnodes()){
+                if(r_node.isAvailableStation()){
+                    stationlist.add((Station)r_node);
+                }
+            }
+            
+            //check Station info
+            if(stationlist.size() <= 0)
+                continue;
+            
+//            System.out.println("======================="+co.getId());
+            Station fStation = stationlist.get(0);
+            System.out.println(fStation.getStationId()+" = "+fStation.getEasting()+", "+fStation.getNorthing());
+            Vector<DMSImpl> dmslist = new Vector<DMSImpl>();
+            //Make DMSImpl
+            for(DMS dms : cordms){
+                String[] splitid = dms.getId().split("_");
+                String did = dms.getId();
+                if(splitid.length > 1){
+                    did = splitid[0];
+                }
+                
+                boolean checkdms = false;
+                for(DMSImpl checkDlist : dmslist){
+                    if(checkDlist.getId().equals(did)){
+                        checkdms = true;
+                    }
+                }
+                //check DMS
+                if(checkdms){
+                    continue;
+                }
+                
+                HashMap<String, DMS> tdms = new HashMap<String, DMS>();
+                for(DMS d : cordms){
+                    if(d.getId().contains(did)){
+                        String[] spid = d.getId().split("_");
+                        if(spid.length > 1){
+                            d.setGID(Integer.parseInt(spid[1]));
+                        }
+                        tdms.put(d.getId(), d);
+                    }
+                }
+                DMSImpl dimpl = new DMSImpl(did,tdms);
+                
+                //Calculate Distance from First Station
+//                System.out.println(dimpl.getId()+" = "+dimpl.getEasting()+", "+dimpl.getNorthing());
+                int distancetoFStation = fStation.calculateDistance(fStation.getEasting(), dimpl.getEasting(), fStation.getNorthing(), dimpl.getNorthing());
+//                System.out.println("->"+distancetoFStation);
+
+                dimpl.setDistanceFromFirstStation(distancetoFStation);
+                dimpl.setCorridor(co); //set Corridor
+                dmslist.add(dimpl);
+                
+            }
+            
+            //Sort with Distance from First Station
+            Collections.sort(dmslist);
+            //add InfraObject
+            for(DMSImpl dimpl : dmslist){
+                co.addDMSImpl(dimpl);
+                this.addInfraObject(dimpl);
+            }
+            
+            //Debug
+//            System.out.println(co.getId());
+//            for(DMSImpl d : co.getDMS()){
+//                System.out.println("==="+d.getId()+"-"+d.getCorridor().getName()+"->"+d.getNorthing()+"-"+d.getEasting()+"===D:"+d.getDistanceFromFirstStation());
+////                for(DMS dd : d.getDMSList()){
+////                    System.out.println(dd.getId()+"->"+dd.getNorthing()+","+dd.getEasting());
+////                }
+//            }
+        }
+        System.out.println("  (OK)");
+    }
     
     /**
      * Add infra object(corridor, station ..) into list
@@ -491,6 +586,27 @@ public class Infra implements Serializable {
      */
     public DMS getDMS(String dms_id) {
         return this.find(dms_id, InfraType.DMS);
+    }
+    
+    /**
+     * Return all DMS
+     * @return all corridors
+     */
+    public Vector<DMS> getDMSs() {
+        HashMap<String, DMS> dm = this.getSet(InfraType.DMS);
+        Vector<DMS> dms = new Vector<DMS>();
+        dms.addAll(dm.values());
+        return dms;
+    }
+    
+    public DMSImpl getDMSImpl(String _id){
+        return this.find(_id,InfraType.DMSImpl);
+    }
+    public Vector<DMSImpl> getDMSImpls(){
+        HashMap<String, DMSImpl> dmsimpl = getSet(InfraType.DMSImpl);
+        Vector<DMSImpl> dim = new Vector<DMSImpl>();
+        dim.addAll(dmsimpl.values());
+        return dim;
     }
     
     /**

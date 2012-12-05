@@ -250,21 +250,49 @@ public class TMO implements Serializable {
         return null;
     }    
     
-    public static int getDistanceInFeet(RNode o1, RNode o2)
-    {
-        int e1 = o1.getEasting();
-        int e2 = o2.getEasting();
-        int n1 = o1.getNorthing();
-        int n2 = o2.getNorthing();
+    /**
+     * @deprecated Use DistanceUtil class
+     * @param _e1
+     * @param _e2
+     * @param _n1
+     * @param _n2
+     * @return 
+     */
+    public static int getDistanceInFeet(int _e1, int _e2, int _n1, int _n2){
+        double e1 = _e1;
+        double e2 = _e2;
+        double n1 = _n1;
+        double n2 = _n2;
         return (int) (Math.sqrt((e1 - e2) * (e1 - e2) + (n1 - n2) * (n1 - n2)) / 1609 * 5280);
     }
     
+    /**
+     * @deprecated Use DistanceUtil class
+     * @param o1
+     * @param o2
+     * @return 
+     */
+    public static int getDistanceInFeet(RNode o1, RNode o2)
+    {
+        double e1 = o1.getEasting();
+        double e2 = o2.getEasting();
+        double n1 = o1.getNorthing();
+        double n2 = o2.getNorthing();
+        return (int) (Math.sqrt((e1 - e2) * (e1 - e2) + (n1 - n2) * (n1 - n2)) / 1609 * 5280);
+    }
+    
+    /**
+     * @deprecated Use DistanceUtil class
+     * @param o1
+     * @param o2
+     * @return 
+     */
     public static float getDistanceInMile(RNode o1, RNode o2)
     {
-        int e1 = o1.getEasting();
-        int e2 = o2.getEasting();
-        int n1 = o1.getNorthing();
-        int n2 = o2.getNorthing();
+        double e1 = o1.getEasting();
+        double e2 = o2.getEasting();
+        double n1 = o1.getNorthing();
+        double n2 = o2.getNorthing();
         return (float)(Math.sqrt((e1 - e2) * (e1 - e2) + (n1 - n2) * (n1 - n2)) / 1609);
     }
 }

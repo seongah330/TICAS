@@ -183,7 +183,7 @@ public abstract class InfraObject implements Serializable {
         return this.infraType;
     }
 
-    protected int calculateDistance(int e1, int e2, int n1, int n2)
+    protected int calculateDistance(double e1, double e2, double n1, double n2)
     {
         return (int) (Math.sqrt((e1 - e2) * (e1 - e2) + (n1 - n2) * (n1 - n2)) / 1609 * 5280);
     }    

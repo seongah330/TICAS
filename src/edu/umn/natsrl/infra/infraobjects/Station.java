@@ -35,6 +35,13 @@ public class Station extends RNode {
     private HashMap<String, Integer> distanceToDownstreamStation = new HashMap<String, Integer>();    // unit = feet
     private HashMap<String, Integer> distanceToUpstreamStation = new HashMap<String, Integer>();    // unit = feet    
     
+    private HashMap<String, Integer> stationFeetPoint = new HashMap<String, Integer>();
+    
+    //DMS Information
+    private HashMap<String, DMSImpl> upstreamDMS = new HashMap<String, DMSImpl>();
+    private HashMap<String, DMSImpl> downstreamDMS = new HashMap<String, DMSImpl>();
+    private HashMap<String, Integer> distanceToDownstreamDMS = new HashMap<String, Integer>();    // unit = feet
+    private HashMap<String, Integer> distanceToUpstreamDMS = new HashMap<String, Integer>();    // unit = feet
     StationType sType;
     
     public Station(Element ele) {
@@ -72,7 +79,9 @@ public class Station extends RNode {
      * @return 
      */
     public int getDistanceToDownstreamStation(String sectionName) {
-
+        if(this.distanceToDownstreamStation.get(sectionName) == null){
+            return -1;
+        }
         Integer v = this.distanceToDownstreamStation.get(sectionName);        
         return v;
     }
@@ -83,10 +92,89 @@ public class Station extends RNode {
      * @return 
      */
     public int getDistanceToUpstreamStation(String sectionName) {
-
+        if(this.distanceToUpstreamStation.get(sectionName) == null){
+            return -1;
+        }
         Integer v = this.distanceToUpstreamStation.get(sectionName);        
         return v;
     }    
+    
+    /**
+     * set upstream DMS near this station
+     * @param sectionName
+     * @param cdms 
+     */
+    public void setUpstreamDMS(String sectionName, DMSImpl cdms) {
+        //Add upstream DMS
+        this.upstreamDMS.put(sectionName, cdms);
+//        //set Distance
+//        int distance = this.calculateDistance(this.getEasting(), cdms.getEasting(), this.getNorthing(), cdms.getNorthing());
+//        this.setDistancetoUpstreamDMS(sectionName, distance);
+    }
+
+    /**
+     * set Downstream DMS near this station
+     * @param sectionName
+     * @param cdms 
+     */
+    public void setDownstreamDMS(String sectionName, DMSImpl cdms) {
+        this.downstreamDMS.put(sectionName, cdms);
+//        //set Distance
+//        int distance = this.calculateDistance(this.getEasting(), cdms.getEasting(), this.getNorthing(), cdms.getNorthing());
+//        this.setDistancetoDownstreamDMS(sectionName, distance);
+    }
+    
+    /**
+     * get Upstream DMS near this Station
+     * @param sectionName
+     * @return there is no DMS - null
+     */
+    public DMSImpl getUpstreamDMS(String sectionName){
+        return this.upstreamDMS.get(sectionName);
+    }
+    
+    /**
+     * get Downstream DMS near this Station
+     * @param sectionName
+     * @return there is no DMS - null
+     */
+    public DMSImpl getDownstreamDMS(String sectionName){
+        return this.downstreamDMS.get(sectionName);
+    }
+    
+    /**
+     * set Distance to Upstream DMS from this station
+     * @param sectionName
+     * @param dis 
+     */
+    public void setDistancetoUpstreamDMS(String sectionName, int dis){
+        this.distanceToUpstreamDMS.put(sectionName, dis);
+    }
+    
+    /**
+     * set Distance to Downstream DMS from this station
+     * @param sectionName
+     * @param dis 
+     */
+    public void setDistancetoDownstreamDMS(String sectionName, int dis){
+        this.distanceToDownstreamDMS.put(sectionName, dis);
+    }
+    
+    /**
+     * get Distance to Upstream DMS from this station
+     * @param sectionName 
+     */
+    public int getDistancetoUpstreamDMS(String sectionName){
+        return this.distanceToUpstreamDMS.get(sectionName);
+    }
+    
+    /**
+     * get Distance to Downstream DMS from this station
+     * @param sectionName 
+     */
+    public int getDistancetoDownstreamDMS(String sectionName){
+        return this.distanceToDownstreamDMS.get(sectionName);
+    }
     
 //    public int getDistanceToDownstreamStation(String sectionName) {
 //        Station cursor = this;
@@ -117,5 +205,16 @@ public class Station extends RNode {
     {
         return getStationId() + " (" + getLabel() + ")";
     }
-    
+
+    public void setStationFeetPoint(String sectionName, int CumulativedistanceInFeet) {
+        stationFeetPoint.put(sectionName, CumulativedistanceInFeet);
+    }
+    public int getStationFeetPoint(String sectionName){
+        if(stationFeetPoint.get(sectionName) == null){
+            return -1;
+        }
+        
+        return stationFeetPoint.get(sectionName);
+    }
+
 }

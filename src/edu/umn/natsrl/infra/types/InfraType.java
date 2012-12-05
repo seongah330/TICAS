@@ -21,6 +21,7 @@ package edu.umn.natsrl.infra.types;
 import edu.umn.natsrl.infra.infraobjects.Access;
 import edu.umn.natsrl.infra.infraobjects.Corridor;
 import edu.umn.natsrl.infra.infraobjects.DMS;
+import edu.umn.natsrl.infra.infraobjects.DMSImpl;
 import edu.umn.natsrl.infra.infraobjects.Detector;
 import edu.umn.natsrl.infra.infraobjects.Entrance;
 import edu.umn.natsrl.infra.infraobjects.Exit;
@@ -45,6 +46,7 @@ public enum InfraType {
     ACCESS(Access.class, "Access"),
     INTERSECTION(Intersection.class, "Intersection"),
     DMS(DMS.class, "DMS"),
+    DMSImpl(DMSImpl.class, "DMSImpl"),
     INTERCHANGE(Interchange.class, "Interchange");
 
     private Class typeClass;
@@ -85,7 +87,11 @@ public enum InfraType {
     public boolean isDMS() {
         return (this == DMS);
     }
-
+    
+    public boolean isDMSImpl(){
+        return (this == DMSImpl);
+    }
+    
     public boolean isEntrance() {
         return (this == ENTRANCE);
     }    

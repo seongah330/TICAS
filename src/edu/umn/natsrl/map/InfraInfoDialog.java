@@ -20,6 +20,8 @@ package edu.umn.natsrl.map;
 
 import edu.umn.natsrl.infra.InfraObject;
 import edu.umn.natsrl.infra.TMO;
+import edu.umn.natsrl.infra.infraobjects.DMS;
+import edu.umn.natsrl.infra.infraobjects.DMSImpl;
 import edu.umn.natsrl.infra.infraobjects.Detector;
 import edu.umn.natsrl.infra.infraobjects.Entrance;
 import edu.umn.natsrl.infra.infraobjects.RNode;
@@ -52,6 +54,8 @@ public class InfraInfoDialog extends javax.swing.JDialog {
             setDetector((Detector)obj);
         } else if(obj.getInfraType().isMeter()) {
             setMeter((RampMeter)obj);
+        } else if(obj.getInfraType().isDMSImpl()){
+            setDMSImpl((DMSImpl)obj);
         }
     }
 
@@ -136,6 +140,23 @@ public class InfraInfoDialog extends javax.swing.JDialog {
         }        
         
     }
+    
+    private void setDMSImpl(DMSImpl dmsImpl) {
+        DefaultTableModel tm = (DefaultTableModel) this.tblProperty.getModel();
+        this.lbId.setText("DMS - "+dmsImpl.getId());
+        
+        tm.addRow(new Object[]{"id", dmsImpl.getId()});
+        tm.addRow(new Object[]{"type", dmsImpl.getInfraType().toString()});
+        tm.addRow(new Object[]{"easting", dmsImpl.getEasting()});
+        tm.addRow(new Object[]{"northing", dmsImpl.getNorthing()});
+        tm.addRow(new Object[]{"DistanceFromFirstStation", dmsImpl.getDistanceFromFirstStation()});
+        
+        int cnt = 1;
+        for(DMS d : dmsImpl.getDMSList()){
+            tm.addRow(new Object[]{"DMS_"+cnt, d.getId()});
+        }
+    }
+
     
     private void setDetector(Detector d) {
         DefaultTableModel tm = (DefaultTableModel) this.tblProperty.getModel();
@@ -301,5 +322,6 @@ public class InfraInfoDialog extends javax.swing.JDialog {
     private javax.swing.JTable tblProperty;
     // End of variables declaration//GEN-END:variables
 
+    
 
 }

@@ -447,6 +447,13 @@ public class RNode extends InfraObject {
         return ( this.infraType == InfraType.STATION ) && this.isAvailable && !isAbandoned() && this.getStationId() != null;
     }
     
+    public boolean hasHov(){
+        for(Detector d : this.getDetectors()){
+            if(d.isHov()) return true;
+        }
+        return false;
+    }
+    
     public boolean isAbandoned() {
         for(Detector d : this.getDetectors() ) {
             if(!d.isAbandoned()) return false;

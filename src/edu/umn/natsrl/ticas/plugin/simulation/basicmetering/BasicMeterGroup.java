@@ -18,8 +18,8 @@
 package edu.umn.natsrl.ticas.plugin.simulation.basicmetering;
 
 import edu.umn.natsrl.infra.simobjects.SimMeter;
+import edu.umn.natsrl.ticas.Simulation.EntranceState;
 import edu.umn.natsrl.ticas.Simulation.SectionHelper;
-import edu.umn.natsrl.ticas.Simulation.SectionHelper.EntranceState;
 import edu.umn.natsrl.util.PropertiesWrapper;
 import java.util.ArrayList;
 import java.util.List;

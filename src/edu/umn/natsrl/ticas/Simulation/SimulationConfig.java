@@ -19,14 +19,14 @@
 package edu.umn.natsrl.ticas.Simulation;
 
 import edu.umn.natsrl.util.PropertiesWrapper;
+import edu.umn.natsrl.util.ticasConfig;
 
 /**
  *
  * @author Chongmyung Park
  */
-public class SimulationConfig {
+public class SimulationConfig extends ticasConfig{
     
-    private static PropertiesWrapper prop = new PropertiesWrapper();
     private static String configFile = "simulation.config";
     
     public static String CASE_FILE = "";
@@ -85,11 +85,12 @@ public class SimulationConfig {
     public static void saveConfig() {
         prop.put("CASE_FILE", CASE_FILE);        
         prop.put("RANDOM_SEED", RANDOM_SEED);   
-        prop.save(configFile);
+        saveConfig(configFile);
     }
     
     public static void loadConfig() {
-        PropertiesWrapper p = PropertiesWrapper.load(configFile);
+        
+        PropertiesWrapper p = loadConfig(configFile);
         if(p != null) {
             prop = p;
             CASE_FILE = prop.get("CASE_FILE");

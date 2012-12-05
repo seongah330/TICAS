@@ -27,10 +27,13 @@ import edu.umn.natsrl.infra.section.SectionHelper.State;
 import edu.umn.natsrl.infra.TMO;
 import edu.umn.natsrl.infra.infraobjects.Corridor;
 import edu.umn.natsrl.infra.infraobjects.Corridor.Direction;
+import edu.umn.natsrl.infra.infraobjects.DMS;
+import edu.umn.natsrl.infra.infraobjects.DMSImpl;
 import edu.umn.natsrl.infra.infraobjects.Detector;
 import edu.umn.natsrl.infra.infraobjects.Entrance;
 import edu.umn.natsrl.infra.infraobjects.RNode;
 import edu.umn.natsrl.infra.infraobjects.RampMeter;
+import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.infra.types.InfraType;
 import edu.umn.natsrl.map.InfraPoint.LABEL_LOC;
 import java.awt.Dimension;
@@ -44,9 +47,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Vector;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import org.jdesktop.swingx.JXMapKit;
@@ -237,7 +242,16 @@ public class MapHelper {
      */
     private Set<InfraPoint> getMarkers(InfraObject[] objs) {
         Set<InfraPoint> markers = new HashSet<InfraPoint>();
+        HashMap<String, Corridor> cinfo = new HashMap<String, Corridor>();
         for (InfraObject o : objs) {
+            //set Corridor
+            RNode cnode = (RNode)o;
+            if(cinfo.size() <= 0){
+                cinfo.put(cnode.getCorridor().getName(), cnode.getCorridor());
+            }else if(cinfo.size() > 0 && cinfo.get(cnode.getCorridor().getName()) == null){
+                cinfo.put(cnode.getCorridor().getName(), cnode.getCorridor());
+            }
+
             InfraType type = o.getInfraType();
             if (type.isRnode()) {
                 RNode rn = (RNode) o;
@@ -265,6 +279,15 @@ public class MapHelper {
                 InfraPoint ip = new InfraPoint(m.getId(), rn.getEasting(), rn.getNorthing());
                 ip.setInfraObject(m);
                 ip.setLabelLoc(getLabelLoc(rn.getCorridor().getDirection()));
+                markers.add(ip);
+            } 
+        }
+        for(Corridor co : cinfo.values()){
+            Vector<DMSImpl> dmss = co.getDMS();
+            for(DMSImpl d : dmss){
+                InfraPoint ip = new InfraPoint(d.getId(),d.getEasting(), d.getNorthing());
+                ip.setInfraObject(d);
+                ip.setLabelLoc(getLabelLoc(co.getDirection()));
                 markers.add(ip);
             }
         }

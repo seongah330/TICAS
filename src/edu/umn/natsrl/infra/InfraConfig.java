@@ -22,6 +22,7 @@ import edu.umn.natsrl.infra.infraobjects.RNode;
 import edu.umn.natsrl.infra.infraobjects.RampMeter;
 import edu.umn.natsrl.infra.infraobjects.Detector;
 import edu.umn.natsrl.infra.infraobjects.Corridor;
+import edu.umn.natsrl.infra.infraobjects.DMS;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -110,6 +111,7 @@ public class InfraConfig implements Serializable {
             
             System.out.println(" (OK)");
             
+            loadDMSFromConfigXML(doc.getElementsByTagName("dms"));
             loadDetectorsFromConfigXML(doc.getElementsByTagName("detector"));
             loadMetersFromConfigXML(doc.getElementsByTagName("meter"));
             loadRNodesFromConfigXML(doc.getElementsByTagName("r_node"));
@@ -126,6 +128,15 @@ public class InfraConfig implements Serializable {
             JOptionPane.showMessageDialog(null, "Fail to read config file. It will be terminated!!");            
             System.exit(0);
         }          
+    }
+    
+    private void loadDMSFromConfigXML(NodeList dmslist){
+        System.out.print("Loading DMSs ...................... ");
+        for(int i=0;i<dmslist.getLength();i++){
+            DMS dms = new DMS((Element)dmslist.item(i));
+            infra.addInfraObject(dms);
+        }
+        System.out.println(" (OK)");
     }
 
     private void loadDetectorsFromConfigXML(NodeList detectorList) {
