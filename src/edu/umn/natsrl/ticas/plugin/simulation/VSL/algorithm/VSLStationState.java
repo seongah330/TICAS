@@ -15,12 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package edu.umn.natsrl.ticas.plugin.simulation.VSL;
+package edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm;
 
-import edu.umn.natsrl.infra.Section;
+import edu.umn.natsrl.infra.Section;    
 import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
 import edu.umn.natsrl.ticas.Simulation.StationState;
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLConfig;
 import edu.umn.natsrl.util.DistanceUtil;
 
 /**
@@ -31,16 +32,16 @@ public class VSLStationState extends StationState{
     protected Double acceleration = null; //Acceleration
     
     /** Count of iterations where station was a bottleneck */
-    protected int n_bottleneck = 0;
+    public int n_bottleneck = 0;
     
     /** Bottleneck exists flag */
-    protected boolean bottleneck = false;
+    public boolean bottleneck = false;
     
     /** Bottleneck flag from previous time step.  This is needed when
      * checking if a bottleneck should be adjusted downstream. */
-    protected boolean p_bottleneck = false;
-    private VSLStationState upstreamVSLState;
-    private VSLStationState downstreamVSLState;
+    public boolean p_bottleneck = false;
+    protected VSLStationState upstreamVSLState;
+    protected VSLStationState downstreamVSLState;
     
     public VSLStationState(Station _station, Section _section, SimObjects simObjects){
         super(_station, _section, simObjects);
@@ -55,7 +56,7 @@ public class VSLStationState extends StationState{
     /**
      * Calculate whether the station is a bottleneck
      */
-    public void calculateBottleneck() {
+    public void calculateBottleneck(){
         VSLStationState upstream = this.getUpstreamVSLStationState();
         int Pdistance = 0;
         if(upstream == null)
@@ -66,7 +67,6 @@ public class VSLStationState extends StationState{
             upstream = upstream.getUpstreamVSLStationState();
             Pdistance += upstream.getdistanceToDownstreamStationState();
         }
-        
         if(upstream != null){
             acceleration = calculateAcceleration(upstream, Pdistance);
             
@@ -86,13 +86,14 @@ public class VSLStationState extends StationState{
             clearBottleneck();
         }
     }
+    
 
-    private boolean isTooClose(int distance) {
+    protected boolean isTooClose(int distance) {
         return DistanceUtil.getFeetToMile(distance) < VSLConfig.VSL_MIN_STATION_MILE;
     }
 
     /** Check the bottleneck thresholds */
-    private void checkThresholds() {
+    protected void checkThresholds() {
         if(isAccelerationValid() && acceleration < getThreshold()){
             n_bottleneck++;
         }else{
@@ -101,12 +102,12 @@ public class VSLStationState extends StationState{
     }
     
     /** Check if acceleration is valid */
-    private boolean isAccelerationValid() {
+    protected boolean isAccelerationValid() {
         return acceleration != null;
     }
     
     /** Get the current deceleration threshold */
-    private int getThreshold() {
+    protected int getThreshold() {
         if(isBeforeStartCount()){
             return getStartThreshold();
         }else{
@@ -115,47 +116,48 @@ public class VSLStationState extends StationState{
     }
 
     /** Test if the number of intervals is lower than start count */
-    private boolean isBeforeStartCount() {
+    protected boolean isBeforeStartCount() {
         return n_bottleneck < VSLConfig.VSA_START_INTERVALS;
     }
 
     /** Get the starting deceleration threshold */
-    private int getStartThreshold() {
+    protected int getStartThreshold() {
         return -1 * VSLConfig.VSL_VSS_DECISION_ACCEL;
     }
 
     /** Get the stopping deceleration threshold */
-    private int getStopThreshold() {
+    protected int getStopThreshold() {
         return -1 * VSLConfig.VSL_TURNOFF_ACCEL;
     }
 
     /** Test if station speed is above the bottleneck id speed */
-    private boolean isAboveBottleneckSpeed() {
+    protected boolean isAboveBottleneckSpeed() {
         return this.getAggregateRollingSpeed() > VSLConfig.VSL_BS_THRESHOLD;
     }
 
     /** Set the bottleneck flag */
-    private void setBottleneck(boolean b) {
+    protected void setBottleneck(boolean b) {
         p_bottleneck = bottleneck;
         bottleneck = b;
     }
 
-    /** Adjust the bottleneck downstream if necessary.
+    /**
+     * Adjust the bottleneck downstream if necessary.
      * @param sp Immediately upstream station */
-    private void adjustDownstream() {
+    protected void adjustDownstream(){
         if(this.getDownstreamVSLStationState() == null){
             return;
         }
         
-        VSLStationState downstream = this.getDownstreamVSLStationState();
+        VSLStationState upstream = this.getUpstreamVSLStationState();
         
-        Double ap = downstream.acceleration;
+        Double ap = upstream.acceleration;
         Double a = acceleration;
-        if(a != null && ap != null && a < ap && downstream.p_bottleneck){
+        if(a != null && ap != null && a < ap && upstream.p_bottleneck){
             // Move bottleneck downstream
             // Don't use setBottleneck, because we don't want
             // p_bottle to be updated
-            downstream.bottleneck = false;
+            upstream.bottleneck = false;
             bottleneck = true;
             // Bump the bottleneck count so it won't just
             // shut off at the next time step
@@ -165,7 +167,7 @@ public class VSLStationState extends StationState{
     }
     
     /** Adjust the bottleneck upstream if necessary */
-    private void adjustUpstream() {
+    protected void adjustUpstream(){
         VSLStationState upstream = this.getUpstreamVSLStationState();
         VSLStationState current = this;
         while(upstream != null){
@@ -239,7 +241,7 @@ public class VSLStationState extends StationState{
     }
 
     /** Check if the (bottleneck) station is in range */
-    private boolean isBottleneckInRange(double d) {
+    protected boolean isBottleneckInRange(double d) {
         if(d > 0){
 //            System.out.print("D>0(upstream) : "+getUpstreamDistance());
             return d < getUpstreamDistance();
@@ -250,12 +252,12 @@ public class VSLStationState extends StationState{
     }
 
     /** Get the downstream bottleneck distance */
-    private double getDownstreamDistance() {
+    protected double getDownstreamDistance() {
         return VSLConfig.VSL_MIN_STATION_MILE;
     }
 
     /** Get the upstream bottleneck distance */
-    private double getUpstreamDistance() {
+    protected double getUpstreamDistance() {
         double lim = this.getStation().getSpeedLimit();
         double sp = this.getAggregateRollingSpeed();
         if(sp > 0 && sp < lim){
@@ -281,5 +283,9 @@ public class VSLStationState extends StationState{
 
     public Double getMilePoint() {
         return DistanceUtil.getFeetToMile(getFeetPoint());
+    }
+    
+    public Double getAcceleration(){
+        return acceleration;
     }
 }

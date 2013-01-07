@@ -22,6 +22,8 @@ import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.ticas.SimulationResult;
 import edu.umn.natsrl.ticas.SimulationResultSaveDialog;
 import edu.umn.natsrl.ticas.plugin.PluginFrame;
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLResultManager;
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLResults;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,5 +67,41 @@ public class SimulationUtil {
         SimulationResultSaveDialog srd = new SimulationResultSaveDialog(simFrame, simSection, simPeriod);
         srd.setLocationRelativeTo(simFrame);
         srd.setVisible(true);
+    }
+    
+    /**
+     * load VSL simulation results from local disk
+     * set data to table
+     */
+    public static ArrayList<VSLResults> loadVSLSimulationResults() {
+        File file = new File(VSLResultManager.SAVE_VSL_DIR);  
+        File[] files = file.listFiles();  
+        if(files == null) return null;
+        
+        
+        ArrayList<VSLResults> res = new ArrayList<VSLResults>();
+        for (int i = 0; i < files.length; i++)  
+        {  
+            if(files[i].isDirectory()) continue;
+            VSLResultManager vm = VSLResultManager.load(files[i]);
+            if(vm == null) continue;
+            res.add(vm.LoadResults());
+        }
+        
+        Collections.sort(res);
+        
+        return res;
+    }
+    
+
+    public static void SaveVSLSimulation(Section simSection, Period simPeriod, PluginFrame simFrame, VSLResults vslResults) {
+        if(simSection == null || simPeriod == null){
+            JOptionPane.showMessageDialog(simFrame, "Empty simulation result");
+            return;
+        }
+        VSLSimulationResultSaveDialog vslsrd = new VSLSimulationResultSaveDialog(simFrame,simSection,simPeriod,vslResults);
+        vslsrd.setLocationRelativeTo(simFrame);
+        vslsrd.setVisible(true);
+        
     }
 }

@@ -76,7 +76,20 @@ public enum VSA {
             if(speed == v.speed) return v;
         }
         return null;        
-    }    
+    }
+    
+    public static VSA getMaxVSA(){
+        Integer maxVSA = 0;
+        VSA cvsa = null;
+        for(VSA v : VSA.values()){
+            if(maxVSA < v.speed && v.getDSDNumber() >= 0){
+                maxVSA = v.speed;
+                cvsa = v;
+            }
+        }
+        return cvsa;
+        
+    }
     
     /**
      * Set desired speed decision number to VSA enum

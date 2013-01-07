@@ -19,6 +19,7 @@ package edu.umn.natsrl.infra.infraobjects;
 
 import edu.umn.natsrl.infra.InfraObject;
 import edu.umn.natsrl.infra.InfraProperty;
+import edu.umn.natsrl.infra.simobjects.SimDMS;
 import edu.umn.natsrl.infra.types.InfraType;
 import edu.umn.natsrl.util.DistanceUtil;
 import java.util.HashMap;
@@ -247,7 +248,6 @@ public class DMSImpl extends InfraObject implements Comparable{
 //    }
 
     /**
-     * @deprecated 
      * not implements
      * @param setSpeed 
      */
@@ -255,9 +255,27 @@ public class DMSImpl extends InfraObject implements Comparable{
         if(setSpeed == null){
             isVSAStarted = false;
             speedlimit = -1;
+            resetVSAtoDMSs();
         }else{
             isVSAStarted = true;
             speedlimit = setSpeed;
+            setVSAtoDMSs(setSpeed);
+        }
+    }
+    
+    private void setVSAtoDMSs(Integer setSpeed) {
+        for(DMS cdms : this.getDMSList()){
+            if(cdms.hasSimDMS()){
+                cdms.getSimulationDMS().updateVSA(setSpeed);
+            }
+        }
+    }
+    
+    private void resetVSAtoDMSs() {
+        for(DMS cdms : this.getDMSList()){
+            if(cdms.hasSimDMS()){
+                cdms.getSimulationDMS().resetUpdated();
+            }
         }
     }
 
@@ -268,5 +286,29 @@ public class DMSImpl extends InfraObject implements Comparable{
     public Integer getSpeedLimit() {
         return speedlimit;
     }
+
+    /**
+     * set SimDMS
+     * @param d 
+     */
+    public void setSimDMS(SimDMS d) {
+        DMS cdms = null;
+        if(dms.get(d.getId()) != null){
+            cdms = dms.get(d.getId());
+            cdms.setSimDMS(d);
+        }else{
+            return;
+        }
+    }
     
+    public boolean hasAllSimDMS(){
+        boolean hdms = true;
+        for(DMS cdms : this.getDMSList()){
+            if(!cdms.hasSimDMS()){
+                hdms = false;
+            }
+        }
+        
+        return hdms;
+    }
 }

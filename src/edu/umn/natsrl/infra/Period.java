@@ -80,6 +80,19 @@ public class Period implements Serializable {
             count++;
         }
     }
+    
+    public int getIntervalPeriod(){
+        Calendar c = Calendar.getInstance();
+        c.setTime(startDate);
+        int count = 0;
+
+        while(true)
+        {
+            if(isSameTime(c.getTime(), this.endDate)) return count;
+            c.add(Calendar.SECOND, interval);
+            count++;
+        }
+    }
 
     
     public String[] getTimeline()
@@ -136,6 +149,22 @@ public class Period implements Serializable {
         c1.setTime(d1);
         c2.setTime(d2);
         if (c1.get(Calendar.YEAR) == c2.get(Calendar.YEAR) && c1.get(Calendar.MONTH) == c2.get(Calendar.MONTH) && c1.get(Calendar.DATE) == c2.get(Calendar.DATE)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    boolean isSameTime(Date d1, Date d2) {
+        if(!isSameDay(d1,d2)){
+            return false;
+        }
+        
+        Calendar c1 = Calendar.getInstance();
+        Calendar c2 = Calendar.getInstance();
+        c1.setTime(d1);
+        c2.setTime(d2);
+        if (c1.get(Calendar.HOUR) == c2.get(Calendar.HOUR) && c1.get(Calendar.MINUTE) == c2.get(Calendar.MINUTE) && c1.get(Calendar.SECOND) == c2.get(Calendar.SECOND)) {
             return true;
         } else {
             return false;

@@ -27,12 +27,15 @@ import edu.umn.natsrl.infra.InfraConstants;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.TMO;
 import edu.umn.natsrl.infra.infraobjects.Corridor;
+import edu.umn.natsrl.infra.infraobjects.DMS;
+import edu.umn.natsrl.infra.infraobjects.DMSImpl;
 import edu.umn.natsrl.infra.infraobjects.Detector;
 import edu.umn.natsrl.infra.infraobjects.Entrance;
 import edu.umn.natsrl.infra.infraobjects.Exit;
 import edu.umn.natsrl.infra.infraobjects.RNode;
 import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.infra.interfaces.IDetectorChecker;
+import edu.umn.natsrl.infra.simobjects.SimDMS;
 import edu.umn.natsrl.infra.simobjects.SimDetector;
 import edu.umn.natsrl.infra.simobjects.SimMeter;
 import edu.umn.natsrl.infra.simobjects.SimMeter.MeterType;
@@ -56,9 +59,11 @@ public class SectionHelper {
     private ArrayList<StationState> stationStates = new ArrayList<StationState>();
     private ArrayList<EntranceState> entranceStates = new ArrayList<EntranceState>();
     private ArrayList<ExitState> exitStates = new ArrayList<ExitState>();
+    private ArrayList<DMSImpl> DMSs = new ArrayList<DMSImpl>();
     private SimObjects simObjects = SimObjects.getInstance();
     private ArrayList<SimMeter> meters;
     private ArrayList<SimDetector> detectors;
+    private ArrayList<SimDMS> simDMSs;
     
     public static IDetectorChecker dc = new IDetectorChecker() {
 
@@ -71,10 +76,11 @@ public class SectionHelper {
         }
     };
     
-    public SectionHelper(Section section, ArrayList<SimDetector> detectors, ArrayList<SimMeter> meters) {
+    public SectionHelper(Section section, ArrayList<SimDetector> detectors, ArrayList<SimMeter> meters, ArrayList<SimDMS> simdms) {
         this.section = section;
         this.detectors = detectors; 
         this.meters = meters;
+        simDMSs = simdms;
         init();
     }
 
@@ -197,7 +203,7 @@ public class SectionHelper {
                 prev = states.get(states.size() - 1);
             }
 
-            if (rn.isStation()) {
+            if (rn.isStation() && rn.isAvailableStation()) {
                 if (!isInMap((Station) rn)) {
                     errorStation.add((Station)rn);
                     continue;
@@ -225,35 +231,10 @@ public class SectionHelper {
             }
         }
         
-        for (SimMeter m : meters) {
-            String name = m.getId();
-            if (name.contains("_L")) {
-                name = name.split("_")[0];
-            }
-            EntranceState st = findStateHasMeter(m);            
-            if (st == null) {
-                System.out.println("Cannot find entrance for " + m.getId());
-                continue;
-            }
-
-            st.meter = m;
-        }
+        setMeters();
+        setStation(errorStation);
+        setDMS();
         
-        CheckStationError(errorStation);
-        
-        //Set up the Up and the Down Stream
-        for(int i = 0; i < stationStates.size();i++){
-            StationState current = stationStates.get(i);
-            if(i > 0){
-                StationState upstream = stationStates.get(i-1);
-                current.setUpstreamStationState(upstream);
-            }
-            
-            if(i < stationStates.size() - 1){
-                StationState downstream = stationStates.get(i+1);
-                current.setDownStreamStationState(downstream);
-            }
-        }
 
         // DEBUG
         StringBuilder sb = new StringBuilder();
@@ -354,6 +335,94 @@ public class SectionHelper {
                 return (StationState) st;
             }
         }
+        return null;
+    }
+
+    private void setMeters() {
+        for (SimMeter m : meters) {
+            String name = m.getId();
+            if (name.contains("_L")) {
+                name = name.split("_")[0];
+            }
+            EntranceState st = findStateHasMeter(m);            
+            if (st == null) {
+                System.out.println("Cannot find entrance for " + m.getId());
+                continue;
+            }
+
+            st.meter = m;
+        }
+    }
+
+    private void setStation(Vector<Station> errorStation) {
+        CheckStationError(errorStation);
+        
+        //Set up the Up and the Down Stream
+        for(int i = 0; i < stationStates.size();i++){
+            StationState current = stationStates.get(i);
+            if(i > 0){
+                StationState upstream = stationStates.get(i-1);
+                current.setUpstreamStationState(upstream);
+            }
+            
+            if(i < stationStates.size() - 1){
+                StationState downstream = stationStates.get(i+1);
+                current.setDownStreamStationState(downstream);
+            }
+        }
+    }
+
+    /**
+     * I think that Real DMS Name is L35xxx_1 <-L35WS53_1,  L35WS53_2
+     */
+    private void setDMS() {
+        //setDMS
+        this.DMSs = (ArrayList<DMSImpl>)section.getDMS();
+        
+        for(SimDMS d : simDMSs){
+            DMSImpl dim = findDMS(d);
+            if(dim == null){
+//                System.out.println("Cannot find DMS for " + d.getId());
+                continue;
+            }else{
+            }
+            
+            dim.setSimDMS(d);
+        }
+        
+        //search error
+        boolean isvslerrfirst = true;
+        if(simDMSs != null && !simDMSs.isEmpty()){
+            for(DMSImpl dm : DMSs){
+                if(isvslerrfirst){
+                    System.out.println("Desired Speed Matching Error for VSL");
+                    isvslerrfirst = false;
+                }
+                
+                if(dm.hasAllSimDMS()){
+                    System.out.println(dm.getId() + " : Correct All DMS");
+                }else{
+                    System.out.println(dm.getId() + " : Incorrect DMS");
+                    for(DMS d : dm.getDMSList()){
+                        System.out.println("  ---"+d.getId()+" : "+d.hasSimDMS());
+                    }
+                }
+                
+            }
+        }
+    }
+
+    /**
+     * @param d
+     * @return 
+     */
+    private DMSImpl findDMS(SimDMS d) {
+        for(DMSImpl dm : DMSs){
+            if(dm.hasDMS(d.getId())){
+                return dm;
+            }
+        }
+        
         return null;
     }
 }

@@ -19,7 +19,8 @@
 package edu.umn.natsrl.infra.simobjects;
 
 import edu.umn.natsrl.infra.infraobjects.DMS;
-import edu.umn.natsrl.vissimctrl.VSA;
+import edu.umn.natsrl.vissimcom.VISSIMController;
+import edu.umn.natsrl.vissimcom.VSA;
 
 /**
  *
@@ -101,11 +102,21 @@ public class SimDMS extends SimObject {
     }
     
     public VSA getVSA() {
+        if(!isUpdatedVSA){
+            return VSA.getMaxVSA();
+        }
         return VSA.getVSA(this.vsa);
     }
 
     public DMS getDms() {
         return dms;
+    }
+    
+    public void setVSAtoVISSIM(VISSIMController vc) {
+        if(vc == null){
+            return;
+        }
+        vc.setVSA(this.getId(), getVSA());
     }
 
     @Override

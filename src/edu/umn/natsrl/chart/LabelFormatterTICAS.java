@@ -35,7 +35,7 @@ public class LabelFormatterTICAS extends ALabelFormatter implements IAxisLabelFo
     @Override
     public String format(double d) {
         String result = ldata.get((int)d);
-        System.out.println("format : "+result);
+//        System.out.println("format : "+result+", "+d);
         if(result == null){
             return "";
         }else{

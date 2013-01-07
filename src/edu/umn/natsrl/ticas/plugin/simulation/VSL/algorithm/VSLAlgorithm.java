@@ -21,7 +21,6 @@ import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.DMSImpl;
 import edu.umn.natsrl.ticas.Simulation.StationState;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLConfig;
-import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLStationState;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +30,9 @@ import java.util.List;
  */
 public class VSLAlgorithm{
     
+    private boolean isDebug = true;
+    private int processCnt = 0;
+    VSLVersion vslversion;
     ArrayList<VSLStationState> stationstates;
     Section section;
     
@@ -49,14 +51,17 @@ public class VSLAlgorithm{
             return (int)Math.round(mph / 5) * 5;
     }
     
-    public VSLAlgorithm(ArrayList<VSLStationState> _stationstate, Section _section){
+    public VSLAlgorithm(ArrayList<VSLStationState> _stationstate, Section _section, VSLVersion vv){
         stationstates = _stationstate;
         section = _section;
+        vslversion = vv;
     }
     
     public void Process(){
+        Debug();
         FindBottleneck();
         setDMS();
+        processCnt ++;
     }
 
     /**
@@ -78,23 +83,23 @@ public class VSLAlgorithm{
      */
     private void setDMS() {
         List<DMSImpl> cdms = section.getDMS();
-        System.out.println("setDMS");
         for(DMSImpl dms : cdms){
-            System.out.println(dms.getId()+"("+dms.getMilePoint(section.getName())+")==");
-            System.out.println("findStation");
-            VSStationFinder vss_finder = new VSStationFinder(dms.getMilePoint(section.getName()));
+            VSStationFinder vss_finder = null;
+            
+            if(vslversion.isNewVersion()){
+                vss_finder = new VSStationFinderNew(dms.getMilePoint(section.getName()));
+            }else if(vslversion.isOldVersion()){
+                vss_finder = new VSStationFinderOld(dms.getMilePoint(section.getName()));
+            }
             findStation(vss_finder);
             
             //Check VSA state
-            
             //set VSS State
             Integer setSpeed = null;
             if(vss_finder.foundVSS()){
                 Integer lim = vss_finder.getSpeedLimit();
-                System.out.print("--FNST : "+vss_finder.getVSS().getID()+", spdlimit : "+lim);
                 if(lim != null){
                     Double a = vss_finder.calculateSpeedAdvisory();
-                    System.out.print(", speedadvisory : "+a);
                     if(a != null){
                         a = Math.max(a, getMinDisplay());
                         int sa = round5Mph(a);
@@ -104,15 +109,10 @@ public class VSLAlgorithm{
                             setSpeed = null;
                         }
                     }
-                    if(setSpeed != null){
-                        System.out.println(", speed : "+setSpeed);
-                    }else{
-                        System.out.println(", speed : null");
-                    }
                 }
             }
             
-            dms.setVSA(setSpeed); //not Implements
+            dms.setVSA(setSpeed);
         }
     }
     
@@ -130,5 +130,12 @@ public class VSLAlgorithm{
             }
         }
         return null;
+    }
+
+    private void Debug() {
+        if(!isDebug)
+            return;
+        
+        System.out.println("Step-"+this.processCnt+".... Processing..");
     }
 }

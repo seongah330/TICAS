@@ -475,7 +475,7 @@ public class RNode extends InfraObject {
     {
         return ( this.infraType == InfraType.EXIT );
     }
-        
+    
     public double getConfidence() {
         return this.roundUp(this.confidence, 1);
     }

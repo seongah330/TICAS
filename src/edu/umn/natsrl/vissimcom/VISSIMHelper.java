@@ -199,4 +199,27 @@ public class VISSIMHelper {
         
         return -1;
     }    
+
+    public static ArrayList<String> loadDMSsFromCasefile(String caseFile) throws IOException{
+        ArrayList<String> DMSs = new ArrayList<String>();
+        String contents = FileHelper.readTextFile(caseFile);
+        
+        if(contents == null || contents.isEmpty()){
+            System.out.println("Cannot find case file");
+            System.exit(-1);
+        }
+
+        // get detector id from text
+        String regx = "DESIRED_SPEED_DECISION ([0-9]+) NAME \"(.*?)\"";
+        Pattern p = Pattern.compile(regx);
+        Matcher matcher = p.matcher(contents);
+        while (matcher.find()) {
+            String dname = matcher.group(2).trim();
+            if (!dname.isEmpty()) {
+                DMSs.add(dname);
+            }
+        }
+        
+        return DMSs;
+    }
 }

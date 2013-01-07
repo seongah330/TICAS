@@ -25,6 +25,7 @@ import edu.umn.natsrl.infra.infraobjects.RampMeter;
 import edu.umn.natsrl.infra.section.SectionHelper;
 import edu.umn.natsrl.infra.section.SectionHelper.EntranceState;
 import edu.umn.natsrl.infra.types.TrafficType;
+import java.util.Date;
 
 /**
  *
@@ -83,6 +84,8 @@ public class RampMeterNode {
     
     private boolean isProcessed = false;
     private boolean isSet = false;
+    private Date RampStartDate;
+    private Date RampEndDate;
     
     RampMeterNode(SectionHelper.EntranceState rNode, Period p,int _interval) {
         entrance = (Entrance)rNode.getRNode();
@@ -467,6 +470,12 @@ public class RampMeterNode {
     public String getRampEndTime(){
         return this.RampEnd;
     }
+    public Date getRampStartDate(){
+        return this.RampStartDate;
+    }
+    public Date getRampEndDate(){
+        return this.RampEndDate;
+    }
     public boolean isRampMeteringActive(){
         return this.isRampMeter;
     }
@@ -487,19 +496,31 @@ public class RampMeterNode {
         }
         return data;
     }
+    
+    /**
+     * Caution : Average is available in Metering Time, it should be make in option( is Metering Time or Total Time)
+     * @deprecated 
+     * @param temp
+     * @param length
+     * @return 
+     */
     private double[] AvgDataInterval(double[] temp, int length) {
         double[] data = new double[length];
         int cnt = 1;
         int i = 0;
         double R_data = 0;
+        double reduce_cnt = 0;
         for(double d : temp){
-            if(d > 0){
+            if(d > 0 && this.green_vol[cnt-1] > 0){
                 R_data += d;
+            }else{
+                reduce_cnt ++;
             }
             if(cnt % (realinterval/period.interval) == 0){
-                double avg = R_data <= 0 ? 0 : R_data / (realinterval/period.interval);
+                double avg = R_data <= 0 ? 0 : R_data / ((realinterval/period.interval)-reduce_cnt);
                 data[i++] = avg;
                 R_data = 0;
+                reduce_cnt = 0;
             }
             cnt ++;
         }
@@ -523,7 +544,9 @@ public class RampMeterNode {
         }
         RampStart = RampMeterUtil.getTime(period, sIdx, realinterval);
         RampEnd = RampMeterUtil.getTime(period, eIdx, realinterval);
-//        System.out.println("- Ramp Active : sIdx : "+RampStart+"("+sIdx+")"+" eIdx : "+RampEnd+"("+eIdx+")");
+        RampStartDate = RampMeterUtil.getDateTime(period, sIdx, realinterval);
+        RampEndDate = RampMeterUtil.getDateTime(period, eIdx, realinterval);
+        System.out.println("- Ramp Active : sIdx : "+RampStart+"("+sIdx+")"+" eIdx : "+RampEnd+"("+eIdx+")");
     }
     
     public void setRealInterval(int interval){

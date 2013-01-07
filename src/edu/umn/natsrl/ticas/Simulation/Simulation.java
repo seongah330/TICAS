@@ -19,6 +19,7 @@ package edu.umn.natsrl.ticas.Simulation;
 
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.Station;
+import edu.umn.natsrl.infra.simobjects.SimDMS;
 import edu.umn.natsrl.infra.simobjects.SimDetector;
 import edu.umn.natsrl.infra.simobjects.SimMeter;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
@@ -36,6 +37,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import jxl.Workbook;
@@ -58,6 +61,7 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     protected ArrayList<SimMeter> meters = new ArrayList<SimMeter>();
     protected ArrayList<SimDetector> detectors = new ArrayList<SimDetector>();
     protected HashMap<String, ArrayList<Double>> travelTimes = new HashMap<String, ArrayList<Double>>();
+    protected ArrayList<SimDMS> simDMSs = new ArrayList<SimDMS>();
     
     protected ArrayList<StationState> stationStates;
     protected ArrayList<EntranceState> entrancestates;
@@ -66,6 +70,8 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     private int samples = 0;    
     
     private int simDuration = 0;
+    
+    protected int simcount=0;
     
     public SectionHelper sectionHelper;
     
@@ -87,7 +93,8 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
             loadSignalGroupFromCasefile(this.caseFile);
             detectors = loadDetectorFromCasefile(this.caseFile);
             this.simDuration = VISSIMHelper.loadSimulationDuration(this.caseFile);
-            sectionHelper = new SectionHelper(section, detectors,meters);
+            simDMSs = loadDMSsFromCasefile(this.caseFile);
+            sectionHelper = new SectionHelper(section, detectors,meters,simDMSs);
 
         }catch(IOException ex){
             ex.printStackTrace();
@@ -122,7 +129,7 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         System.out.println("total Running Time : " +totalExecutionStep+", "+totalSamples);
         samples = 0;
         long sTime = new Date().getTime();
-        int simcount=0; //30sec interval
+        simcount=0; //30sec interval
         int runInterval = 30;
         
         /**
@@ -325,10 +332,11 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     private void updateStates() {
         if(entrancestates.isEmpty())
             return;
-        
-        //Update Entrance
-        for(EntranceState e : entrancestates){
-            e.updateState();
+        else{
+            //Update Entrance
+            for(EntranceState e : entrancestates){
+                e.updateState();
+            }
         }
         
         //Update Station
@@ -361,7 +369,25 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
             }
         }
     }
+    
+    private ArrayList<SimDMS> loadDMSsFromCasefile(String casefile){
+        ArrayList<SimDMS> simdms = new ArrayList<SimDMS>();
+        try {
+            ArrayList<String> dmss = VISSIMHelper.loadDMSsFromCasefile(this.caseFile);
+            for(String d : dmss){
+                simdms.add(simObjects.getDms(d));
+            }
+            return simdms;
+        } catch (IOException ex) {
+            return null;
+        }
+    }
 
+    /**
+     * loadDetector from Casefile
+     * @param caseFile
+     * @return 
+     */
     private ArrayList<SimDetector> loadDetectorFromCasefile(String caseFile) {
         ArrayList<SimDetector> simDets = new ArrayList<SimDetector>();
         ArrayList<String> dets = VISSIMHelper.loadDetectorsFromCasefile(caseFile);

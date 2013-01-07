@@ -25,6 +25,9 @@ import edu.umn.natsrl.infra.infraobjects.DMSImpl;
 import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.infra.section.SectionManager;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
+import edu.umn.natsrl.map.MapHelper;
+import edu.umn.natsrl.map.TMCProvider;
+import edu.umn.natsrl.ticas.Simulation.Emulation;
 import edu.umn.natsrl.ticas.Simulation.Simulation;
 import edu.umn.natsrl.ticas.Simulation.SimulationConfig;
 import edu.umn.natsrl.ticas.Simulation.SimulationUtil;
@@ -34,37 +37,62 @@ import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.DensityAggregation;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.MaxSpeed;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.SpeedAggregation;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.SpeedforLowK;
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLVersion;
 import edu.umn.natsrl.util.FileHelper;
 import edu.umn.natsrl.vissimcom.ComError;
 import edu.umn.natsrl.vissimcom.VISSIMVersion;
+import info.monitorenter.gui.chart.views.ChartPanel;
 import java.io.File;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
+import javax.swing.table.DefaultTableModel;
+import org.jdesktop.swingx.mapviewer.GeoPosition;
 
 /**
  *
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
-public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.ISimEndSignal{
+public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.ISimEndSignal, Emulation.ISimEndSignal{
     private PluginFrame simFrame;
     private TMO tmo = TMO.getInstance();
     private Vector<Section> sections = new Vector<Section>();
     
     VSLSim simulation;
+    VSLEmulation emulation;
     private Date startTime;
     
     private PrintStream backupOut;
     private PrintStream backupErr;
     
+    /**
+     * Map
+     */
+    private int initZoom = 10;
+    private double initLatitude = 44.974878;
+    private double initLongitude = -93.233414;    
+    private MapHelper simMapHelper;
+    
+    /**
+     * Result Chart
+     */
+    VSLChartXY resultchart;
+    VSLResults vslresult_chart;
+    ChartPanel result_cpn;
+    boolean isResultLoaded = false;
     /**
      * Creates new form VSLSimulationGUI
      */
@@ -111,26 +139,26 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
         jLabel6 = new javax.swing.JLabel();
         tbxRandom = new javax.swing.JTextField();
         cbxvissimVersion = new javax.swing.JComboBox();
+        jLabel15 = new javax.swing.JLabel();
+        cbxSimulationMode = new javax.swing.JComboBox();
         jPanel4 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         tbxDeceleration = new javax.swing.JTextField();
         tbxZesDecceleration = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        tbxCloseThreshold = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
         tbxBSSpeedThreshold = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         tbxTurnOffAcceleration = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
         tbxMinStationDistance = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
-        cbxSimulationMode = new javax.swing.JComboBox();
-        jPanel5 = new javax.swing.JPanel();
-        jLabel11 = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
+        cbxVSLVersion = new javax.swing.JComboBox();
         jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
+        pnSpeedAggreagation = new javax.swing.JPanel();
+        label_SpeedAggregation = new javax.swing.JLabel();
+        label_DensityA = new javax.swing.JLabel();
+        label_SpeedforLow = new javax.swing.JLabel();
+        label_MaxSpeed = new javax.swing.JLabel();
         cbxUAggregation = new javax.swing.JComboBox();
         cbxKAggregation = new javax.swing.JComboBox();
         cbxUforLowK = new javax.swing.JComboBox();
@@ -139,6 +167,18 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
         tbxFixedUforLowK = new javax.swing.JTextField();
         tbxMaxSpeedAlpha = new javax.swing.JTextField();
         btnStartSimulation = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
+        simJmKit = new org.jdesktop.swingx.JXMapKit();
+        pnDate = new javax.swing.JPanel();
+        natsrlCalendar = new edu.umn.natsrl.gadget.calendar.NATSRLCalendar();
+        jLabel7 = new javax.swing.JLabel();
+        cbxStartHour = new javax.swing.JComboBox();
+        jLabel28 = new javax.swing.JLabel();
+        cbxStartMin = new javax.swing.JComboBox();
+        cbxEndMin = new javax.swing.JComboBox();
+        jLabel20 = new javax.swing.JLabel();
+        cbxEndHour = new javax.swing.JComboBox();
+        jLabel11 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         chkShowVehicles = new javax.swing.JCheckBox();
         jPanel6 = new javax.swing.JPanel();
@@ -150,6 +190,20 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
         jPanel9 = new javax.swing.JPanel();
         jPanel10 = new javax.swing.JPanel();
         PanelChart = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
+        PanelChart_result = new javax.swing.JPanel();
+        cbxSavedResult = new javax.swing.JComboBox();
+        btnReadResult = new javax.swing.JButton();
+        btnLoadExcel = new javax.swing.JButton();
+        sld_resultChart = new javax.swing.JSlider();
+        tbxTimer = new javax.swing.JTextField();
+        btn_reChart_left = new javax.swing.JButton();
+        btn_reChart_right = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        Result_table = new javax.swing.JTable();
+        cbx_result_station = new javax.swing.JComboBox();
+        jLabel12 = new javax.swing.JLabel();
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Simulation Option", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 0, 12))); // NOI18N
 
@@ -192,6 +246,17 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
 
         cbxvissimVersion.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
 
+        jLabel15.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        jLabel15.setText("Simulation Mode");
+
+        cbxSimulationMode.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        cbxSimulationMode.setPreferredSize(new java.awt.Dimension(150, 22));
+        cbxSimulationMode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxSimulationModeActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -205,20 +270,25 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
                         .addComponent(tbxCaseFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel2)
                     .addComponent(jLabel1)
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel3)
+                    .addComponent(tbxRandom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbxvissimVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(cbxSections, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnOpenSectionEditor))
-                    .addComponent(jLabel6)
-                    .addComponent(jLabel3)
-                    .addComponent(tbxRandom, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbxvissimVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(14, Short.MAX_VALUE))
+                    .addComponent(jLabel15)
+                    .addComponent(cbxSimulationMode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addComponent(jLabel15)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cbxSimulationMode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 10, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(btnOpenSectionEditor)
                     .addGroup(jPanel3Layout.createSequentialGroup()
@@ -239,7 +309,7 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbxvissimVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "VSL Configuration", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 0, 12))); // NOI18N
@@ -255,12 +325,6 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
 
         jLabel5.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel5.setText("Zone Decision Accel");
-
-        tbxCloseThreshold.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        tbxCloseThreshold.setPreferredSize(new java.awt.Dimension(60, 22));
-
-        jLabel7.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel7.setText("Close Threshold");
 
         tbxBSSpeedThreshold.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxBSSpeedThreshold.setPreferredSize(new java.awt.Dimension(60, 22));
@@ -280,11 +344,11 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
         jLabel10.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         jLabel10.setText("Min Distance");
 
-        jLabel15.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel15.setText("Simulation Mode");
+        cbxVSLVersion.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        cbxVSLVersion.setPreferredSize(new java.awt.Dimension(150, 22));
 
-        cbxSimulationMode.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        cbxSimulationMode.setPreferredSize(new java.awt.Dimension(150, 22));
+        jLabel13.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        jLabel13.setText("VSL Version");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -295,10 +359,6 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                                .addComponent(jLabel7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(tbxCloseThreshold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                                 .addComponent(jLabel4)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -321,15 +381,14 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(tbxMinStationDistance, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                        .addComponent(jLabel15)
+                        .addComponent(jLabel13)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cbxSimulationMode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(cbxVSLVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
                     .addComponent(tbxDeceleration, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -343,30 +402,27 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
                     .addComponent(tbxTurnOffAcceleration, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(tbxCloseThreshold, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel10)
                     .addComponent(tbxMinStationDistance, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel15)
-                    .addComponent(cbxSimulationMode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(cbxVSLVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel13)))
         );
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Speed Aggregation", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 0, 12))); // NOI18N
+        pnSpeedAggreagation.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Speed Aggregation", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 0, 12))); // NOI18N
 
-        jLabel11.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel11.setText("Speed Aggregation");
+        label_SpeedAggregation.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        label_SpeedAggregation.setText("Speed Aggregation");
 
-        jLabel12.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel12.setText("Density Aggregation");
+        label_DensityA.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        label_DensityA.setText("Density Aggregation");
 
-        jLabel13.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel13.setText("Speed for Low K");
+        label_SpeedforLow.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        label_SpeedforLow.setText("Speed for Low K");
 
-        jLabel14.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        jLabel14.setText("Max Speed");
+        label_MaxSpeed.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        label_MaxSpeed.setText("Max Speed");
 
         cbxUAggregation.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         cbxUAggregation.setPreferredSize(new java.awt.Dimension(150, 22));
@@ -404,61 +460,60 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
         tbxMaxSpeedAlpha.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tbxMaxSpeedAlpha.setPreferredSize(new java.awt.Dimension(30, 22));
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnSpeedAggreagationLayout = new javax.swing.GroupLayout(pnSpeedAggreagation);
+        pnSpeedAggreagation.setLayout(pnSpeedAggreagationLayout);
+        pnSpeedAggreagationLayout.setHorizontalGroup(
+            pnSpeedAggreagationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnSpeedAggreagationLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addComponent(jLabel11)
+                .addGroup(pnSpeedAggreagationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnSpeedAggreagationLayout.createSequentialGroup()
+                        .addComponent(label_SpeedAggregation)
                         .addGap(18, 18, 18)
                         .addComponent(cbxUAggregation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel5Layout.createSequentialGroup()
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel12)
-                            .addComponent(jLabel13)
-                            .addComponent(jLabel14))
+                    .addGroup(pnSpeedAggreagationLayout.createSequentialGroup()
+                        .addGroup(pnSpeedAggreagationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(label_DensityA)
+                            .addComponent(label_SpeedforLow)
+                            .addComponent(label_MaxSpeed))
                         .addGap(11, 11, 11)
-                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGroup(pnSpeedAggreagationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pnSpeedAggreagationLayout.createSequentialGroup()
                                 .addComponent(cbxUforLowK, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(tbxFixedUforLowK, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel5Layout.createSequentialGroup()
+                            .addGroup(pnSpeedAggreagationLayout.createSequentialGroup()
                                 .addComponent(cbxKAggregation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(tbxMovingKAvgCount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel5Layout.createSequentialGroup()
+                            .addGroup(pnSpeedAggreagationLayout.createSequentialGroup()
                                 .addComponent(cbxMaxSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(tbxMaxSpeedAlpha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(81, Short.MAX_VALUE))
         );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel11)
+        pnSpeedAggreagationLayout.setVerticalGroup(
+            pnSpeedAggreagationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnSpeedAggreagationLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(pnSpeedAggreagationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(label_SpeedAggregation)
                     .addComponent(cbxUAggregation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel12)
+                .addGroup(pnSpeedAggreagationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(label_DensityA)
                     .addComponent(cbxKAggregation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(tbxMovingKAvgCount, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel13)
+                .addGroup(pnSpeedAggreagationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(label_SpeedforLow)
                     .addComponent(cbxUforLowK, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(tbxFixedUforLowK, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel14)
+                .addGroup(pnSpeedAggreagationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(label_MaxSpeed)
                     .addComponent(cbxMaxSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tbxMaxSpeedAlpha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(43, Short.MAX_VALUE))
+                    .addComponent(tbxMaxSpeedAlpha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         btnStartSimulation.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
@@ -469,32 +524,139 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
             }
         });
 
+        jPanel5.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        simJmKit.setMiniMapVisible(false);
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(simJmKit, javax.swing.GroupLayout.DEFAULT_SIZE, 521, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(simJmKit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        pnDate.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Date", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 0, 12))); // NOI18N
+
+        jLabel7.setText("Start Time");
+
+        cbxStartHour.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        cbxStartHour.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" }));
+        cbxStartHour.setMinimumSize(new java.awt.Dimension(40, 20));
+        cbxStartHour.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                cbxStartHourMouseClicked(evt);
+            }
+        });
+
+        jLabel28.setFont(new java.awt.Font("Verdana 12", 0, 12)); // NOI18N
+        jLabel28.setText(":");
+
+        cbxStartMin.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        cbxStartMin.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59" }));
+        cbxStartMin.setMinimumSize(new java.awt.Dimension(40, 20));
+
+        cbxEndMin.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        cbxEndMin.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59" }));
+        cbxEndMin.setMinimumSize(new java.awt.Dimension(40, 20));
+
+        jLabel20.setFont(new java.awt.Font("Verdana 12", 0, 12)); // NOI18N
+        jLabel20.setText(":");
+
+        cbxEndHour.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        cbxEndHour.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23" }));
+        cbxEndHour.setMinimumSize(new java.awt.Dimension(40, 20));
+
+        jLabel11.setText("End Time");
+
+        javax.swing.GroupLayout pnDateLayout = new javax.swing.GroupLayout(pnDate);
+        pnDate.setLayout(pnDateLayout);
+        pnDateLayout.setHorizontalGroup(
+            pnDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnDateLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(natsrlCalendar, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(pnDateLayout.createSequentialGroup()
+                        .addComponent(jLabel11)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(cbxEndHour, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 3, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(5, 5, 5)
+                        .addComponent(cbxEndMin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnDateLayout.createSequentialGroup()
+                        .addComponent(jLabel7)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(cbxStartHour, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel28, javax.swing.GroupLayout.PREFERRED_SIZE, 3, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(5, 5, 5)
+                        .addComponent(cbxStartMin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        pnDateLayout.setVerticalGroup(
+            pnDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(natsrlCalendar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(pnDateLayout.createSequentialGroup()
+                .addGroup(pnDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cbxStartHour, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbxStartMin, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel28)
+                    .addComponent(jLabel7))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cbxEndMin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbxEndHour, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel20)
+                    .addComponent(jLabel11)))
+        );
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(pnSpeedAggreagation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnStartSimulation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(btnStartSimulation))
-                .addContainerGap(561, Short.MAX_VALUE))
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnDate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnStartSimulation)
-                .addContainerGap(77, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pnSpeedAggreagation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnStartSimulation, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(pnDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         tabPanel.addTab("VSL Option", jPanel1);
@@ -549,7 +711,7 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
             jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 630, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 570, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -581,7 +743,7 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
                 .addContainerGap())
         );
 
-        tabPanel.addTab("Console", jPanel2);
+        tabPanel.addTab("Simulation Console", jPanel2);
 
         jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Graph"));
 
@@ -627,10 +789,198 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
             .addGroup(jPanel9Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(293, Short.MAX_VALUE))
+                .addContainerGap(233, Short.MAX_VALUE))
         );
 
-        tabPanel.addTab("Graph", jPanel9);
+        tabPanel.addTab("Simulation State", jPanel9);
+
+        jPanel11.setBorder(javax.swing.BorderFactory.createTitledBorder("Graph"));
+
+        PanelChart_result.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                PanelChart_resultComponentResized(evt);
+            }
+        });
+        PanelChart_result.addHierarchyListener(new java.awt.event.HierarchyListener() {
+            public void hierarchyChanged(java.awt.event.HierarchyEvent evt) {
+                PanelChart_resultHierarchyChanged(evt);
+            }
+        });
+
+        javax.swing.GroupLayout PanelChart_resultLayout = new javax.swing.GroupLayout(PanelChart_result);
+        PanelChart_result.setLayout(PanelChart_resultLayout);
+        PanelChart_resultLayout.setHorizontalGroup(
+            PanelChart_resultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 947, Short.MAX_VALUE)
+        );
+        PanelChart_resultLayout.setVerticalGroup(
+            PanelChart_resultLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 371, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
+        jPanel11.setLayout(jPanel11Layout);
+        jPanel11Layout.setHorizontalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel11Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(PanelChart_result, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel11Layout.setVerticalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel11Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(PanelChart_result, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        cbxSavedResult.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        cbxSavedResult.setPreferredSize(new java.awt.Dimension(300, 20));
+
+        btnReadResult.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        btnReadResult.setText("Load");
+        btnReadResult.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReadResultActionPerformed(evt);
+            }
+        });
+
+        btnLoadExcel.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        btnLoadExcel.setText("Extract");
+        btnLoadExcel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoadExcelActionPerformed(evt);
+            }
+        });
+
+        sld_resultChart.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
+                sld_resultChartMouseWheelMoved(evt);
+            }
+        });
+        sld_resultChart.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                sld_resultChartStateChanged(evt);
+            }
+        });
+
+        tbxTimer.setEditable(false);
+        tbxTimer.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+
+        btn_reChart_left.setText("< STEP");
+        btn_reChart_left.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_reChart_leftActionPerformed(evt);
+            }
+        });
+
+        btn_reChart_right.setText("STEP >");
+        btn_reChart_right.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_reChart_rightActionPerformed(evt);
+            }
+        });
+
+        Result_table.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        Result_table.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "", "Title 2", "Title 3", "Title 4"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, true
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(Result_table);
+
+        cbx_result_station.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        cbx_result_station.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cbx_result_stationItemStateChanged(evt);
+            }
+        });
+        cbx_result_station.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbx_result_stationActionPerformed(evt);
+            }
+        });
+
+        jLabel12.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+        jLabel12.setText("Station Info");
+
+        javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(jPanel8);
+        jPanel8.setLayout(jPanel8Layout);
+        jPanel8Layout.setHorizontalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(sld_resultChart, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel8Layout.createSequentialGroup()
+                                .addComponent(tbxTimer, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btn_reChart_left)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btn_reChart_right)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(cbx_result_station, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel12, javax.swing.GroupLayout.Alignment.TRAILING)))
+                            .addComponent(cbxSavedResult, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jPanel8Layout.createSequentialGroup()
+                                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(btnReadResult, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(btnLoadExcel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 366, Short.MAX_VALUE))
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        jPanel8Layout.setVerticalGroup(
+            jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel8Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(sld_resultChart, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(tbxTimer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(btn_reChart_left)
+                                .addComponent(btn_reChart_right)
+                                .addComponent(jLabel12)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cbx_result_station, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
+                        .addComponent(cbxSavedResult, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnReadResult, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnLoadExcel, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(25, 25, 25))
+                    .addGroup(jPanel8Layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addContainerGap())))
+        );
+
+        tabPanel.addTab("Simulation Result", jPanel8);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -645,8 +995,8 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tabPanel)
-                .addContainerGap())
+                .addComponent(tabPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 688, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -671,7 +1021,7 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
     private void btnStartSimulationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartSimulationActionPerformed
         // TODO add your handling code here:
 //        StartSimulation
-        this.StartSimulation();
+        Process();
         
     }//GEN-LAST:event_btnStartSimulationActionPerformed
 
@@ -698,17 +1048,106 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
         setVissimVisible(this.chkShowVehicles.isSelected());
     }//GEN-LAST:event_chkShowVehiclesActionPerformed
 
+    private void btnReadResultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReadResultActionPerformed
+        // TODO add your handling code here:
+        LoadResultChart();
+    }//GEN-LAST:event_btnReadResultActionPerformed
+
+    private void btnLoadExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadExcelActionPerformed
+        // TODO add your handling code here:
+        extractExcel();
+    }//GEN-LAST:event_btnLoadExcelActionPerformed
+
+    private void cbxStartHourMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_cbxStartHourMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbxStartHourMouseClicked
+
+    private void cbxSimulationModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxSimulationModeActionPerformed
+        // TODO add your handling code here:
+        SimulationModeVisible((SimulationMode)this.cbxSimulationMode.getSelectedItem());
+    }//GEN-LAST:event_cbxSimulationModeActionPerformed
+
+    private void sld_resultChartStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sld_resultChartStateChanged
+        // TODO add your handling code here:
+        if(!isResultLoaded){
+            return;
+        }
+        updateSlide(sld_resultChart.getValue());
+    }//GEN-LAST:event_sld_resultChartStateChanged
+
+    private void sld_resultChartMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_sld_resultChartMouseWheelMoved
+        // TODO add your handling code here:
+        if(!isResultLoaded){
+            return;
+        }
+        
+        if(evt.getWheelRotation() > 0){ //up
+            updateSlideWheel(-1);
+        }else{ //down
+            updateSlideWheel(1);
+        }
+    }//GEN-LAST:event_sld_resultChartMouseWheelMoved
+
+    private void btn_reChart_leftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_reChart_leftActionPerformed
+        // TODO add your handling code here:
+        if(isResultLoaded){
+            updateSlideWheel(-1);
+        }
+    }//GEN-LAST:event_btn_reChart_leftActionPerformed
+
+    private void btn_reChart_rightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_reChart_rightActionPerformed
+        // TODO add your handling code here:
+        if(isResultLoaded){
+            updateSlideWheel(1);
+        }
+    }//GEN-LAST:event_btn_reChart_rightActionPerformed
+
+    private void PanelChart_resultHierarchyChanged(java.awt.event.HierarchyEvent evt) {//GEN-FIRST:event_PanelChart_resultHierarchyChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_PanelChart_resultHierarchyChanged
+
+    private void PanelChart_resultComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_PanelChart_resultComponentResized
+        // TODO add your handling code here:
+        if(isResultLoaded){
+            updateSlide(sld_resultChart.getValue());
+        }
+    }//GEN-LAST:event_PanelChart_resultComponentResized
+
+    private void cbx_result_stationItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbx_result_stationItemStateChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbx_result_stationItemStateChanged
+
+    private void cbx_result_stationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbx_result_stationActionPerformed
+        // TODO add your handling code here:
+        if(isResultLoaded){
+           loadResultDatas();
+        }
+    }//GEN-LAST:event_cbx_result_stationActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel PanelChart;
+    private javax.swing.JPanel PanelChart_result;
+    private javax.swing.JTable Result_table;
+    private javax.swing.JButton btnLoadExcel;
     private javax.swing.JButton btnOpenSectionEditor;
+    private javax.swing.JButton btnReadResult;
     private javax.swing.JButton btnSelectCasefile;
     private javax.swing.JButton btnStartSimulation;
+    private javax.swing.JButton btn_reChart_left;
+    private javax.swing.JButton btn_reChart_right;
+    private javax.swing.JComboBox cbxEndHour;
+    private javax.swing.JComboBox cbxEndMin;
     private javax.swing.JComboBox cbxKAggregation;
     private javax.swing.JComboBox cbxMaxSpeed;
+    private javax.swing.JComboBox cbxSavedResult;
     private javax.swing.JComboBox cbxSections;
     private javax.swing.JComboBox cbxSimulationMode;
+    private javax.swing.JComboBox cbxStartHour;
+    private javax.swing.JComboBox cbxStartMin;
     private javax.swing.JComboBox cbxUAggregation;
     private javax.swing.JComboBox cbxUforLowK;
+    private javax.swing.JComboBox cbxVSLVersion;
+    private javax.swing.JComboBox cbx_result_station;
     private javax.swing.JComboBox cbxvissimVersion;
     private javax.swing.JCheckBox chkShowVehicles;
     private javax.swing.JTextArea errorstate;
@@ -717,9 +1156,10 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -729,51 +1169,72 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JLabel label_DensityA;
+    private javax.swing.JLabel label_MaxSpeed;
+    private javax.swing.JLabel label_SpeedAggregation;
+    private javax.swing.JLabel label_SpeedforLow;
+    private edu.umn.natsrl.gadget.calendar.NATSRLCalendar natsrlCalendar;
+    private javax.swing.JPanel pnDate;
+    private javax.swing.JPanel pnSpeedAggreagation;
+    private org.jdesktop.swingx.JXMapKit simJmKit;
     private javax.swing.JTextArea simstate;
+    private javax.swing.JSlider sld_resultChart;
     private javax.swing.JTabbedPane tabPanel;
     private javax.swing.JTextField tbxBSSpeedThreshold;
     private javax.swing.JTextField tbxCaseFile;
-    private javax.swing.JTextField tbxCloseThreshold;
     private javax.swing.JTextField tbxDeceleration;
     private javax.swing.JTextField tbxFixedUforLowK;
     private javax.swing.JTextField tbxMaxSpeedAlpha;
     private javax.swing.JTextField tbxMinStationDistance;
     private javax.swing.JTextField tbxMovingKAvgCount;
     private javax.swing.JTextField tbxRandom;
+    private javax.swing.JTextField tbxTimer;
     private javax.swing.JTextField tbxTurnOffAcceleration;
     private javax.swing.JTextField tbxZesDecceleration;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void signalEnd(int code) {
-        if(code == -1) {
-            this.chkShowVehicles.setEnabled(true);
-            this.chkShowVehicles.setSelected(false); 
-            setVissimVisible(false);
-            return;
-        }
-        
-        ComError ce = ComError.getErrorbyID(code);
-        if(!ce.isCorrect()){
-            JOptionPane.showMessageDialog(simFrame, ce.toString());
-            this.isStartSimulation(false);
-            return;
-        }
-        
-        int samples = simulation.getSamples();
-        if(samples < 5) {
-            JOptionPane.showMessageDialog(simFrame, "Too short simulation");
-            simFrame.afterSimulation(null, null);
-            this.simFrame.setVisible(false);            
+        SimulationMode smode = (SimulationMode)this.cbxSimulationMode.getSelectedItem();
+        int samples = 0;
+        VSLResults vslresult = null;
+        if(smode.isSimulationMode()){
+            if(code == -1) {
+                this.chkShowVehicles.setEnabled(true);
+                this.chkShowVehicles.setSelected(false); 
+                setVissimVisible(false);
+                return;
+            }
+
+            ComError ce = ComError.getErrorbyID(code);
+            if(!ce.isCorrect()){
+                JOptionPane.showMessageDialog(simFrame, ce.toString());
+                this.isStartSimulation(false);
+                return;
+            }
+
+            samples = simulation.getSamples();
+            if(samples < 5) {
+                JOptionPane.showMessageDialog(simFrame, "Too short simulation");
+                simFrame.afterSimulation(null, null);
+                this.simFrame.setVisible(false);            
+            }
+            vslresult = simulation.getVSLResults();
+        }else if(smode.isEmulationMode()){
+            samples = emulation.getSample();
+            vslresult = emulation.getVSLResults();
         }
         
         int duration = samples * 30;        
@@ -785,9 +1246,11 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
         c.add(Calendar.SECOND, duration);
         Date eTime = c.getTime();
         simFrame.afterSimulation((Section)this.cbxSections.getSelectedItem(), new Period(sTime, eTime, 30));
-        SimulationUtil.SaveSimulation((Section)this.cbxSections.getSelectedItem(),new Period(sTime, eTime, 30),simFrame);
+        SimulationUtil.SaveVSLSimulation((Section)this.cbxSections.getSelectedItem(),new Period(sTime, eTime, 30),simFrame,vslresult);
         System.out.println("Restore output redirection ... ");
+        loadVSLResults();
         this.restoreOutput();
+        isStartSimulation(false);
     }
     
     /**
@@ -817,6 +1280,8 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
     private void isStartSimulation(boolean flag){
         if(flag){
             tabPanel.setSelectedIndex(1);
+        }else{
+            tabPanel.setSelectedIndex(0);
         }
         this.btnStartSimulation.setEnabled(!flag);
         this.btnSelectCasefile.setEnabled(!flag);
@@ -865,7 +1330,12 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
             this.cbxvissimVersion.addItem(v);
         }
         
+        loadMap();
+        loadVSLMode();
+        loadSimulationMode();
         loadVSLParameter();
+        setGUIEnable();
+        initResult();
     }
     
     private void saveSimulationConfig() {
@@ -877,10 +1347,9 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
     private void saveVSLParameter(){
         VSLConfig.VSL_VSS_DECISION_ACCEL = Integer.parseInt(this.tbxDeceleration.getText());
         VSLConfig.VSL_CONTROL_THRESHOLD = Integer.parseInt(this.tbxZesDecceleration.getText());
-        VSLConfig.VSL_CLOSE_THRESHOLD = Integer.parseInt(this.tbxCloseThreshold.getText());
         VSLConfig.VSL_BS_THRESHOLD = Integer.parseInt(this.tbxBSSpeedThreshold.getText());
         VSLConfig.VSL_TURNOFF_ACCEL = Integer.parseInt(this.tbxTurnOffAcceleration.getText());
-        VSLConfig.VSL_MIN_DISTANCE = Integer.parseInt(this.tbxMinStationDistance.getText());
+        VSLConfig.VSL_MIN_STATION_MILE = Double.parseDouble(this.tbxMinStationDistance.getText());
         
         saveSpeedValueList();
         VSLConfig.save();
@@ -907,10 +1376,9 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
         VSLConfig.load();
         this.tbxDeceleration.setText(String.valueOf(VSLConfig.VSL_VSS_DECISION_ACCEL));
         this.tbxZesDecceleration.setText(String.valueOf(VSLConfig.VSL_CONTROL_THRESHOLD));
-        this.tbxCloseThreshold.setText(String.valueOf(VSLConfig.VSL_CLOSE_THRESHOLD));
         this.tbxBSSpeedThreshold.setText(String.valueOf(VSLConfig.VSL_BS_THRESHOLD));
         this.tbxTurnOffAcceleration.setText(String.valueOf(VSLConfig.VSL_TURNOFF_ACCEL));
-        this.tbxMinStationDistance.setText(String.valueOf(VSLConfig.VSL_MIN_DISTANCE));
+        this.tbxMinStationDistance.setText(String.valueOf(VSLConfig.VSL_MIN_STATION_MILE));
         loadSpeedValueList();
     }
 
@@ -957,15 +1425,24 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
         tbx.setEnabled(hasValue);
     }
 
-    private void StartSimulation() {
+    private void Process(){
         saveSimulationConfig();
         saveVSLParameter();
+        this.redirectOutput(simstate,errorstate);
+        SimulationMode smode = (SimulationMode)cbxSimulationMode.getSelectedItem();
+        VSLVersion vv = (VSLVersion)cbxVSLVersion.getSelectedItem();
+        if(smode.isSimulationMode()){
+            StartSimulation(vv);
+        }else if(smode.isEmulationMode()){
+            StartEmulation(vv);
+        }
+    }
+    private void StartSimulation(VSLVersion vv) {
         try{
             startTime = new Date();
-            this.redirectOutput(simstate,errorstate);
             Section s = (Section)this.cbxSections.getSelectedItem();
             VISSIMVersion version = (VISSIMVersion)this.cbxvissimVersion.getSelectedItem();
-            simulation = new VSLSim(SimulationConfig.CASE_FILE,SimulationConfig.RANDOM_SEED,s,version);
+            simulation = new VSLSim(SimulationConfig.CASE_FILE,SimulationConfig.RANDOM_SEED,s,version,vv);
             simulation.setSignalListener(this);
             simulation.setChartPanel(this.PanelChart);
             simulation.start();
@@ -973,5 +1450,347 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+    
+    private void StartEmulation(VSLVersion vv){
+        System.out.println("step 0");
+        Calendar[] selectedDates = this.natsrlCalendar.getSelectedDates();
+        
+        if(selectedDates.length > 1){
+            JOptionPane.showMessageDialog(null, "Please Select 1 day..");
+            return;
+        }
+        
+        if(selectedDates.length <= 0){
+            JOptionPane.showMessageDialog(null, "please Select day..");
+            return;
+        }
+        
+        Section section = (Section) this.cbxSections.getSelectedItem();
+        if (section == null) {
+            return;
+        }
+        
+        Calendar cs,ce;
+        cs = (Calendar)selectedDates[0].clone();
+        ce = (Calendar)selectedDates[0].clone();
+        
+        // set period for staring time
+//        Calendar cs = this.calStartDate.getSelectedDate();
+        int hour = Integer.parseInt(this.cbxStartHour.getSelectedItem().toString());
+        cs.set(Calendar.HOUR_OF_DAY, hour);
+        cs.set(Calendar.MINUTE, Integer.parseInt(this.cbxStartMin.getSelectedItem().toString()));
+//        cs.set(Calendar.SECOND, 0);
+       
+        // set period for ending time
+//        Calendar ce = this.calEndDate.getSelectedDate();
+        hour = Integer.parseInt(this.cbxEndHour.getSelectedItem().toString());
+        ce.set(Calendar.HOUR_OF_DAY, hour);
+        ce.set(Calendar.MINUTE, Integer.parseInt(this.cbxEndMin.getSelectedItem().toString()));
+        //barelane
+        
+        Period p = new Period(cs.getTime(),ce.getTime(),VSLConfig.Interval);
+        
+        startTime = new Date();
+        emulation = new VSLEmulation(section,p,vv);
+        emulation.setSignalListener(this);
+        emulation.start();
+        isStartSimulation(true);
+    }
+
+    private void setGUIEnable() {
+        SpeedAggregationMenu(false);
+    }
+
+    private void SpeedAggregationMenu(boolean par) {
+        pnSpeedAggreagation.setEnabled(par);
+        label_SpeedAggregation.setEnabled(par);
+        label_MaxSpeed.setEnabled(par);
+        label_SpeedforLow.setEnabled(par);
+        label_DensityA.setEnabled(par);
+        cbxUAggregation.setEnabled(par);
+        cbxKAggregation.setEnabled(par);
+        cbxUforLowK.setEnabled(par);
+        cbxMaxSpeed.setEnabled(par);
+        tbxMovingKAvgCount.setEnabled(par);
+        tbxFixedUforLowK.setEnabled(par);
+        tbxMaxSpeedAlpha.setEnabled(par);
+    }
+    
+    private void SimulationModeVisible(SimulationMode simulationMode) {
+        if(simulationMode.isSimulationMode()){
+            setModeVisible(false);
+        }else if(simulationMode.isEmulationMode()){
+            setModeVisible(true);
+        }
+    }
+    
+    private void setModeVisible(boolean b) {
+        this.pnDate.setVisible(b);
+        this.cbxvissimVersion.setEnabled(!b);
+        this.tbxRandom.setEnabled(!b);
+        this.tbxCaseFile.setEnabled(!b);
+        this.btnSelectCasefile.setEnabled(!b);
+    }
+    
+    private void loadVSLMode() {
+        if(this.cbxVSLVersion != null)
+            this.cbxVSLVersion.removeAllItems();
+        
+        for(VSLVersion s : VSLVersion.values())
+        {
+            if(s != null) {
+                cbxVSLVersion.addItem(s);
+            } else {
+                System.out.println("Loaded is null");
+            }           
+        }           
+    }
+
+    private void loadSimulationMode() {
+        if(this.cbxSimulationMode != null)
+            this.cbxSimulationMode.removeAllItems();
+        
+        for(SimulationMode s : SimulationMode.values())
+        {
+            if(s != null) {
+                cbxSimulationMode.addItem(s);
+            } else {
+                System.out.println("Loaded is null");
+            }           
+        }           
+    }
+
+    private void loadMap() {
+        /**
+         * Load Map
+         */
+        this.simJmKit.setTileFactory(TMCProvider.getTileFactory());
+        this.simJmKit.setAddressLocation(new GeoPosition(this.initLatitude, this.initLongitude));
+        this.simJmKit.setZoom(this.initZoom);
+        simMapHelper = new MapHelper(this.simJmKit);
+        simMapHelper.setFrame(simFrame); 
+    }
+
+    private void LoadResultChart() {
+        vslresult_chart = (VSLResults)cbxSavedResult.getSelectedItem();
+        
+        initSlide();
+        initResultChart();
+        updateResultChart(0);
+        isResultLoaded = true;
+        loadStationBox();
+    }
+
+    private void initSlide() {
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                sld_resultChart.setMaximum(vslresult_chart.getDataLength()-1);
+                sld_resultChart.setValue(0);
+            }
+        }, 0);
+    }
+    
+    private void updateSlide(final int value) {
+        updateResultChart(value);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                tbxTimer.setText(String.valueOf(value+1));
+                loadResultDatas();
+            }
+        }, 0);
+    }
+    
+    private void updateSlideWheel(int i) {
+        int idx = sld_resultChart.getValue() + i;
+        if(sld_resultChart.getMaximum() < idx || 0 > idx){
+            return;
+        }
+        sld_resultChart.setValue(idx);
+    }
+    
+    private void initResultChart() {
+        PanelChart_result.removeAll();
+        resultchart = new VSLChartXY(vslresult_chart.getMilePointListLayout(),null);
+        result_cpn = new ChartPanel(resultchart.getChart());
+        result_cpn.setSize(PanelChart_result.getSize());
+        PanelChart_result.add(result_cpn);
+    }
+
+    private void setChartEnable(boolean b) {
+        btnReadResult.setEnabled(b);
+        btnLoadExcel.setEnabled(b);
+        /**
+         * Scroll
+         */
+        btn_reChart_left.setEnabled(b);
+        btn_reChart_right.setEnabled(b);
+        sld_resultChart.setEnabled(b);
+        tbxTimer.setEnabled(b);
+    }
+
+    private void updateResultChart(final int value) {
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                resultchart.AddVSLResultStationSpeedGraph(vslresult_chart.getMapStations(), "StationSpeed",value);
+                resultchart.AddMapDMSSpeedGraph(vslresult_chart.getMapDMSs(), "DMSSpeedLimit",value);
+                result_cpn.setSize(PanelChart_result.getSize());
+                PanelChart_result.getParent().validate();
+            }
+        }, 0);
+    }
+
+    /**
+     * about VSL Result Tab
+     */
+    private void initResult() {
+        loadVSLResults();
+    }
+    
+    private void loadVSLResults(){
+        new Timer().schedule(new TimerTask(){
+            @Override
+            public void run() {
+                loadVSLSimulationResults();
+            }
+        },5);
+    }
+    
+    private void loadVSLSimulationResults() {
+        setChartEnable(false);
+        this.cbxSavedResult.setEnabled(false);
+        if(this.cbxSavedResult != null)
+            this.cbxSavedResult.removeAllItems();
+        cbxSavedResult.addItem("Loading Datas.....");
+        
+        ArrayList<VSLResults> res = SimulationUtil.loadVSLSimulationResults();
+        
+        if(this.cbxSavedResult != null)
+            this.cbxSavedResult.removeAllItems();
+        
+        if(res == null){
+            return;
+        }
+        for(VSLResults s : res)
+        {
+            if(s != null) {
+                cbxSavedResult.addItem(s);
+            } else {
+                System.out.println("Loaded is null");
+            }           
+        }           
+        this.cbxSavedResult.setEnabled(true);
+        setChartEnable(true);
+    }
+
+    private void extractExcel() {
+        final VSLResults res = (VSLResults)cbxSavedResult.getSelectedItem();
+        
+        new Timer().schedule(new TimerTask(){
+            @Override
+            public void run() {
+                VSLResultExtractor vex = new VSLResultExtractor(res);
+                vex.run();
+            }
+        },5);
+    }
+
+    /**
+     * Load Station ComboBox
+     */
+    private void loadStationBox() {
+        if(!this.isResultLoaded){
+            return;
+        }
+        
+        if(cbx_result_station != null){
+            this.cbx_result_station.removeAllItems();
+        }
+        
+        for(VSLResultStation vs : vslresult_chart.getStations().values()){
+            cbx_result_station.addItem(vs);
+        }
+    }
+
+    /**
+     * load Data into Table
+     * @param vslResultStation 
+     */
+    private void loadResultDatas() {
+        if(!this.isResultLoaded){
+            return;
+        }
+        
+        VSLResultStation vslResultStation = (VSLResultStation)cbx_result_station.getSelectedItem();
+        
+        if(vslResultStation == null){
+            return;
+        }
+        
+        ArrayList<VSLResultStation> list = vslresult_chart.getNearStationbyID(vslResultStation.getID());
+        
+        if(list == null){
+            return;
+        }
+        /**
+         * Set Title
+         */
+        String[] columns = new String[list.size()+1];
+        columns[0] = "";
+        for(int i=0; i<list.size();i++){
+            VSLResultStation vs = list.get(i);
+            columns[i+1] = vs.getID();
+        }
+        
+        DefaultTableModel tmodel = new DefaultTableModel();
+        tmodel.setColumnIdentifiers(columns);
+        Result_table.setModel(tmodel);
+        
+        DefaultTableModel rows = (DefaultTableModel)Result_table.getModel();
+        String[] rowTitle = new String[]{"Speed","Acc","VSS","Count"};
+        int idx = this.sld_resultChart.getValue();
+        
+        for(int i=0; i<rowTitle.length;i++){
+            Vector<Object> data = new Vector<Object>();
+            data.add(rowTitle[i]);
+            for(VSLResultStation vs : list){
+                switch(i){
+                    case 0 :
+                        data.add(vs.getRollingSpeeds()[idx]);
+                        break;
+                    case 1 :
+                        data.add(vs.getAcceleration()[idx]);
+                        break;
+                    case 2 :
+                        data.add(vs.getCurrentVSS()[idx]);
+                        break;
+                    case 3 :
+                        data.add(vs.getBottleneckCounts()[idx]);
+                        break;
+                }
+            }
+            rows.addRow(data);
+        }
+//        
+//        DefaultTableModel rows = (DefaultTableModel)tbRate.getModel();
+//        for(int i=0;i<totalrows;i++){
+//            int timeinterval = (i)*interval;
+//            Vector<Double> data = new Vector<Double>();
+//            
+//            //Add interval
+//            data.add((double)timeinterval);
+//            
+//            //Add Data
+//            if(fmg != null){
+//                for(FixedMeter fmeter : fmg.getFixedMeters()){
+//                    if(i < fmeter.rate.size())
+//                        data.add(fmeter.rate.get(i));
+//                }
+//            }
+//            rows.addRow(data);
+//        }
     }
 }

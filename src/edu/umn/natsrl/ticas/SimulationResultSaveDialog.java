@@ -22,6 +22,8 @@ import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.simobjects.RandomSeed;
 import edu.umn.natsrl.infra.simobjects.SimulationSeveralResult;
+import edu.umn.natsrl.ticas.plugin.PluginFrame;
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLResults;
 import java.awt.Frame;
 import java.io.File;
 import javax.swing.JOptionPane;
@@ -32,11 +34,14 @@ import javax.swing.JOptionPane;
  */
 public class SimulationResultSaveDialog extends javax.swing.JDialog {
 
-    private Section section;
-    private Period period;
+    protected Section section;
+    protected Period period;
     public boolean isSaved = false;
     
     private RandomSeed SimRandom = RandomSeed.getInstance();
+    
+    protected String fname;
+    protected String desc;
              
     public SimulationResultSaveDialog(Frame parent, Section section, Period period) {
         super(parent, true);
@@ -45,11 +50,11 @@ public class SimulationResultSaveDialog extends javax.swing.JDialog {
         this.period = period;               
     }
     
-    private void saveResult()
+    protected void saveResult()
     {
-        String name = this.tbxSectionName.getText();
-        String desc = this.tbxSectionDesc.getText();
-        if(!checkName(name)) return;
+        fname = this.tbxSectionName.getText();
+        desc = this.tbxSectionDesc.getText();
+        if(!checkName(fname)) return;
 
         try {
             System.out.println("SAVE : period=" + period);
@@ -61,9 +66,9 @@ public class SimulationResultSaveDialog extends javax.swing.JDialog {
         
         SimulationResult sr = null;
         if(this.SimRandom.hasSimulationKey())
-            sr = new SimulationResult(name, desc, section, period,false,SimulationSeveralResult.getKey(this.SimRandom.getName(), this.SimRandom.getSimulationKey()),this.SimRandom.getLength());
+            sr = new SimulationResult(fname, desc, section, period,false,SimulationSeveralResult.getKey(this.SimRandom.getName(), this.SimRandom.getSimulationKey()),this.SimRandom.getLength());
         else
-            sr = new SimulationResult(name, desc, section, period);
+            sr = new SimulationResult(fname, desc, section, period);
         
         try {
             sr.save();

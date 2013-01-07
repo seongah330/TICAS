@@ -19,6 +19,7 @@ package edu.umn.natsrl.ticas.plugin.rampmeterevaluator;
 
 import edu.umn.natsrl.infra.Period;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  *
@@ -37,5 +38,19 @@ public class RampMeterUtil {
         int min = c.get(Calendar.MINUTE);
         
         return String.format("%02d:%02d", hour, min);
+    }
+    
+    public static Date getDateTime(Period p, int count,int Interval){
+        int tgap = 0;
+        tgap = Interval/60;
+        
+        Calendar c = Calendar.getInstance();
+        c.set(p.start_year, p.start_month-1, p.start_date, p.start_hour, p.start_min);
+        for(int i=0; i<=count; i++) c.add(Calendar.MINUTE, tgap);
+
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int min = c.get(Calendar.MINUTE);
+        
+        return c.getTime();
     }
 }

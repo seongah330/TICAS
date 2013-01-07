@@ -21,9 +21,11 @@ import edu.umn.natsrl.infra.types.TrafficType;
 import edu.umn.natsrl.util.FileHelper;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import jxl.Workbook;
 import jxl.write.Label;
 import jxl.write.Number;
+import jxl.write.DateTime;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 
@@ -219,6 +221,7 @@ public class RampMeterWriter {
             String str= currentRamp.getLabel()+"("+currentRamp.getId()+")          State-"+currentRamp.isActive();
             addData(sheet,column,row++,new String[]{str});
             addData(sheet,column,row++,new String[]{"Metering"});
+            addData(sheet,column,row++,new String[]{""});
             addData(sheet,column,row++,new String[]{"Start"});
             addData(sheet,column,row++,new String[]{"End"});
             row ++;
@@ -230,18 +233,21 @@ public class RampMeterWriter {
             /**
              * WRite Data
              */
-            row-=4;
+            row-=5;
             int daycnt = 0;
             for(RampMeterResult day : analysis){
                 currentRamp = dayResult.get(daycnt).getRamps().get(i);
                 int dayrow = row;
                 addData(sheet,column,dayrow++,new String[]{""+currentRamp.isRampMeteringActive()});
+                addData(sheet,column,dayrow++,new String[]{day.getPeriodtoHString()});
                 if(currentRamp.isRampMeteringActive()){
                     addData(sheet,column,dayrow++,new String[]{""+currentRamp.getRampStartTime()});
                     addData(sheet,column,dayrow++,new String[]{""+currentRamp.getRampEndTime()});
+//                    addData(sheet,column,dayrow++,currentRamp.getRampStartDate());
+//                    addData(sheet,column,dayrow++,currentRamp.getRampEndDate());
                 }else{
-                    addData(sheet,column,dayrow++,new String[]{"-"});
-                    addData(sheet,column,dayrow++,new String[]{"-"});
+                    addData(sheet,column,dayrow++,new String[]{"0:00"});
+                    addData(sheet,column,dayrow++,new String[]{"0:00"});
                 }
                 addData(sheet,column,dayrow++,new String[]{day.getPeriodtoHString()});
                 column = writeDatas(sheet,column,dayrow,day,i,type);
@@ -420,6 +426,19 @@ public class RampMeterWriter {
             ex.printStackTrace();
         }
     }
+    
+    private void addData(WritableSheet sheet, int column, int row, Date data)
+    {
+        try {
+            if(data == null)
+                return;
+                sheet.addCell(new DateTime(column, row++, data));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    
     
     /**
      * Add Data Number

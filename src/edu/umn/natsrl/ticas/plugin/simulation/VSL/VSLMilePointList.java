@@ -17,6 +17,7 @@
  */
 package edu.umn.natsrl.ticas.plugin.simulation.VSL;
 
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLStationState;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.DMSImpl;
 import java.util.ArrayList;

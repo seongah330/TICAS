@@ -197,7 +197,7 @@ public class SRTEChartView extends javax.swing.JFrame {
         });
 
         tbxACCPointThreshHold.setText("1");
-        tbxACCPointThreshHold.setName("1");
+        tbxACCPointThreshHold.setName("1"); // NOI18N
         tbxACCPointThreshHold.setPreferredSize(new java.awt.Dimension(50, 20));
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);

@@ -32,8 +32,9 @@ import javax.swing.JOptionPane;
  * @author Chongmyung Park
  */
 public class TICASVersion {
-    public static final String version = " 3.275b";    
+    public static final String version = " 3.276b";    
     public static final boolean ISINIT = true;
+    public static final boolean ISOPTIONINIT = true;
     public static String currentVersion;
     
     private static String versionFoler = "config";
@@ -92,6 +93,9 @@ public class TICASVersion {
     public static void initDataFiles() {
         System.out.println("Reset Geo Data.....");
         new File("infra.dat").delete();
+        if(ISOPTIONINIT){
+            new File("ticas.cfg").delete();
+        }
         System.out.println("Clear All Cache.....");
         tmo.clearAllCache();
     }

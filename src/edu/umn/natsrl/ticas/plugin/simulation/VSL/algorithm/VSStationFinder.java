@@ -18,7 +18,6 @@
 package edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm;
 
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLConfig;
-import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLStationState;
 
 /**
  *
@@ -113,7 +112,6 @@ public class VSStationFinder {
     public Double calculateSpeedAdvisory() {
         if(vss != null && vss_mp != null) {
             Double spd = vss.getAggregateRollingSpeed();
-            System.out.print(", sppd : "+spd);
             if(spd > 0){
                 return calculateSpeedAdvisory(spd, vss_mp - ma);
             }
@@ -125,15 +123,15 @@ public class VSStationFinder {
     * @param spd Average speed at VSS.
     * @param d Distance upstream of station.
     * @return Speed advisory. */
-    private Double calculateSpeedAdvisory(double spd, double d){
+    protected Double calculateSpeedAdvisory(double spd, double d){
         if(d > 0){
             int acc = -getControlThreshold();
             double s2 = spd * spd + 2.0 * acc * d;
-            System.out.print(", acc="+acc+", s2="+s2);
+//            System.out.print(", acc="+acc+", s2="+s2);
             if(s2 < 0){
                 return null;
             }
-            System.out.print(", adv="+(double)Math.sqrt(s2));
+//            System.out.print(", adv="+(double)Math.sqrt(s2));
             return (double)Math.sqrt(s2);
         }else{
             return spd;
@@ -152,7 +150,7 @@ public class VSStationFinder {
     }
     
     /** Get the speed*/
-    private Double getSpeed(){
+    protected Double getSpeed(){
         if(su != null && sd != null){
             double u0 = su.getAggregateRollingSpeed();
             double u1 = sd.getAggregateRollingSpeed();

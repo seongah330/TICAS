@@ -36,10 +36,8 @@ public class VSLConfig extends ticasConfig{
      */
     public static int VSL_VSS_DECISION_ACCEL = 1500;  //VSL VDA VSS Decision Acceleration (unit : mile / h^2)
     public static int VSL_CONTROL_THRESHOLD = 1000; //VSL ZDA 
-    public static int VSL_CLOSE_THRESHOLD = 3500;
     public static int VSL_BS_THRESHOLD = 55;
     public static int VSL_TURNOFF_ACCEL = 750; //VSL TOA 
-    public static int VSL_MIN_DISTANCE = 1000;
     public static double VSL_MIN_STATION_MILE = 0.2f;
     public static int VSA_START_INTERVALS = 3;
     
@@ -56,13 +54,14 @@ public class VSLConfig extends ticasConfig{
     public static double VSL_MIN_CHANGE = 5.0;
     public static int FTM = 5280;   // 1 mile = 5280 feets
     
+    public static int Interval = 30;
+    
     public static void save(){
         prop.put("VSL_VDA", VSL_VSS_DECISION_ACCEL);
         prop.put("ZDA", VSL_CONTROL_THRESHOLD);
-        prop.put("VCT", VSL_CLOSE_THRESHOLD);
         prop.put("VBT", VSL_BS_THRESHOLD);
         prop.put("TOA", VSL_TURNOFF_ACCEL);
-        prop.put("VMD", VSL_MIN_DISTANCE);
+        prop.put("VMD", VSL_MIN_STATION_MILE);
         prop.put("SA", SPEED_SPEED_AGGREGATION.getSRC());
         prop.put("DA", SPEED_DENSITY_AGGREGATION.getSRC());
         prop.put("SLK", SPEED_SPEED_FOR_LOW_K.getSRC());
@@ -75,10 +74,9 @@ public class VSLConfig extends ticasConfig{
             //exe
             VSL_VSS_DECISION_ACCEL = p.getInteger("VSL_VDA");
             VSL_CONTROL_THRESHOLD = p.getInteger("ZDA");
-            VSL_CLOSE_THRESHOLD = p.getInteger("VCT");
             VSL_BS_THRESHOLD = p.getInteger("VBT");
             VSL_TURNOFF_ACCEL = p.getInteger("TOA");
-            VSL_MIN_DISTANCE = p.getInteger("VMD");
+            VSL_MIN_STATION_MILE = p.getDouble("VMD");
             SPEED_SPEED_AGGREGATION = SpeedAggregation.getTypebyID(p.getInteger("SA"));
             SPEED_DENSITY_AGGREGATION = DensityAggregation.getTypebyID(p.getInteger("DA"));
             SPEED_SPEED_FOR_LOW_K = SpeedforLowK.getTypebyID(p.getInteger("SLK"));

@@ -62,6 +62,7 @@ public class StationState extends State {
    public StationState(Station s, Section _sec,SimObjects simObjects) {            
        super(s.getStationId(), s);
        section = _sec;
+       System.out.println(s.getStationId()+", "+s.getLabel()+", "+s.getId());
        this.simstation = simObjects.getStation(s.getStationId());
        type = StateType.STATION;
        simobjects = simObjects;
@@ -163,6 +164,7 @@ public class StationState extends State {
            return -1;
        }
    }
+   
    public double getAverageRollingSpeed(int prevStep, int howManySteps){
        double sum = 0;
        int validCount = 0;
@@ -326,14 +328,18 @@ public class StationState extends State {
 
    /** Update the rolling samples for previous time step */
    protected void updateRollingSamples() {
-           rolling_samples = calculateRollingSamples();
+           rolling_samples = calculateRollingSamples(1);
    }
-
+   
    /** Calculate the number of samples for rolling average */
    protected int calculateRollingSamples() {
-           return Math.min(calculateMaxSamples(), rolling_samples + 1);
+       return calculateRollingSamples(0);
    }
 
+   protected int calculateRollingSamples(int i){
+       return Math.min(calculateMaxSamples(), rolling_samples+i);
+   }
+   
    /** Calculate the maximum number of samples for rolling average */
    protected int calculateMaxSamples(){
        if(isSpeedTrending()){

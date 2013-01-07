@@ -34,7 +34,7 @@ import java.util.TreeMap;
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
 public class TICASChart {
-    Chart2D chart;
+    protected Chart2D chart;
     IAxis axisX;
     IAxis axisY;
     
@@ -84,7 +84,7 @@ public class TICASChart {
         IAxis axisX = chart.getAxisX();
         axisX.setRangePolicy(new RangePolicyFixedViewport(new Range(min, max)));
         axisX.setAxisScalePolicy(new AxisScalePolicyManualTicks());
-        setStickSpacing(axisX,5);
+        setStickSpacing(axisX,10);
 //        axisX.scaleTrace(new TracePoint2D());
         
     }

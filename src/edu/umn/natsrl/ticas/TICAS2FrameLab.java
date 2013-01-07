@@ -152,7 +152,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         /*
         * temporary empty - soobin Jeon
         */
-//        sd.setAlwaysOnTop(false);
+        sd.setAlwaysOnTop(false);
         
         sd.setVisible(true);
     }
@@ -1313,7 +1313,14 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
      */
     private void selectOutputPath() {
         JFileChooser chooser = new JFileChooser();
-        chooser.setCurrentDirectory(new java.io.File("."));
+        
+        String path = ".";
+        String prevPath = this.tbxOutputFolder.getText();
+        if (!prevPath.isEmpty()) {
+            path = new File(prevPath).getAbsolutePath();
+        }
+        
+        chooser.setCurrentDirectory(new java.io.File(path));
         chooser.setDialogTitle("Select output folder");
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setAcceptAllFileFilterUsed(false);

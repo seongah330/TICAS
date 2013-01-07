@@ -216,9 +216,12 @@ public class Detector extends InfraObject implements Comparable {
      * @return 
      */
     public Vector<Double> adjustInterval(Vector<Double> data, AdjustType atype) {
+        if(data == null){
+            return null;
+        }
         int interval = this.period.interval / 30;
         Vector<Double> aData = new Vector<Double>();
-
+        
         for (int i = 0; i < data.size(); i += interval) {
             double sum = 0.0;
             double validCount = 0;

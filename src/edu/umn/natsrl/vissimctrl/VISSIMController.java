@@ -525,7 +525,6 @@ public class VISSIMController {
     private void initializeFromCaseFile() throws IOException {
 
         String text = FileHelper.readTextFile(this.caseFile);
-
         // VSA setting
         String regx = "DESIRED_SPEED (.*?)NAME \"(.*?)\"  (.*?)";
         Pattern p = Pattern.compile(regx);

@@ -17,15 +17,20 @@
  */
 package edu.umn.natsrl.ticas.plugin.simulation.VSL;
 
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLStationState;
 import edu.umn.natsrl.chart.TICASChart;
 import edu.umn.natsrl.chart.TICASChartXY;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.DMSImpl;
 import edu.umn.natsrl.infra.infraobjects.Station;
+import edu.umn.natsrl.infra.simobjects.SimDMS;
 import edu.umn.natsrl.ticas.Simulation.Simulation;
 import edu.umn.natsrl.ticas.Simulation.SimulationImpl;
 import edu.umn.natsrl.ticas.Simulation.StationState;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLAlgorithm;
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLStationStateNew;
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLStationStateOld;
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLVersion;
 import edu.umn.natsrl.vissimcom.VISSIMVersion;
 import info.monitorenter.gui.chart.views.ChartPanel;
 import java.util.ArrayList;
@@ -50,9 +55,14 @@ public class VSLSim extends Simulation implements SimulationImpl{
     ChartPanel cpn;
     
     VSLMilePointList ml;
+    VSLResults vslresult;
     
-    public VSLSim(String caseFile, int seed, Section section, VISSIMVersion v){
+    VSLVersion vslversion;
+    
+    public VSLSim(String caseFile, int seed, Section section, VISSIMVersion v, VSLVersion _vv){
         super(caseFile,seed,section,v);
+        
+        vslversion = _vv;
         init();
     }
     
@@ -63,7 +73,13 @@ public class VSLSim extends Simulation implements SimulationImpl{
          */
         for(int i=0;i<sectionHelper.getStationStates().size();i++){
             StationState cs = sectionHelper.getStationStates().get(i);
-            VSLStationState current = new VSLStationState(cs);
+            
+            VSLStationState current = null;
+            if(vslversion.isNewVersion()){
+                current = new VSLStationStateNew(cs);
+            }else if(vslversion.isOldVersion()){
+                current = new VSLStationStateOld(cs);
+            }
             
             if(cs.getUpstreamStationState() != null){
                 VSLStationState upstreamVSL = VSLStationStates.get(i-1);
@@ -76,13 +92,14 @@ public class VSLSim extends Simulation implements SimulationImpl{
         }
         initDebug();
         ml = new VSLMilePointList(VSLStationStates,section.getDMS());
+        vslresult = new VSLResults(section,ml,vslversion);
 
     }
     
     @Override
     public void RunningInitialize() {
         super.RunningInitialize();
-        vsl = new VSLAlgorithm(VSLStationStates,this.section);
+        vsl = new VSLAlgorithm(VSLStationStates,this.section,vslversion);
         initChart();
 //        Debug();
     }
@@ -100,8 +117,9 @@ public class VSLSim extends Simulation implements SimulationImpl{
         for(VSLStationState cs : VSLStationStates){
             cs.updateState();
         }
-        
         vsl.Process();
+        updateDMS();
+        updateResults();
     }
 
     @Override
@@ -217,6 +235,12 @@ public class VSLSim extends Simulation implements SimulationImpl{
             System.out.println(s.getStation().getStationFeetPoint(this.section.getName()));
         }
     }
+    
+    private void updateDMS() {
+        for(SimDMS sdms : this.simDMSs){
+            sdms.setVSAtoVISSIM(vc);
+        }
+    }
 
     void setChartPanel(JPanel PanelChart) {
         chartPanel = PanelChart;
@@ -226,8 +250,8 @@ public class VSLSim extends Simulation implements SimulationImpl{
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                chart.AddStationSpeedGraph(ml.getStationStates(), "StationSpeed");
-                chart.AddDMSSpeedGraph(ml.getDMSs(), "DMSSpeedLimit");
+                chart.AddVSLResultStationSpeedGraph(vslresult.getMapStations(), "StationSpeed");
+                chart.AddMapDMSSpeedGraph(vslresult.getMapDMSs(), "DMSSpeedLimit");
                 cpn.setSize(chartPanel.getSize());
                 chartPanel.getParent().validate();
             }
@@ -235,16 +259,39 @@ public class VSLSim extends Simulation implements SimulationImpl{
     }
 
     private void initChart() {
-        xmap = new HashMap<Integer,String>();
-        int cnt = 0;
-        for(VSLStationState s : VSLStationStates){
-            xmap.put(cnt, s.getID());
-            cnt++;
-        }
+//        xmap = new HashMap<Integer,String>();
+//        int cnt = 0;
+//        for(VSLResultStation s : vslresult.getStations().values()){
+//            xmap.put(cnt, s.getID());
+//            cnt++;
+//        }
         chartPanel.removeAll();
-        chart = new VSLChartXY(ml.getMilePointListLayout(),null);
+        chart = new VSLChartXY(vslresult.getMilePointListLayout(),null);
         cpn = new ChartPanel(chart.getChart());
         cpn.setSize(chartPanel.getSize());
         chartPanel.add(cpn);
+    }
+
+    private void updateResults() {
+        //add Station info
+        for (int i = 0; i < VSLStationStates.size(); i++) {
+            VSLStationState s = VSLStationStates.get(i);
+            VSLResultStation rs = vslresult.getStations().get(s.getMilePoint());
+            if(rs != null){
+                rs.addData(s);
+            }
+        }
+        
+        //add DMS info
+        for(DMSImpl d : section.getDMS()){
+            VSLResultDMS rd = vslresult.getDMSs().get(d.getMilePoint(section.getName()));
+            if(rd != null){
+                rd.addData(d);
+            }
+        }
+    }
+    
+    public VSLResults getVSLResults(){
+        return vslresult;
     }
 }

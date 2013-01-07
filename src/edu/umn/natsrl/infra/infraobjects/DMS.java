@@ -33,12 +33,13 @@ import org.w3c.dom.Element;
  */
 public class DMS extends InfraObject {
     public static int MAX_RANGE_TO_STATION = 800; //feet
-    SimDMS simDMS;
+    private SimDMS simDMS;
     
     private int easting = 0;
     private int northing = 0;
     private int gid = 1;
     private DMSImpl dmsImpl;
+    private boolean hasSimDMS = false;
 
     public DMS(){
         this.infraType = InfraType.DMS;
@@ -58,6 +59,11 @@ public class DMS extends InfraObject {
     public void setSimDMS(SimDMS simDMS) {
         this.simDMS = simDMS;
         this.id = simDMS.name;
+        hasSimDMS = true;
+    }
+    
+    public SimDMS getSimulationDMS(){
+        return simDMS;
     }
     
     void setDMSImpl(DMSImpl dmsimpl) {
@@ -68,6 +74,10 @@ public class DMS extends InfraObject {
     
     public DMSImpl getDMSImpl(){
         return dmsImpl;
+    }
+    
+    public boolean hasSimDMS(){
+        return this.hasSimDMS;
     }
     
     private void setLocation() {

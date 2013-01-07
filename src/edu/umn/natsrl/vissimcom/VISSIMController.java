@@ -407,7 +407,7 @@ public class VISSIMController {
             //     (assume : driver increase speed after passing DMS
             IDesiredSpeedDecision dsd = this.desiredSpeedDecisionList.get(dmsName);
             IDesiredSpeedDecision dsd_alt = this.desiredSpeedDecisionList.get(dmsName + "A");
-
+            System.out.println("set VSA : "+dmsName+" - "+vsa.speed);
             if (dsd == null) {
                 System.out.println("  - Warnning!! VISSIMController.setVSA() : can not find DMS(" + dmsName + ")");
                 return;
