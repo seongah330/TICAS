@@ -43,29 +43,47 @@ public class VSStationFinderNew extends VSStationFinder{
         return false;
     }
     
-    /** Calculate the advisory speed */
+    /** Calculate a speed advisory.
+    * @param spd Average speed at VSS.
+    * @param d Distance upstream of station.
+    * @return Speed advisory. */
     @Override
-    public Double calculateSpeedAdvisory() {
-        Double splimit = null;
-        if(vss != null && vss_mp != null) {
-            Double spd = vss.getAggregateRollingSpeed();
-//            System.out.print(", sppd : "+spd);
-            if(spd > 0){
-                splimit = calculateSpeedAdvisory(spd, vss_mp - ma);
+    protected Double calculateSpeedAdvisory(double spd, double d){
+        if(d > 0){
+            int acc = -vss.getControlThreshold();
+            double s2 = spd * spd + 2.0 * acc * d;
+//            System.out.print(", acc="+acc+", s2="+s2);
+            if(s2 < 0){
+                return null;
             }
+//            System.out.print(", adv="+(double)Math.sqrt(s2));
+            return (double)Math.sqrt(s2);
+        }else{
+            return spd;
         }
-        
-        if(splimit == null){
-            return null;
-        }
-        
-        Double sdSpeed = sd.getAggregateRollingSpeed();
-        if(!sd.getID().equals(vss.getID()) &&
-            sdSpeed < splimit){
-            splimit = null;
-        }
-        
-        return splimit;
     }
-    
+//    /** Calculate the advisory speed */
+//    @Override
+//    public Double calculateSpeedAdvisory() {
+//        Double splimit = null;
+//        if(vss != null && vss_mp != null) {
+//            Double spd = vss.getAggregateRollingSpeed();
+////            System.out.print(", sppd : "+spd);
+//            if(spd > 0){
+//                splimit = calculateSpeedAdvisory(spd, vss_mp - ma);
+//            }
+//        }
+//        
+//        if(splimit == null){
+//            return null;
+//        }
+//        
+//        Double sdSpeed = sd.getAggregateRollingSpeed();
+//        if(!sd.getID().equals(vss.getID()) &&
+//            sdSpeed < splimit){
+//            splimit = null;
+//        }
+//        
+//        return splimit;
+//    }
 }

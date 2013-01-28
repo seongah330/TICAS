@@ -21,6 +21,7 @@ import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLStationState;
 import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.DMSImpl;
+import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.ticas.Simulation.Emulation;
 import edu.umn.natsrl.ticas.Simulation.EmulationImpl;
 import edu.umn.natsrl.ticas.Simulation.StationState;
@@ -29,6 +30,7 @@ import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLStationStateNew;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLStationStateOld;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLVersion;
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 /**
  *
@@ -37,6 +39,8 @@ import java.util.ArrayList;
 public class VSLEmulation extends Emulation implements EmulationImpl{
     
     private ArrayList<VSLStationState> VSLStationStates = new ArrayList<VSLStationState>();
+    TreeMap<Double, VSLStationState> StationMap = new TreeMap<Double, VSLStationState>();
+    
     VSLMilePointList ml;
     VSLResults vslresult;
     
@@ -57,12 +61,7 @@ public class VSLEmulation extends Emulation implements EmulationImpl{
         for(int i=0;i<sectionHelper.getStationStates().size();i++){
             StationState cs = sectionHelper.getStationStates().get(i);
             
-            VSLStationState current = null;
-            if(vslversion.isNewVersion()){
-                current = new VSLStationStateNew(cs);
-            }else if(vslversion.isOldVersion()){
-                current = new VSLStationStateOld(cs);
-            }
+            VSLStationState current = vslversion.getVSLStationState(cs);
             
             if(cs.getUpstreamStationState() != null){
                 VSLStationState upstreamVSL = VSLStationStates.get(i-1);
@@ -72,8 +71,13 @@ public class VSLEmulation extends Emulation implements EmulationImpl{
             
             VSLStationStates.add(current);
             
+            //Add Map
+            StationMap.put(current.getMilePoint(), current);
+            StationMap.keySet().iterator();
+            
         }
         initDebug();
+        Debug();
         ml = new VSLMilePointList(VSLStationStates,section.getDMS());
         vslresult = new VSLResults(section,ml,vslversion);
     }
@@ -82,7 +86,7 @@ public class VSLEmulation extends Emulation implements EmulationImpl{
     public void RunningInitialize(){
         super.RunningInitialize();
         System.out.println("Run");
-        vsl = new VSLAlgorithm(VSLStationStates,section,vslversion);
+        vsl = new VSLAlgorithm(VSLStationStates,section,vslversion,StationMap);
     }
 
     @Override
@@ -147,6 +151,75 @@ public class VSLEmulation extends Emulation implements EmulationImpl{
             VSLResultDMS rd = vslresult.getDMSs().get(d.getMilePoint(section.getName()));
             if(rd != null){
                 rd.addData(d);
+            }
+        }
+    }
+    
+    private void Debug() {
+        if(VSLStationStates.isEmpty())
+            return;
+        
+        System.out.println("Node Lists");
+        StationState node = VSLStationStates.get(0);
+        while(true){
+            System.out.print(node.getID() + " - ");
+//            if(node.getUpstreamStationState() != null){
+//                System.out.print(node.getUpstreamStationState().getID()+"("+node.getStation().getDistanceToUpstreamStation(section.getName())+")");
+//            }else
+//                System.out.print("null");
+            
+            if(node.getDownStreamStationState() != null){
+                System.out.print(" - "+node.getDownStreamStationState().getID()+"("+node.getStation().getDistanceToDownstreamStation(section.getName())+")");
+                System.out.print(" - "+node.getdistanceToDownstreamStationState());
+            }else
+                System.out.print(" - null");
+            
+            
+            System.out.println();
+//            System.out.println(node.getID() + " - "+node.getDownStreamStationState().getID()+"("+node.getStation().getDistanceToDownstreamStation(this.section.getName())+")"
+//                    +" : "+node.getDownStreamStationState().getID()+"("+node.getdistanceToDownstreamStationState()+")");
+            if(node.getDownStreamStationState() != null){
+                node = node.getDownStreamStationState();
+            }else{
+                break;
+            }
+        }
+        
+        System.out.println("Tree Check");
+        for(VSLStationState vs : StationMap.values()){
+            System.out.println(vs.getID());
+        }
+        
+        System.out.println("VSL Check");
+        VSLStationState n = VSLStationStates.get(0);
+        while(true){
+            System.out.println(n.getID());
+            if(n.getDownstreamVSLStationState() != null){
+                n = n.getDownstreamVSLStationState();
+            }else{
+                break;
+            }
+        }
+        
+        System.out.println();
+        System.out.println("StationState List");
+        for(VSLStationState s : this.VSLStationStates){
+            System.out.println(s.getID() + " : "+s.getdistanceToDownstreamStationState());
+        }
+        System.out.println("RealStation List");
+        if(VSLStationStates.isEmpty())
+            return;
+        Station rstation = VSLStationStates.get(0).getStation();
+        while(true){
+            System.out.print(rstation.getStationId() + " : ");
+            Station down = rstation.getDownStation(this.section.getName());
+            if(down == null){
+                System.out.println("null");
+                break;
+            }
+            else{
+                System.out.println(down.getDistanceToUpstreamStation(this.section.getName()));
+                rstation = down;
             }
         }
     }

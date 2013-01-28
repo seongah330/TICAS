@@ -80,7 +80,7 @@ public class VSLResults implements Comparable{
         //init Station
         for(VSLStationState s : ml.getStationStates().values()){
             station.put(s.getMilePoint(), new VSLResultStation(s));
-            System.out.println("test Mile Point : "+s.getMilePoint());
+            System.out.println("test Mile Point : "+s.getID()+"-"+s.getMilePoint());
         }
         
         //init DMS

@@ -118,6 +118,7 @@ public class Detector extends InfraObject implements Comparable {
          * modify soobin Jeon 02/17/2012
          * not correct.. wavetronics speed calculate... perhaps...
          */
+        
         if (this.isWavetronics()) {
             double[] speed_data = ddr.read(TrafficType.SPEED_FOR_MICROWAVE);
             if (speed_data != null) {

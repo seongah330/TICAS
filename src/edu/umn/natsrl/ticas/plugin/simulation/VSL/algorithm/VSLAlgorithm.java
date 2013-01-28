@@ -23,6 +23,7 @@ import edu.umn.natsrl.ticas.Simulation.StationState;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLConfig;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  *
@@ -34,6 +35,7 @@ public class VSLAlgorithm{
     private int processCnt = 0;
     VSLVersion vslversion;
     ArrayList<VSLStationState> stationstates;
+    TreeMap<Double, VSLStationState> StationMap;
     Section section;
     
     /** Get the minimum speed to display for advisory */
@@ -51,23 +53,43 @@ public class VSLAlgorithm{
             return (int)Math.round(mph / 5) * 5;
     }
     
-    public VSLAlgorithm(ArrayList<VSLStationState> _stationstate, Section _section, VSLVersion vv){
+    public VSLAlgorithm(ArrayList<VSLStationState> _stationstate, Section _section, VSLVersion vv, TreeMap<Double, VSLStationState> _map){
         stationstates = _stationstate;
         section = _section;
         vslversion = vv;
+        StationMap = _map;
     }
     
     public void Process(){
         Debug();
-        FindBottleneck();
+        //Execute FindBottleneck according to VSL version
+        if(vslversion.getSID() > 2){
+            FindBottleneck();
+        }else{
+            FindBottleneck_old();
+        }
         setDMS();
         processCnt ++;
+    }
+    
+    private void FindBottleneck(){
+        final TreeMap<Double, VSLStationState> upstream = 
+                new TreeMap<Double, VSLStationState>();
+        for(VSLStationState vs : StationMap.values()){
+            if(vs.getAggregateRollingSpeed() > 0){
+                upstream.put(vs.getMilePoint(), vs);
+                vs.calculateBottleneck(vs.getMilePoint(), upstream);
+                vs.calculateControlThreshold(vs.getMilePoint(),upstream);
+            }else{
+                vs.clearBottleneck();
+            }
+        }
     }
 
     /**
      * Find Bottleneck
      */
-    private void FindBottleneck() {
+    private void FindBottleneck_old() {
         for(VSLStationState vs : stationstates){
             if(vs.getAggregateRollingSpeed() > 0){
                 vs.calculateBottleneck();
@@ -84,13 +106,9 @@ public class VSLAlgorithm{
     private void setDMS() {
         List<DMSImpl> cdms = section.getDMS();
         for(DMSImpl dms : cdms){
-            VSStationFinder vss_finder = null;
+            VSStationFinder vss_finder = vslversion.getVSStationFinder(dms.getMilePoint(section.getName()));
+            double aVSA = 0;
             
-            if(vslversion.isNewVersion()){
-                vss_finder = new VSStationFinderNew(dms.getMilePoint(section.getName()));
-            }else if(vslversion.isOldVersion()){
-                vss_finder = new VSStationFinderOld(dms.getMilePoint(section.getName()));
-            }
             findStation(vss_finder);
             
             //Check VSA state
@@ -100,6 +118,7 @@ public class VSLAlgorithm{
                 Integer lim = vss_finder.getSpeedLimit();
                 if(lim != null){
                     Double a = vss_finder.calculateSpeedAdvisory();
+                    aVSA = a;
                     if(a != null){
                         a = Math.max(a, getMinDisplay());
                         int sa = round5Mph(a);
@@ -113,6 +132,7 @@ public class VSLAlgorithm{
             }
             
             dms.setVSA(setSpeed);
+            dms.setActualVSA(aVSA);
         }
     }
     
@@ -135,7 +155,7 @@ public class VSLAlgorithm{
     private void Debug() {
         if(!isDebug)
             return;
-        
+        System.out.println();
         System.out.println("Step-"+this.processCnt+".... Processing..");
     }
 }

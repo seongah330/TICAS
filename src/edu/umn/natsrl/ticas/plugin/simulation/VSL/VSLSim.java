@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeMap;
 import javax.swing.JPanel;
 
 /**
@@ -48,6 +49,7 @@ public class VSLSim extends Simulation implements SimulationImpl{
     VSLAlgorithm vsl;
     JPanel chartPanel = null;
     private ArrayList<VSLStationState> VSLStationStates = new ArrayList<VSLStationState>();
+    TreeMap<Double, VSLStationState> StationMap = new TreeMap<Double, VSLStationState>();
     
     //for Graph X axis
     HashMap<Integer,String> xmap;
@@ -74,12 +76,7 @@ public class VSLSim extends Simulation implements SimulationImpl{
         for(int i=0;i<sectionHelper.getStationStates().size();i++){
             StationState cs = sectionHelper.getStationStates().get(i);
             
-            VSLStationState current = null;
-            if(vslversion.isNewVersion()){
-                current = new VSLStationStateNew(cs);
-            }else if(vslversion.isOldVersion()){
-                current = new VSLStationStateOld(cs);
-            }
+            VSLStationState current = vslversion.getVSLStationState(cs);
             
             if(cs.getUpstreamStationState() != null){
                 VSLStationState upstreamVSL = VSLStationStates.get(i-1);
@@ -88,6 +85,9 @@ public class VSLSim extends Simulation implements SimulationImpl{
             }
             
             VSLStationStates.add(current);
+            //Add Map
+            StationMap.put(current.getMilePoint(), current);
+            StationMap.keySet().iterator();
             
         }
         initDebug();
@@ -99,7 +99,7 @@ public class VSLSim extends Simulation implements SimulationImpl{
     @Override
     public void RunningInitialize() {
         super.RunningInitialize();
-        vsl = new VSLAlgorithm(VSLStationStates,this.section,vslversion);
+        vsl = new VSLAlgorithm(VSLStationStates,this.section,vslversion,StationMap);
         initChart();
 //        Debug();
     }
@@ -179,6 +179,11 @@ public class VSLSim extends Simulation implements SimulationImpl{
             }
         }
         
+        System.out.println("Tree Check");
+        for(VSLStationState vs : StationMap.values()){
+            System.out.println(vs.getID());
+        }
+        
         System.out.println("VSL Check");
         VSLStationState n = VSLStationStates.get(0);
         while(true){
@@ -214,26 +219,27 @@ public class VSLSim extends Simulation implements SimulationImpl{
     }
 
     private void initDebug() {
-        System.out.println();
-        System.out.println("DMS-Station Distance compare");
-        for(VSLStationState s : VSLStationStates){
-            String sname = section.getName();
-//            DMSImpl ddms = s.getStation().getDownstreamDMS(this.section.getName());
-//            int ddistance = s.getStation().getDistancetoDownstreamDMS(sname);
-//            DMSImpl udms = s.getStation().getUpstreamDMS(this.section.getName());
-//            int udistance = s.getStation().getDistancetoUpstreamDMS(sname);
-//            System.out.println("--"+s.getID());
-//            System.out.println("---U:"+udms.getId()+"("+udistance+")"+"-DownstreamStation : "+udms.getDownstreamStation(sname)+"("+udms.getDistancetoDownstreamStation(sname));
-//            System.out.println("---D:"+ddms.getId()+"("+ddistance+")"+"-UpstreamStation : "+ddms.getUpstreamStation(sname)+"("+ddms.getDistancetoUpstreamStation(sname));
-            System.out.print("--"+s.getID() + " : ");
-            if(s.getdistanceToUpstreamStationState() != -1){
-                System.out.print(s.getdistanceToUpstreamStationState());
-            }else{
-                System.out.print("0");
-            }
-            System.out.print(" - ");
-            System.out.println(s.getStation().getStationFeetPoint(this.section.getName()));
-        }
+//        System.out.println();
+//        System.out.println("DMS-Station Distance compare");
+//        for(VSLStationState s : VSLStationStates){
+//            String sname = section.getName();
+////            DMSImpl ddms = s.getStation().getDownstreamDMS(this.section.getName());
+////            int ddistance = s.getStation().getDistancetoDownstreamDMS(sname);
+////            DMSImpl udms = s.getStation().getUpstreamDMS(this.section.getName());
+////            int udistance = s.getStation().getDistancetoUpstreamDMS(sname);
+////            System.out.println("--"+s.getID());
+////            System.out.println("---U:"+udms.getId()+"("+udistance+")"+"-DownstreamStation : "+udms.getDownstreamStation(sname)+"("+udms.getDistancetoDownstreamStation(sname));
+////            System.out.println("---D:"+ddms.getId()+"("+ddistance+")"+"-UpstreamStation : "+ddms.getUpstreamStation(sname)+"("+ddms.getDistancetoUpstreamStation(sname));
+//            System.out.print("--"+s.getID() + " : ");
+//            if(s.getdistanceToUpstreamStationState() != -1){
+//                System.out.print(s.getdistanceToUpstreamStationState());
+//            }else{
+//                System.out.print("0");
+//            }
+//            System.out.print(" - ");
+//            System.out.println(s.getStation().getStationFeetPoint(this.section.getName()));
+//        }
+        
     }
     
     private void updateDMS() {
@@ -252,6 +258,7 @@ public class VSLSim extends Simulation implements SimulationImpl{
             public void run() {
                 chart.AddVSLResultStationSpeedGraph(vslresult.getMapStations(), "StationSpeed");
                 chart.AddMapDMSSpeedGraph(vslresult.getMapDMSs(), "DMSSpeedLimit");
+                chart.AddMapDMSActualSpeedGraph(vslresult.getMapDMSs(), "DMSActualSpeedLimit");
                 cpn.setSize(chartPanel.getSize());
                 chartPanel.getParent().validate();
             }

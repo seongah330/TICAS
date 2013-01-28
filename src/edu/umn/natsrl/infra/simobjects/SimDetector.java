@@ -324,14 +324,13 @@ public class SimDetector extends SimObject {
     }
 
     public void addData(double v, double q, double u, double k, double occupancy) {
-        
-         double scanData = calculateScan(k);
+        double scanData = calculateScan(k);
         double occData = scanData / InfraConstants.MAX_SCANS * 100;
         
         if(occupancy > 0) {
             occData = occupancy;
             scanData = occData * InfraConstants.MAX_SCANS / 100;
-            k = occupancy * 5280 / this.detector.getFieldLength() / 100;   
+            k = occupancy * 5280 / this.detector.getFieldLength() / 100;
             u = q / k;
         }
         this.volume.add(v);
@@ -339,7 +338,17 @@ public class SimDetector extends SimObject {
         this.speed.add(u);
         this.density.add(k);
         this.scan.add(scanData);
-        this.occupancy.add(occData);        
+        this.occupancy.add(occData);
+    }
+    
+    public void addRealDatatoSim(double v, double q, double u, double k, double occupancy) {
+        double scanData = calculateScan(k);
+        this.volume.add(v);
+        this.flow.add(q);
+        this.speed.add(u);
+        this.density.add(k);
+        this.scan.add(scanData);
+        this.occupancy.add(occupancy);
     }
     
     //for Debug

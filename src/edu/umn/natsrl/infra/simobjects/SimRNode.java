@@ -71,7 +71,8 @@ public class SimRNode extends SimObject {
         {
             if(checker != null && !checker.check(d.detector)) continue;
             double value = d.getData(type, period);
-
+            if(type.isSpeed()){
+            }
             if(d.detector.isAbandoned() || !d.detector.isStationOrCD()) continue;
             if(value <= 0) continue;
             sum += value;

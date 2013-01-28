@@ -17,13 +17,17 @@
  */
 package edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm;
 
+import edu.umn.natsrl.ticas.Simulation.StationState;
+
 /**
  *
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
 public enum VSLVersion {
-    NEWVERSION(1,"New Version"),
-    OLDVERSION(2,"Old Version");
+    NEWVERSIONFULLSEARCH_PRO(4,"New Version_Full_Search_Professor"),
+    NEWVERSIONFULLSEARCH(3,"New Version_Full_Search"),
+    NEWVERSION(2,"New Version_old"),
+    OLDVERSION(1,"Old Version");
 
     int vid;
     String vlabel;
@@ -43,8 +47,35 @@ public enum VSLVersion {
         return null;
     }
     
-    public boolean isNewVersion(){return this==NEWVERSION;}
-    public boolean isOldVersion(){return this==OLDVERSION;}
+    public VSLStationState getVSLStationState(StationState cs){
+        switch(vid){
+            case 1 :
+                return new VSLStationState(cs);
+            case 2 :
+                return new VSLStationStateNew(cs);
+            case 3 : 
+                return new VSLStationStateFullSearch(cs);
+            case 4 : 
+                return new VSLStationStateFullSearch_pro(cs);
+            default :
+                return new VSLStationState(cs);
+        }
+    }
+    
+    public VSStationFinder getVSStationFinder(Double mpoint){
+        switch(vid){
+            case 1 :
+                return new VSStationFinder(mpoint);
+            case 2 :
+                return new VSStationFinderNew(mpoint);
+            case 3 :
+                return new VSStationFinderNew(mpoint);
+            case 4 :
+                return new VSStationFinderNew(mpoint);
+            default :
+                return new VSStationFinder(mpoint);
+        }
+    }
     
     @Override
     public String toString(){

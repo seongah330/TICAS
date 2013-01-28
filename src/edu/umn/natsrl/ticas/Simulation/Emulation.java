@@ -154,7 +154,7 @@ public class Emulation extends Thread {
                 double q = d.getFlow()[sample];
                 double u = d.getSpeed()[sample];
                 double k = d.getDensity()[sample];
-                double occ = d.getOccupancy()[sample];
+                double occ = -1;
                 AddDetectorData(d.getDetectorId(),v,q,u,k,occ);
             }
         }
@@ -162,7 +162,7 @@ public class Emulation extends Thread {
     
     private void AddDetectorData(int detector_id, double v, double q, double u, double k, double occupancy) {
         SimDetector simDetector = simObjects.getDetector(""+detector_id);
-        simDetector.addData(v, q, u, k, occupancy);
+        simDetector.addRealDatatoSim(v, q, u, k, occupancy);
     }
     
     public void DisplayStationState() {

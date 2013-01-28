@@ -51,6 +51,7 @@ public class DMSImpl extends InfraObject implements Comparable{
     int northing = -1;
     private boolean isVSAStarted = false;
     private int speedlimit = 0;
+    private double ActualSpeedlimit = 0;
 
     public DMSImpl(){
         this.infraType = InfraType.DMSImpl;
@@ -263,6 +264,10 @@ public class DMSImpl extends InfraObject implements Comparable{
         }
     }
     
+    public void setActualVSA(double speed){
+        ActualSpeedlimit = speed;
+    }
+    
     private void setVSAtoDMSs(Integer setSpeed) {
         for(DMS cdms : this.getDMSList()){
             if(cdms.hasSimDMS()){
@@ -285,6 +290,10 @@ public class DMSImpl extends InfraObject implements Comparable{
 
     public Integer getSpeedLimit() {
         return speedlimit;
+    }
+    
+    public double getActualSpeedLimit(){
+        return ActualSpeedlimit;
     }
 
     /**

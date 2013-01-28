@@ -23,6 +23,7 @@ import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.SpeedAggregation;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.SpeedforLowK;
 import edu.umn.natsrl.util.PropertiesWrapper;
 import edu.umn.natsrl.util.ticasConfig;
+import java.io.File;
 
 /**
  *
@@ -35,11 +36,13 @@ public class VSLConfig extends ticasConfig{
      * Not Fixed Value
      */
     public static int VSL_VSS_DECISION_ACCEL = 1500;  //VSL VDA VSS Decision Acceleration (unit : mile / h^2)
-    public static int VSL_CONTROL_THRESHOLD = 1000; //VSL ZDA 
+    public static int VSL_CONTROL_THRESHOLD = -1000; //VSL ZDA 
     public static int VSL_BS_THRESHOLD = 55;
     public static int VSL_TURNOFF_ACCEL = 750; //VSL TOA 
-    public static double VSL_MIN_STATION_MILE = 0.2f;
+    public static double VSL_MIN_STATION_MILE = 0.2d;
     public static int VSA_START_INTERVALS = 3;
+    public static double VSL_RANGE_THRESHOLD = 35;
+    public static int VSL_MOVING_ACCEL = 600;
     
     public static SpeedAggregation SPEED_SPEED_AGGREGATION = SpeedAggregation.LAB;
     public static DensityAggregation SPEED_DENSITY_AGGREGATION = DensityAggregation.MovingKAvg;
@@ -56,6 +59,8 @@ public class VSLConfig extends ticasConfig{
     
     public static int Interval = 30;
     
+    public static VSAControlMode vsaControlMODE= VSAControlMode.VAR_MODE;
+    
     public static void save(){
         prop.put("VSL_VDA", VSL_VSS_DECISION_ACCEL);
         prop.put("ZDA", VSL_CONTROL_THRESHOLD);
@@ -66,6 +71,8 @@ public class VSLConfig extends ticasConfig{
         prop.put("DA", SPEED_DENSITY_AGGREGATION.getSRC());
         prop.put("SLK", SPEED_SPEED_FOR_LOW_K.getSRC());
         prop.put("SMS", SPEED_MAX_SPEED.getSRC());
+        prop.put("MOVE_DEC", VSL_MOVING_ACCEL);
+        prop.put("MOVE_SPD", VSL_RANGE_THRESHOLD);
         saveConfig(configFile);
     }
     public static void load(){
@@ -77,6 +84,8 @@ public class VSLConfig extends ticasConfig{
             VSL_BS_THRESHOLD = p.getInteger("VBT");
             VSL_TURNOFF_ACCEL = p.getInteger("TOA");
             VSL_MIN_STATION_MILE = p.getDouble("VMD");
+            VSL_MOVING_ACCEL = p.getInteger("MOVE_DEC");
+            VSL_RANGE_THRESHOLD = p.getDouble("MOVE_SPD");
             SPEED_SPEED_AGGREGATION = SpeedAggregation.getTypebyID(p.getInteger("SA"));
             SPEED_DENSITY_AGGREGATION = DensityAggregation.getTypebyID(p.getInteger("DA"));
             SPEED_SPEED_FOR_LOW_K = SpeedforLowK.getTypebyID(p.getInteger("SLK"));

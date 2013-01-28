@@ -433,18 +433,23 @@ public class StationState extends State {
        int distance = TMO.getDistanceInFeet(this.getStation(), upstream.getStation());
        return calculateAcceleration(upstream,distance);
    }
+   
    public Double calculateAcceleration(StationState upstream, int distance){
+       double d = DistanceUtil.getFeetToMile(distance);
+       return calculateAcceleration(upstream, d);
+   }
+   
+   public Double calculateAcceleration(StationState upstream, Double d){
        if(upstream == null){
            return null;
        }
        double u = this.getAggregateRollingSpeed();
        double usu = upstream.getAggregateRollingSpeed();
-       return calculateAcceleration(u,usu,distance);
+       return calculateAcceleration(u,usu,d);
    }
 
-   private Double calculateAcceleration(double u, double usu, int distance) {
-       assert distance > 0;
-       double d = DistanceUtil.getFeetToMile(distance);
+   private Double calculateAcceleration(double u, double usu, Double d) {
+       assert d > 0;
        if(u > 0 && usu > 0){
            return (u * u - usu * usu) / (2 * d);
        }else

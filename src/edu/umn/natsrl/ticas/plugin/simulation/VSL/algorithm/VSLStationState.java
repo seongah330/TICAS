@@ -23,6 +23,7 @@ import edu.umn.natsrl.infra.simobjects.SimObjects;
 import edu.umn.natsrl.ticas.Simulation.StationState;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLConfig;
 import edu.umn.natsrl.util.DistanceUtil;
+import java.util.NavigableMap;
 
 /**
  *
@@ -43,6 +44,8 @@ public class VSLStationState extends StationState{
     protected VSLStationState upstreamVSLState;
     protected VSLStationState downstreamVSLState;
     
+    public int VSLCONTROLTHRESHOLD = 0;
+    
     public VSLStationState(Station _station, Section _section, SimObjects simObjects){
         super(_station, _section, simObjects);
     }
@@ -53,6 +56,14 @@ public class VSLStationState extends StationState{
         this.setDownStreamStationState(s.getDownStreamStationState());
     }
 
+    public void calculateBottleneck(double m, NavigableMap<Double, VSLStationState> upstream){
+        
+    }
+    
+    public void calculateControlThreshold(double m, NavigableMap<Double, VSLStationState> upstream){
+        
+    }
+    
     /**
      * Calculate whether the station is a bottleneck
      */
@@ -87,7 +98,9 @@ public class VSLStationState extends StationState{
         }
     }
     
-
+    protected boolean isTooClose(double d){
+        return d < VSLConfig.VSL_MIN_STATION_MILE;
+    }
     protected boolean isTooClose(int distance) {
         return DistanceUtil.getFeetToMile(distance) < VSLConfig.VSL_MIN_STATION_MILE;
     }
@@ -262,6 +275,7 @@ public class VSLStationState extends StationState{
         double sp = this.getAggregateRollingSpeed();
         if(sp > 0 && sp < lim){
             int acc = -getControlThreshold();
+            System.out.println(acc);
             return (lim * lim - sp * sp) / (2 * acc);
         }else{
             return 0;
@@ -270,7 +284,7 @@ public class VSLStationState extends StationState{
     
     /** Get the control deceleration threshold */
     protected int getControlThreshold() {
-            return -1 * VSLConfig.VSL_CONTROL_THRESHOLD;
+            return VSLConfig.VSL_CONTROL_THRESHOLD;
     }
     
     public int getSpeedLimit(){
@@ -287,5 +301,9 @@ public class VSLStationState extends StationState{
     
     public Double getAcceleration(){
         return acceleration;
+    }
+    
+    public int getVSSControlThreshold(){
+        return VSLCONTROLTHRESHOLD;
     }
 }

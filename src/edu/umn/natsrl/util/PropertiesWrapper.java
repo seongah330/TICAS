@@ -217,6 +217,16 @@ public class PropertiesWrapper implements Serializable {
         return arr;
     }
     
+    public int[] getIntegerArray(String key) {
+        String str = prop.getProperty(key);
+        String[] csv = str.split(DELIM);
+        int[] arr = new int[csv.length];
+        for (int i = 0; i < csv.length; i++) {
+            arr[i] = Integer.parseInt(csv[i]);
+        }
+        return arr;
+    }
+    
     @Override
     public PropertiesWrapper clone() {
         ObjectOutputStream output = null;

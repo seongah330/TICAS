@@ -79,6 +79,11 @@ public class VSLResultInfra {
         return var == true ? 0 : 1;
     }
     
+    protected void addAllDatas(int[] par, ArrayList<Integer> data){
+        for(int p : par){
+            data.add(p);
+        }
+    }
     protected void addAllDatas(double[] par, ArrayList<Double> data){
         for(double p : par){
             data.add(p);

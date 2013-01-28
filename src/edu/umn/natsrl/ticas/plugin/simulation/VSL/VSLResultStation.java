@@ -35,6 +35,7 @@ class VSLResultStation extends VSLResultInfra{
     private ArrayList<Double> bottleneckCount = new ArrayList<Double>();
     private ArrayList<Boolean> cVSS = new ArrayList<Boolean>();
     private ArrayList<Boolean> pVSS = new ArrayList<Boolean>();
+    private ArrayList<Integer> ControlThreshold = new ArrayList<Integer>();
     
     
     VSLResultStation(VSLStationState s) {
@@ -53,16 +54,16 @@ class VSLResultStation extends VSLResultInfra{
             acc = s.getAcceleration();
         }
         addData(s.getFlow(),s.getAverageFlow(0, 1),s.getAverageDensity(0, 1),s.getAverageSpeed(0, 1),s.getAggregateRollingSpeed(),s.getTotalVolume(0, 1),acc
-                ,s.n_bottleneck,s.bottleneck,s.p_bottleneck);
+                ,s.n_bottleneck,s.bottleneck,s.p_bottleneck,s.getVSSControlThreshold());
     }
     
-    public void addData(double _q, double _aq, double _k, double _u, double _ru, double _v, double _acc, double bcnt, int cvss, int pvss){
+    public void addData(double _q, double _aq, double _k, double _u, double _ru, double _v, double _acc, double bcnt, int cvss, int pvss, int a){
         boolean _cvss = convertDoubletoBoolean(cvss);
         boolean _pvss = convertDoubletoBoolean(pvss);
-        addData(_q,_aq,_k,_u,_ru,_v,_acc,bcnt,_cvss,_pvss);
+        addData(_q,_aq,_k,_u,_ru,_v,_acc,bcnt,_cvss,_pvss,a);
     }
     
-    public void addData(double _q, double _aq, double _k, double _u, double _ru, double _v, double _acc, double bcnt, boolean cvss, boolean pvss){
+    public void addData(double _q, double _aq, double _k, double _u, double _ru, double _v, double _acc, double bcnt, boolean cvss, boolean pvss,int a){
         q.add(_q);
         aq.add(_aq);
         k.add(_k);
@@ -73,9 +74,10 @@ class VSLResultStation extends VSLResultInfra{
         bottleneckCount.add(bcnt);
         cVSS.add(cvss);
         pVSS.add(pvss);
+        ControlThreshold.add(a);
     }
     
-    public void addAllDatas(double[] _q,double[] _qa,double[] _k,double[] _u,double[] _ru,double[] _acc,double[] _v,double[] _bcnt,double[] _cvss,double[] _pvss){
+    public void addAllDatas(double[] _q,double[] _qa,double[] _k,double[] _u,double[] _ru,double[] _acc,double[] _v,double[] _bcnt,double[] _cvss,double[] _pvss,int[] a){
         addAllDatas(_q, q);
         addAllDatas(_qa, aq);
         addAllDatas(_k, k);
@@ -86,6 +88,8 @@ class VSLResultStation extends VSLResultInfra{
         addAllDatas(_bcnt, bottleneckCount);
         addAllDatas(convertDoubletoBooleanArray(_cvss), cVSS);
         addAllDatas(convertDoubletoBooleanArray(_pvss), pVSS);
+        addAllDatas(convertDoubletoBooleanArray(_pvss), pVSS);
+        addAllDatas(a,ControlThreshold);
     }
     
     
@@ -101,6 +105,7 @@ class VSLResultStation extends VSLResultInfra{
         bottleneckCount.clear();
         cVSS.clear();
         pVSS.clear();
+        ControlThreshold.clear();
     }
 
     public double[] getFlows() {
@@ -138,6 +143,9 @@ class VSLResultStation extends VSLResultInfra{
     }
     public double[] getPreviousVSStoDouble(){
         return convertBooleantoDoubleArray(getPreviousVSS());
+    }
+    public int[] getControlThreshold(){
+        return getArraytoInt(this.ControlThreshold);
     }
     
     @Override

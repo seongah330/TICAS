@@ -24,10 +24,10 @@ import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLConfig;
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
 public class VSStationFinder {
-    static private int getControlThreshold(){
-        return -1 * VSLConfig.VSL_CONTROL_THRESHOLD;
-    }
     
+    static private int getControlThreshold(){
+        return VSLConfig.VSL_CONTROL_THRESHOLD;
+    }
     /**
      * Mile point to search for VSS
      */

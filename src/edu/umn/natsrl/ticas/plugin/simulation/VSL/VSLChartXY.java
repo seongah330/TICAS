@@ -84,7 +84,7 @@ public class VSLChartXY extends TICASChartXY{
     
     private void AddStationGraph(double[] xdata, double[] speeddata, double[] vsldata, String name){
         super.addXYGraph(xdata, speeddata, name);
-        super.addXYGraph(xdata, speeddata, name+"DISC",new TracePainterDisc(),Color.blue);
+        super.addXYGraph(xdata, speeddata, name+"DISC",new TracePainterDisc(),Color.red);
         if(vsldata != null){
             super.addXYGraph(xdata, vsldata, "VSS",new TracePainterVerticalBar(3,chart),Color.red);
         }
@@ -125,6 +125,32 @@ public class VSLChartXY extends TICASChartXY{
     }
     
     private void AddDMSGraph(double[] xdata, double[] ydata, String name){
-        super.addXYGraph(xdata, ydata, name, new TracePainterDisc(), Color.black);
+        super.addXYGraph(xdata, ydata, name, new TracePainterDisc(10), Color.BLACK);
+    }
+    
+    public void AddMapDMSActualSpeedGraph(TreeMap<Integer,VSLResultDMS> dmss, String name){
+        AddMapDMSActualSpeedGraph(dmss,name,null);
+    }
+    public void AddMapDMSActualSpeedGraph(TreeMap<Integer,VSLResultDMS> dmss, String name, Integer idx){
+        double[] xdata = new double[dmss.size()];
+        double[] ydata = new double[dmss.size()];
+        int cnt = 0;
+        for(Integer key : dmss.keySet()){
+            xdata[cnt] = key;
+            
+            int sindx = 0;
+            if(idx == null){
+                sindx = dmss.get(key).getActualSpeedLimit().length - 1;
+            }else{
+                sindx = idx;
+            }
+            ydata[cnt] = dmss.get(key).getActualSpeedLimit()[sindx];
+            cnt++;
+        }
+        AddDMSActualGraph(xdata,ydata,name);
+    }
+    
+    private void AddDMSActualGraph(double[] xdata, double[] ydata, String name){
+        super.addXYGraph(xdata, ydata, name, new TracePainterDisc(4), Color.BLUE);
     }
 }
