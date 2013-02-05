@@ -86,7 +86,7 @@ public class VSLResults implements Comparable{
         //init DMS
         for(DMSImpl d : ml.getDMSs().values()){
             DMSs.put(d.getMilePoint(section.getName()),new VSLResultDMS(d.getMilePoint(section.getName()),d.getId()));
-            System.out.println("test Mile Point(DMS) : "+d.getMilePoint(section.getName()));
+            System.out.println("test Mile Point(DMS) : "+d.getId()+d.getMilePoint(section.getName()));
         }
         
         updateMap();

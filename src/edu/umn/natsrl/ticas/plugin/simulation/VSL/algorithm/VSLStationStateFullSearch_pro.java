@@ -42,7 +42,7 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
     }
     
 //    public int VSLCONTROLTHRESHOLD = 0;
-    public double VSLCONTROLDISTANCE = 0;
+//    public double VSLCONTROLDISTANCE = 0;
 
     /** Acceleration Sample Count*/
     protected int s_count = 3;
@@ -66,6 +66,7 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
     public void calculateBottleneck(double m,
         NavigableMap<Double, VSLStationState> upstream)
     {
+        System.out.println("Calculate VSL - NEW");
         Double mp = upstream.lowerKey(m);
         while(mp != null && isTooClose(m - mp)){
             mp = upstream.lowerKey(mp);
@@ -107,7 +108,7 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
         int accsize = AccelerationHistory.length-1;
         for(int i=0; i<=accsize;i++){
             Double acc = AccelerationHistory[accsize-i];
-            if(acc == null || acc >= 0 ||  acc > bacc)
+            if(acc == null || acc >= 0 ||  acc >= bacc)
                 return false;
             else
                 bacc = acc;
@@ -125,14 +126,15 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
         boolean isUpdate = false;
         Map.Entry<Double, VSLStationState> entry = upstream.higherEntry(mu);
         VSLStationState s = entry.getValue();
+//        System.out.println("adJustVSS");
         while(entry != null){
             VSLStationState sp = entry.getValue();
             Double ap = sp.acceleration;
-            
+//            System.out.print(sp.getID() + " : ");
             if(ap != null && ap >= 0)
                 isUpdate = true;
             
-            if(ap != null
+            if(ap != null && !isAboveBottleneckSpeed()
                     && ap < this.getVSLMovingAcc() && !isUpdate){
                 s.bottleneck = false;
                 s.n_bottleneck = 0;
@@ -146,6 +148,7 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
                 sp.bottleneck = false;
                 sp.n_bottleneck = 0;
             }
+//            System.out.println(sp.bottleneck);
             entry = upstream.higherEntry(entry.getKey());
         }
         
@@ -164,9 +167,11 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
         Double mp = m;
         VSLStationState sp = null;
         boolean isVSS = false;
+//        System.out.println("Find VSS");
         while(mp != null){
             sp = upstream.get(mp);
             Double ap = sp.acceleration;
+//            System.out.println(sp.getID());
             if(ap != null && ap >= 0 && sp.getAggregateRollingSpeed() > getVSLRangeThreshold())
                 break;
             else{
@@ -175,23 +180,29 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
                 mp = upstream.lowerKey(mp);
             }
         }
-        
-        if(isVSS)
+//        System.out.println("isVSS : "+isVSS + ", MP : "+mp);
+        mp = mp != null ? mp : upstream.firstKey();
+        if(isVSS){
             return mp;
+        }
         else
             return null;
     }
     
     @Override
     public void calculateControlThreshold(double m, NavigableMap<Double, VSLStationState> upstream){
-        if(VSLConfig.vsaControlMODE.isVARMODE())
-            calculateControlThreshold_VARMODE(m,upstream);
-        else if(VSLConfig.vsaControlMODE.isTTMODE())
+        if(VSLConfig.vsaControlMODE.isTTMODE())
             calculateControlThreshold_TTMODE(m,upstream);
+        else if(VSLConfig.vsaControlMODE.isTTNOLIMIT())
+            calculateControlThreshold__TTMODE_NOLIMIT(m,upstream);
         
     }
     
-    private void calculateControlThreshold_TTMODE(double m, NavigableMap<Double, VSLStationState> upstream) {
+    private void calculateControlThreshold__TTMODE_NOLIMIT(double m, NavigableMap<Double, VSLStationState> upstream) {
+        System.out.println("Calculate THREsHOLD - NEW");
+        double cm = m;
+        double cu = getAggregateRollingSpeed(); //
+        boolean cbottleneck = this.bottleneck;
         double mp = m; // milepoint : most end station
         double uMax = getAggregateRollingSpeed(); //Max u
         double sum = uMax; //speed sum between Station of Max u and Last Station
@@ -200,17 +211,97 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
         Map.Entry<Double, VSLStationState> entry = upstream.lowerEntry(mp);
         while(entry != null){ //calculate Travel Time Boundary
             mp = entry.getKey();
-            System.out.print("m - mp : "+(m-mp)+" - ");
+//            System.out.print("m - mp : "+(cm-mp)+" - ");
+            if(isCalculateDistance(cm-mp,2.0d)){
+                VSLStationState s = entry.getValue();
+//                System.out.print("Station "+s.getID()+"..proc");
+                double u = s.getAggregateRollingSpeed();
+                
+                if(u >= uMax){
+                    uMax = u;
+                    sum = uMax;
+                    scnt = 1;
+                }
+                else if(uMax != 0){// && (uMax - u) <= 10){
+                    if(scnt == 1){
+                        sum += u;
+                        scnt ++;
+                    }
+                }else{
+                    mp = upstream.higherKey(mp);
+                    break;
+                }
+//                System.out.println("cu = "+cu+", su = "+s.getAggregateRollingSpeed()+", su-cu="+(u-cu)+"-"+isContinueSpeed(u-cu));
+//                if(s.bottleneck && cbottleneck && u > cu && isContinueSpeed(u-cu)){
+//                    uMax = u;
+//                    sum = uMax;
+//                    scnt = 1;
+//                    cm = mp;
+//                    cu = u;
+//                    cbottleneck = s.bottleneck;
+//                    s.VSLCONTROLDISTANCE = 0;
+//                }
+                if(s.bottleneck){
+                    break;
+                }
+                
+            }else{
+//                System.out.println();
+                break;
+            }
+            
+            entry = upstream.lowerEntry(entry.getKey());
+        }
+        
+        double u1 = sum / scnt;
+        double ugap = u1 - getAggregateRollingSpeed();
+        double tt = calculateTravelTime(mp,upstream);
+        
+//        System.out.println("End Station : "+upstream.get(mp).getID());
+//        System.out.println("Sum / cnt = x : "+sum+" / "+scnt+" = "+(sum/scnt));
+        
+        double distance = m - mp;
+//        System.out.print("TTLMODE : "+this.getID());
+        if(ugap >= 0 && distance > 0){
+            VSLCONTROLTHRESHOLD = -(int)(ugap / tt);
+            VSLCONTROLTHRESHOLD = Math.max(VSLCONTROLTHRESHOLD, VSLConfig.VSL_CONTROL_THRESHOLD);
+            VSLCONTROLDISTANCE = distance;
+//            System.out.println(" - "+VSLCONTROLTHRESHOLD+", dis="+VSLCONTROLDISTANCE);
+        }
+        else{
+            VSLCONTROLTHRESHOLD = 0;
+            VSLCONTROLDISTANCE = 0;
+//            System.out.println(" - "+VSLCONTROLTHRESHOLD);
+        }
+    }
+    
+    /**
+     * Calculate A with Travel Time  
+     * a = V1 - Vvss / TravelTime
+     * @param m
+     * @param upstream 
+     */
+    private void calculateControlThreshold_TTMODE(double m, NavigableMap<Double, VSLStationState> upstream) {
+        double cu = getAggregateRollingSpeed(); //Current Speed, if it's VSS
+        double mp = m; // milepoint : most end station
+        double uMax = getAggregateRollingSpeed(); //Max u
+        double sum = uMax; //speed sum between Station of Max u and Last Station
+        int scnt = 1;
+        
+        Map.Entry<Double, VSLStationState> entry = upstream.lowerEntry(mp);
+        while(entry != null){ //calculate Travel Time Boundary
+            mp = entry.getKey();
+//            System.out.print("m - mp : "+(m-mp)+" - ");
             if(isCalculateDistance(m-mp,2.0d)){
                 VSLStationState s = entry.getValue();
-                System.out.println("Station "+s.getID()+"..proc");
+//                System.out.print("Station "+s.getID()+"..proc");
                 double u = s.getAggregateRollingSpeed();
                 if(u >= uMax){
                     uMax = u;
                     sum = uMax;
                     scnt = 1;
                 }
-                else if(uMax != 0 && (uMax - u) <= 10){
+                else if(uMax != 0){// && (uMax - u) <= 10){
                     sum += u;
                     scnt ++;
                 }else{
@@ -218,10 +309,12 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
                     break;
                 }
                 
-                if(s.bottleneck)
+//                System.out.println("cu = "+cu+", su = "+s.getAggregateRollingSpeed()+", ca = "+this.acceleration+", sa="+s.acceleration);
+                if((s.bottleneck && s.getAggregateRollingSpeed() < cu) ||
+                        (s.bottleneck && (s.getAggregateRollingSpeed() >= cu && s.acceleration < this.acceleration)))
                     break;
             }else{
-                System.out.println();
+//                System.out.println();
                 break;
             }
             
@@ -232,82 +325,21 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
         double ugap = u1 - getAggregateRollingSpeed();
         double tt = calculateTravelTime(mp,upstream);
         
-        System.out.println("End Station : "+upstream.get(mp).getID());
-        System.out.println("Sum / cnt = x : "+sum+" / "+scnt+" = "+(sum/scnt));
+//        System.out.println("End Station : "+upstream.get(mp).getID());
+//        System.out.println("Sum / cnt = x : "+sum+" / "+scnt+" = "+(sum/scnt));
         
         double distance = m - mp;
-        System.out.print("TTMODE : "+this.getID());
+//        System.out.print("TTMODE : "+this.getID());
         if(ugap >= 0 && distance > 0){
             VSLCONTROLTHRESHOLD = -(int)(ugap / tt);
             VSLCONTROLTHRESHOLD = Math.max(VSLCONTROLTHRESHOLD, VSLConfig.VSL_CONTROL_THRESHOLD);
             VSLCONTROLDISTANCE = distance;
-            System.out.println(" - "+VSLCONTROLTHRESHOLD);
+//            System.out.println(" - "+VSLCONTROLTHRESHOLD);
         }
         else{
             VSLCONTROLTHRESHOLD = 0;
             VSLCONTROLDISTANCE = 0;
-            System.out.println(" - "+VSLCONTROLTHRESHOLD);
-        }
-    }
-    
-    private void calculateControlThreshold_TTMODE_OLD(double m, NavigableMap<Double, VSLStationState> upstream) {
-        if(!bottleneck) //not VSS return;
-            return;
-        
-        double mp = m; // milepoint : most end station
-        double uMax = getAggregateRollingSpeed(); //Max u
-        double sum = uMax; //speed sum between Station of Max u and Last Station
-        int scnt = 1;
-        
-        Map.Entry<Double, VSLStationState> entry = upstream.lowerEntry(mp);
-        while(entry != null){ //calculate Travel Time Boundary
-            mp = entry.getKey();
-            System.out.print("m - mp : "+(m-mp)+" - ");
-            if(isCalculateDistance(m-mp,2.0d)){
-                VSLStationState s = entry.getValue();
-                System.out.println("Station "+s.getID()+"..proc");
-                double u = s.getAggregateRollingSpeed();
-                if(u >= uMax){
-                    uMax = u;
-                    sum = uMax;
-                    scnt = 1;
-                }
-                else if(uMax != 0){
-                    sum += u;
-                    scnt ++;
-                }
-                
-                if(s.bottleneck)
-                    break;
-            }else{
-                System.out.println();
-                break;
-            }
-            
-            entry = upstream.lowerEntry(entry.getKey());
-        }
-        
-        double u1 = sum / scnt;
-        double ugap = u1 - getAggregateRollingSpeed();
-        double tt = calculateTravelTime(mp,upstream);
-        
-        if(entry == null){
-            entry = upstream.firstEntry();
-        }
-        System.out.println("End Station : "+entry.getValue().getID());
-        System.out.println("Sum / cnt = x : "+sum+" / "+scnt+" = "+(sum/scnt));
-        
-        double distance = m - mp;
-        System.out.print("TTMODE : "+this.getID());
-        if(ugap >= 0 && distance > 0){
-            VSLCONTROLTHRESHOLD = -(int)(ugap / tt);
-            VSLCONTROLDISTANCE = distance;
-            System.out.println(" - "+VSLCONTROLTHRESHOLD);
-        }
-        else{
-            VSLCONTROLTHRESHOLD = 0;
-            VSLCONTROLDISTANCE = 0;
-            System.out.println(" - "+VSLCONTROLTHRESHOLD);
+//            System.out.println(" - "+VSLCONTROLTHRESHOLD);
         }
     }
     
@@ -323,7 +355,7 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
             double distance = (cm - um) / 3;
             //calculate Travel Time
             tt += (distance / cu) + (distance / ((cu+uu) / 2)) + (distance / uu);
-            
+//            System.out.println(entry.getValue().getID()+" - "+tt);
             if(um == em)
                 break;
             
@@ -331,45 +363,6 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
         }
         
         return tt;
-    }
-    
-    public void calculateControlThreshold_VARMODE(double m, NavigableMap<Double, VSLStationState> upstream){
-        VSLStationState s = this;
-        Double maxPoint = null;
-        Map.Entry<Double, VSLStationState> entry = upstream.lowerEntry(m);
-        while(entry != null){
-            Double mp = entry.getKey();
-            if(isCalculateDistance(m-mp)){
-                VSLStationState cs = entry.getValue();
-                Double sp = cs.getAggregateRollingSpeed();
-                Double ss = s.getAggregateRollingSpeed();
-
-                if(sp >= ss){
-                    s = cs;
-                    maxPoint = mp;
-                }
-            }else
-                break;
-            
-            entry = upstream.lowerEntry(entry.getKey());
-        }
-        
-        if(maxPoint != null){
-            Double cu = getAggregateRollingSpeed();
-            Double maxu = s.getAggregateRollingSpeed();
-            double distance = m - maxPoint;
-            if(maxu > cu){
-                VSLCONTROLTHRESHOLD = -(int)(((maxu * maxu) - (cu * cu)) / (2d * distance));
-                VSLCONTROLTHRESHOLD = (int)(VSLCONTROLTHRESHOLD * 0.5);
-                VSLCONTROLDISTANCE = distance;
-            }else{
-                VSLCONTROLTHRESHOLD = VSLConfig.VSL_CONTROL_THRESHOLD;
-                VSLCONTROLDISTANCE = 0;
-            }
-        }else{
-            VSLCONTROLTHRESHOLD = VSLConfig.VSL_CONTROL_THRESHOLD;
-            VSLCONTROLDISTANCE = 0;
-        }
     }
     
     private boolean isCalculateDistance(double d){
@@ -385,7 +378,7 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
     /** Get the control deceleration threshold */
     @Override
     protected int getControlThreshold() {
-        if(VSLConfig.vsaControlMODE.isVARMODE() || VSLConfig.vsaControlMODE.isTTMODE())
+        if(VSLConfig.vsaControlMODE.isTTMODE() || VSLConfig.vsaControlMODE.isTTNOLIMIT())
             return VSLCONTROLTHRESHOLD;
         else
             return VSLConfig.VSL_CONTROL_THRESHOLD;

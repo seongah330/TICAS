@@ -45,6 +45,7 @@ public class VSLStationState extends StationState{
     protected VSLStationState downstreamVSLState;
     
     public int VSLCONTROLTHRESHOLD = 0;
+    public double VSLCONTROLDISTANCE = 0;
     
     public VSLStationState(Station _station, Section _section, SimObjects simObjects){
         super(_station, _section, simObjects);
@@ -145,6 +146,7 @@ public class VSLStationState extends StationState{
 
     /** Test if station speed is above the bottleneck id speed */
     protected boolean isAboveBottleneckSpeed() {
+//        System.out.println("AGGSpd : "+this.getAggregateRollingSpeed()+"VSL_BS_THRESHOLD : "+VSLConfig.VSL_BS_THRESHOLD);
         return this.getAggregateRollingSpeed() > VSLConfig.VSL_BS_THRESHOLD;
     }
 

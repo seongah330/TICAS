@@ -108,13 +108,15 @@ public class VSLAlgorithm{
         for(DMSImpl dms : cdms){
             VSStationFinder vss_finder = vslversion.getVSStationFinder(dms.getMilePoint(section.getName()));
             double aVSA = 0;
+//            System.out.println("Find Station for DMS"+"-"+dms.getId());
             
             findStation(vss_finder);
-            
+//            System.out.print(dms.getId() + " : ");
             //Check VSA state
             //set VSS State
             Integer setSpeed = null;
             if(vss_finder.foundVSS()){
+//                System.out.println(" - Found!!");
                 Integer lim = vss_finder.getSpeedLimit();
                 if(lim != null){
                     Double a = vss_finder.calculateSpeedAdvisory();

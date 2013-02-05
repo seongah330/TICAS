@@ -22,8 +22,8 @@ package edu.umn.natsrl.ticas.plugin.simulation.VSL;
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
 public enum VSAControlMode {
+    TT_NOLIMIT("Travel Time_Dts_NoLimit"),
     TT_MODE("Calc with Travel Time"),
-    VAR_MODE("VAR MODE"),
     STATIC_MODE("STATIC MODE");
     
     String str = null;
@@ -32,9 +32,9 @@ public enum VSAControlMode {
         str = s;
     }
     
-    public boolean isVARMODE(){return this==VAR_MODE;}
     public boolean isSTATICMODE(){return this==STATIC_MODE;}
     public boolean isTTMODE(){return this==TT_MODE;}
+    public boolean isTTNOLIMIT(){return this==TT_NOLIMIT;}
     
     @Override
     public String toString(){

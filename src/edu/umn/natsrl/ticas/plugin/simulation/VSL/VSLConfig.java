@@ -43,6 +43,7 @@ public class VSLConfig extends ticasConfig{
     public static int VSA_START_INTERVALS = 3;
     public static double VSL_RANGE_THRESHOLD = 35;
     public static int VSL_MOVING_ACCEL = 600;
+    public static double VSL_VSS_CONTINUE_SPEED = 5.0d;
     
     public static SpeedAggregation SPEED_SPEED_AGGREGATION = SpeedAggregation.LAB;
     public static DensityAggregation SPEED_DENSITY_AGGREGATION = DensityAggregation.MovingKAvg;
@@ -59,7 +60,7 @@ public class VSLConfig extends ticasConfig{
     
     public static int Interval = 30;
     
-    public static VSAControlMode vsaControlMODE= VSAControlMode.VAR_MODE;
+    public static VSAControlMode vsaControlMODE= VSAControlMode.TT_NOLIMIT;
     
     public static void save(){
         prop.put("VSL_VDA", VSL_VSS_DECISION_ACCEL);
