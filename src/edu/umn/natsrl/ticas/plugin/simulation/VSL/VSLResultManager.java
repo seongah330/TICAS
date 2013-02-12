@@ -17,6 +17,7 @@
  */
 package edu.umn.natsrl.ticas.plugin.simulation.VSL;
 
+import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.ticas.SimulationResult;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLVersion;
@@ -49,6 +50,9 @@ public class VSLResultManager {
     final String TYPE_ID = "TYPE_ID";
     final String TYPE_STATION = "STATION";
     final String TYPE_DMS = "DMS";
+    final String PERIOD_START = "PERIOD_START";
+    final String PERIOD_END = "PERIOD_END";
+    final String PERIOD_INTERVAL = "PERIOD_INTERVAL";
     
     public final static String SAVE_PROP_DIR = SimulationResult.SAVE_PROP_DIR;
     public final static String SAVE_VSL_DIR = SAVE_PROP_DIR + File.separator + "VSL";
@@ -59,8 +63,10 @@ public class VSLResultManager {
     transient Section section;
     private List<String> keys = new ArrayList<String>();
     private VSLVersion vslversion;
+    private Period speriod;
     
     private PropertiesWrapper prop = new PropertiesWrapper();
+    
     
     
     public VSLResultManager(String _name, String _desc, VSLResults vresult){
@@ -70,6 +76,7 @@ public class VSLResultManager {
         keys = vresult.getMilePointstoString();
         created = new Date();
         vslversion = vresult.getVSLVersion();
+        speriod = vresult.getPeriod();
         SaveData(keys,vresult);
     }
 
@@ -83,6 +90,12 @@ public class VSLResultManager {
             vslversion = VSLVersion.getVSLVersion(prop.getInteger(VSLVERSION));
         }catch(Exception e){
             vslversion = null;
+        }
+        
+        try{
+            speriod = new Period(prop.getDate(PERIOD_START), prop.getDate(PERIOD_END), prop.getInteger(PERIOD_INTERVAL));
+        }catch(Exception e){
+            speriod = null;
         }
         
         
@@ -139,6 +152,9 @@ public class VSLResultManager {
         //Section Info
         prop.put(SECTION_NAME, section.getName());
         prop.put(SECTION_RNODES, section.getRNodeIds());
+        prop.put(PERIOD_START,speriod.startDate);
+        prop.put(PERIOD_END, speriod.endDate);
+        prop.put(PERIOD_INTERVAL, speriod.interval);
         prop.put(DATAKEY, keys1);
 
         saveMainData(vresult);
@@ -194,6 +210,7 @@ public class VSLResultManager {
     
     public VSLResults LoadResults() {
         VSLResults vresult = new VSLResults(name,created,vslversion);
+        vresult.setPeriod(speriod);
         for(String key : keys){
             String type = prop.get(setKey(key,TYPE));
             

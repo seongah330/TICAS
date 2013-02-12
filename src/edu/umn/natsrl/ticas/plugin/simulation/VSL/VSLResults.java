@@ -17,6 +17,7 @@
  */
 package edu.umn.natsrl.ticas.plugin.simulation.VSL;
 
+import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLStationState;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.DMSImpl;
@@ -41,6 +42,7 @@ public class VSLResults implements Comparable{
     private String Name;
     private Date created;
     private Section section;
+    private Period period;
     private TreeMap<Double,VSLResultStation> station = new TreeMap<Double,VSLResultStation>();
     private TreeMap<Double,VSLResultDMS> DMSs = new TreeMap<Double,VSLResultDMS>();
     private TreeMap<Integer,String> map = new TreeMap<Integer,String>();
@@ -354,5 +356,19 @@ public class VSLResults implements Comparable{
 
     public VSLVersion getVSLVersion() {
         return vslversion;
+    }
+
+    public void setPeriod(Period p){
+        period = p.clone();
+    }
+    
+    public Period getPeriod() {
+        return period.clone();
+    }
+    
+    public boolean equalData(Object tm){
+        VSLResults tv = (VSLResults)tm;
+        return tv.Name.equals(this.Name);
+            
     }
 }

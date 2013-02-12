@@ -175,7 +175,7 @@ public class SectionEditorPanel extends javax.swing.JPanel {
         jxMap = new org.jdesktop.swingx.JXMapKit();
         panCreateSection = new javax.swing.JPanel();
 
-        tabMainTab.setFont(new java.awt.Font("Verdana", 0, 12));
+        tabMainTab.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tabMainTab.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 tabMainTabStateChanged(evt);
@@ -284,10 +284,10 @@ public class SectionEditorPanel extends javax.swing.JPanel {
                 .addContainerGap())
         );
 
-        tabMainTab.addTab("Route Lists", jPanel1);
+        tabMainTab.addTab("Freeway Section List", jPanel1);
 
         panCreateSection.setLayout(new java.awt.BorderLayout());
-        tabMainTab.addTab("Create Route", panCreateSection);
+        tabMainTab.addTab("Create Freeway Section", panCreateSection);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -295,7 +295,7 @@ public class SectionEditorPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tabMainTab, javax.swing.GroupLayout.DEFAULT_SIZE, 949, Short.MAX_VALUE)
+                .addComponent(tabMainTab)
                 .addContainerGap())
         );
         layout.setVerticalGroup(

@@ -93,6 +93,27 @@ public class SimulationUtil {
         return res;
     }
     
+    public static void DeleteVSLSimulationResult(VSLResults result){
+        File file = new File(VSLResultManager.SAVE_VSL_DIR);  
+        File[] files = file.listFiles();  
+        if(files == null) return;
+        
+        
+        for (int i = 0; i < files.length; i++)  
+        {  
+            if(files[i].isDirectory()) continue;
+            VSLResultManager vm = VSLResultManager.load(files[i]);
+            if(vm == null) continue;
+            VSLResults tr = vm.LoadResults();
+            System.out.println(tr.getName());
+            if(tr.equalData(result)){
+                File dfile = new File(files[i].getAbsolutePath());
+                dfile.delete();
+                break;
+            }
+        }
+    }
+    
 
     public static void SaveVSLSimulation(Section simSection, Period simPeriod, PluginFrame simFrame, VSLResults vslResults) {
         if(simSection == null || simPeriod == null){

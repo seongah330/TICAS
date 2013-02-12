@@ -26,7 +26,7 @@ import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLConfig;
 public class VSStationFinder {
     
     static private int getControlThreshold(){
-        return VSLConfig.VSL_CONTROL_THRESHOLD;
+        return -1 * VSLConfig.VSL_CONTROL_THRESHOLD;
     }
     /**
      * Mile point to search for VSS

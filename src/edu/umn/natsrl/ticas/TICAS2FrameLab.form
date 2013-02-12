@@ -181,8 +181,8 @@
         <Container class="javax.swing.JPanel" name="panRouteCreation">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Route Creation">
-                <Property name="tabTitle" type="java.lang.String" value="Route Creation"/>
+              <JTabbedPaneConstraints tabName="Freeway Section Creation">
+                <Property name="tabTitle" type="java.lang.String" value="Freeway Section Creation"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
@@ -401,7 +401,7 @@
                                   </Group>
                               </Group>
                           </Group>
-                          <EmptySpace pref="34" max="32767" attributes="0"/>
+                          <EmptySpace max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -807,7 +807,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Verdana" size="10" style="1"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Measurments"/>
+                    <Property name="text" type="java.lang.String" value="Traffic Flow Measurments"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel23">
@@ -1069,7 +1069,7 @@
                     <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                       <Color blue="0" green="0" red="ff" type="rgb"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Extract"/>
+                    <Property name="text" type="java.lang.String" value="Traffic Data/Measures Extraction"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnEvaluateActionPerformed"/>
@@ -1564,7 +1564,7 @@
               <Properties>
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                    <TitledBorder title="Simulation &amp; Simulation Data Extraction">
+                    <TitledBorder title="Simulation/Emulation &amp; Simulation Output Extraction">
                       <Font PropertyName="font" name="Verdana" size="10" style="1"/>
                       <Color PropertyName="color" blue="0" green="0" id="black" palette="1" red="0" type="palette"/>
                     </TitledBorder>
@@ -1674,7 +1674,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Verdana" size="12" style="0"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Run Simulation"/>
+                    <Property name="text" type="java.lang.String" value="Run"/>
                   </Properties>
                   <Events>
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRunSimulationPluginActionPerformed"/>

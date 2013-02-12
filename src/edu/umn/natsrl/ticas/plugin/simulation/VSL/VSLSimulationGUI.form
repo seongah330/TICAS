@@ -41,8 +41,8 @@
         <Container class="javax.swing.JPanel" name="jPanel1">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="VSL Option">
-                <Property name="tabTitle" type="java.lang.String" value="VSL Option"/>
+              <JTabbedPaneConstraints tabName="VSL Simulation/Emulation">
+                <Property name="tabTitle" type="java.lang.String" value="VSL Simulation/Emulation"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
@@ -52,15 +52,15 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                          <Component id="jPanel4" max="32767" attributes="0"/>
-                          <Component id="jPanel3" max="32767" attributes="0"/>
-                          <Component id="btnStartSimulation" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="jPanel4" min="-2" pref="493" max="-2" attributes="0"/>
+                          <Component id="jPanel3" alignment="0" max="32767" attributes="0"/>
+                          <Component id="btnStartSimulation" alignment="0" max="32767" attributes="0"/>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jPanel5" max="32767" attributes="0"/>
                           <Component id="pnDate" max="32767" attributes="0"/>
+                          <Component id="jPanel5" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -95,7 +95,7 @@
               <Properties>
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                    <TitledBorder title="Simulation Option">
+                    <TitledBorder title="Simulation/Emulation Option">
                       <Font PropertyName="font" name="Verdana" size="12" style="0"/>
                     </TitledBorder>
                   </Border>
@@ -269,7 +269,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Verdana" size="12" style="0"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Simulation Mode"/>
+                    <Property name="text" type="java.lang.String" value="Simulation/Emulation Mode"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JComboBox" name="cbxSimulationMode">
@@ -294,7 +294,7 @@
               <Properties>
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                    <TitledBorder title="VSL Configuration">
+                    <TitledBorder title="VSL Strategy Configuration">
                       <Font PropertyName="font" name="Verdana" size="12" style="0"/>
                     </TitledBorder>
                   </Border>
@@ -308,76 +308,71 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
-                                  <Component id="jLabel13" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Component id="cbxVSLVersion" max="32767" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="1" attributes="0">
-                                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" alignment="1" attributes="0">
-                                          <Component id="jLabel16" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Component id="tbxVSLMOVEDec" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
-                                          <Component id="jLabel17" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="tbxVSLMOVESpeed" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <Group type="102" alignment="1" attributes="0">
-                                          <Group type="103" groupAlignment="1" attributes="0">
-                                              <Group type="102" alignment="1" attributes="0">
-                                                  <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                                  <Component id="tbxDeceleration" min="-2" max="-2" attributes="0"/>
-                                              </Group>
-                                              <Group type="102" alignment="1" attributes="0">
-                                                  <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
-                                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                                  <Component id="tbxZesDecceleration" min="-2" max="-2" attributes="0"/>
-                                              </Group>
-                                          </Group>
-                                          <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
-                                          <Group type="103" groupAlignment="0" attributes="0">
-                                              <Group type="102" alignment="1" attributes="0">
-                                                  <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
-                                                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                                                  <Component id="tbxBSSpeedThreshold" min="-2" max="-2" attributes="0"/>
-                                              </Group>
-                                              <Group type="103" alignment="1" groupAlignment="0" max="-2" attributes="0">
-                                                  <Group type="102" alignment="0" attributes="0">
-                                                      <EmptySpace min="-2" pref="100" max="-2" attributes="0"/>
-                                                      <Component id="tbxTurnOffAcceleration" min="-2" max="-2" attributes="0"/>
-                                                  </Group>
-                                                  <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
-                                              </Group>
-                                          </Group>
-                                      </Group>
-                                      <Group type="102" alignment="1" attributes="0">
-                                          <Group type="103" groupAlignment="1" attributes="0">
-                                              <Component id="jLabel19" min="-2" max="-2" attributes="0"/>
-                                              <Component id="jLabel10" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                          <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
-                                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                              <Group type="102" attributes="0">
-                                                  <Component id="tbxMinStationDistance" min="-2" max="-2" attributes="0"/>
-                                                  <EmptySpace min="-2" pref="189" max="-2" attributes="0"/>
-                                              </Group>
-                                              <Component id="cbx_vsaControlMode" max="32767" attributes="0"/>
-                                          </Group>
-                                      </Group>
-                                  </Group>
-                              </Group>
-                              <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="jLabel18" min="-2" max="-2" attributes="0"/>
                                       <Component id="jLabel14" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                               </Group>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Group type="103" groupAlignment="1" attributes="0">
+                                      <Group type="102" attributes="0">
+                                          <Component id="jLabel13" min="-2" max="-2" attributes="0"/>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="cbxVSLVersion" max="32767" attributes="0"/>
+                                      </Group>
+                                      <Group type="102" alignment="1" attributes="0">
+                                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                          <Group type="103" groupAlignment="1" attributes="0">
+                                              <Group type="102" attributes="0">
+                                                  <Component id="jLabel19" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace max="-2" attributes="0"/>
+                                                  <Component id="cbx_vsaControlMode" min="-2" pref="249" max="-2" attributes="0"/>
+                                              </Group>
+                                              <Group type="102" attributes="0">
+                                                  <Group type="103" groupAlignment="1" attributes="0">
+                                                      <Group type="102" alignment="1" attributes="0">
+                                                          <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                                          <Component id="tbxDeceleration" min="-2" max="-2" attributes="0"/>
+                                                      </Group>
+                                                      <Group type="102" alignment="1" attributes="0">
+                                                          <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
+                                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                                          <Component id="tbxZesDecceleration" min="-2" max="-2" attributes="0"/>
+                                                      </Group>
+                                                      <Group type="102" alignment="1" attributes="0">
+                                                          <Component id="jLabel10" min="-2" max="-2" attributes="0"/>
+                                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                                          <Component id="tbxMinStationDistance" min="-2" max="-2" attributes="0"/>
+                                                      </Group>
+                                                  </Group>
+                                                  <EmptySpace max="-2" attributes="0"/>
+                                                  <Group type="103" groupAlignment="1" attributes="0">
+                                                      <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
+                                                  </Group>
+                                                  <EmptySpace max="-2" attributes="0"/>
+                                                  <Group type="103" groupAlignment="0" attributes="0">
+                                                      <Component id="tbxBSSpeedThreshold" min="-2" max="-2" attributes="0"/>
+                                                      <Component id="tbxTurnOffAcceleration" min="-2" max="-2" attributes="0"/>
+                                                  </Group>
+                                              </Group>
+                                              <Group type="102" alignment="1" attributes="0">
+                                                  <Component id="jLabel16" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                                  <Component id="tbxVSLMOVEDec" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
+                                                  <Component id="jLabel17" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace max="-2" attributes="0"/>
+                                                  <Component id="tbxVSLMOVESpeed" min="-2" max="-2" attributes="0"/>
+                                              </Group>
+                                          </Group>
+                                      </Group>
+                                  </Group>
+                                  <EmptySpace min="-2" pref="39" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
-                          <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -435,7 +430,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Verdana" size="12" style="0"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="VSS Decision Accel"/>
+                    <Property name="text" type="java.lang.String" value="Decel Threshold"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JTextField" name="tbxDeceleration">
@@ -463,7 +458,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Verdana" size="12" style="0"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Zone Decision Accel"/>
+                    <Property name="text" type="java.lang.String" value="Zone Decision Decel"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JTextField" name="tbxBSSpeedThreshold">
@@ -481,7 +476,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Verdana" size="12" style="0"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="BS Threshold"/>
+                    <Property name="text" type="java.lang.String" value="VSS Speed Threshold"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JTextField" name="tbxTurnOffAcceleration">
@@ -499,7 +494,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Verdana" size="12" style="0"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Turnoff Accel"/>
+                    <Property name="text" type="java.lang.String" value="VSS Turnoff Decel"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JTextField" name="tbxMinStationDistance">
@@ -517,7 +512,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Verdana" size="12" style="0"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Min Distance"/>
+                    <Property name="text" type="java.lang.String" value="Min Distance Bet 2 Stations"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JComboBox" name="cbxVSLVersion">
@@ -532,6 +527,9 @@
                       <Dimension value="[150, 22]"/>
                     </Property>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cbxVSLVersionActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel13">
                   <Properties>
@@ -590,7 +588,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Verdana" size="12" style="0"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="VSL Initial Identification"/>
+                    <Property name="text" type="java.lang.String" value="Bottleneck Station(VSS) Initial Identification"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel19">
@@ -598,7 +596,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Verdana" size="12" style="0"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="VSA Control Accel"/>
+                    <Property name="text" type="java.lang.String" value="VSL Calculation Option"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JComboBox" name="cbx_vsaControlMode">
@@ -618,7 +616,7 @@
                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                   <Font name="Verdana" size="12" style="0"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="Start Simulation"/>
+                <Property name="text" type="java.lang.String" value="Start Simulation/Emulation"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnStartSimulationActionPerformed"/>
@@ -638,7 +636,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="simJmKit" pref="525" max="32767" attributes="0"/>
+                          <Component id="simJmKit" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -647,7 +645,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="simJmKit" max="32767" attributes="0"/>
+                          <Component id="simJmKit" pref="428" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -699,7 +697,7 @@
                                   <Component id="cbxStartMin" min="-2" max="-2" attributes="1"/>
                               </Group>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace pref="69" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -1220,8 +1218,8 @@
         <Container class="javax.swing.JPanel" name="jPanel8">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Simulation Result">
-                <Property name="tabTitle" type="java.lang.String" value="Simulation Result"/>
+              <JTabbedPaneConstraints tabName="Simulation/Emulation Result">
+                <Property name="tabTitle" type="java.lang.String" value="Simulation/Emulation Result"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
@@ -1250,10 +1248,12 @@
                                   </Group>
                                   <Component id="cbxSavedResult" max="32767" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
-                                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                                          <Component id="btnReadResult" alignment="0" max="32767" attributes="0"/>
-                                          <Component id="btnLoadExcel" alignment="0" pref="366" max="32767" attributes="0"/>
-                                      </Group>
+                                      <Component id="btnReadResult" min="-2" pref="366" max="-2" attributes="0"/>
+                                      <EmptySpace pref="64" max="32767" attributes="0"/>
+                                      <Component id="btn_deleteresult" min="-2" pref="91" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="btnLoadExcel" min="-2" pref="366" max="-2" attributes="0"/>
                                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                                   </Group>
                               </Group>
@@ -1285,13 +1285,16 @@
                               </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="cbx_result_station" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace pref="7" max="32767" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
                               <Component id="cbxSavedResult" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="btnReadResult" min="-2" pref="40" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="btn_deleteresult" min="-2" pref="32" max="-2" attributes="0"/>
+                                  <Component id="btnReadResult" min="-2" pref="40" max="-2" attributes="0"/>
+                              </Group>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnLoadExcel" min="-2" pref="40" max="-2" attributes="0"/>
-                              <EmptySpace min="-2" pref="25" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="63" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" attributes="0">
                               <Component id="jScrollPane1" pref="0" max="32767" attributes="0"/>
@@ -1342,7 +1345,7 @@
                   <Layout>
                     <DimensionLayout dim="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <EmptySpace min="0" pref="947" max="32767" attributes="0"/>
+                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                     </DimensionLayout>
                     <DimensionLayout dim="1">
@@ -1405,7 +1408,7 @@
             </Component>
             <Component class="javax.swing.JButton" name="btn_reChart_left">
               <Properties>
-                <Property name="text" type="java.lang.String" value="&lt; STEP"/>
+                <Property name="text" type="java.lang.String" value="&lt; PREV"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_reChart_leftActionPerformed"/>
@@ -1413,7 +1416,7 @@
             </Component>
             <Component class="javax.swing.JButton" name="btn_reChart_right">
               <Properties>
-                <Property name="text" type="java.lang.String" value="STEP &gt;"/>
+                <Property name="text" type="java.lang.String" value="NEXT &gt;"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_reChart_rightActionPerformed"/>
@@ -1464,6 +1467,14 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="Station Info"/>
               </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="btn_deleteresult">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Delete"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btn_deleteresultActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

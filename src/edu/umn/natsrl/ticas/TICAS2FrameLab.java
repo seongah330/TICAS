@@ -437,7 +437,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             addSimulationPlugins(meteringPlugin);            
         }        
         
-        PluginInfo vslPlugin = new PluginInfo("VSL Simulation", PluginType.SIMULATION, VSLSimulation.class);
+        PluginInfo vslPlugin = new PluginInfo("VSL Simulation/Emulation", PluginType.SIMULATION, VSLSimulation.class);
         addSimulationPlugins(vslPlugin);
         
         if(addSFIMPlugin) {
@@ -1467,7 +1467,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         });
 
         panRouteCreation.setLayout(new java.awt.BorderLayout());
-        mainTab.addTab("Route Creation", panRouteCreation);
+        mainTab.addTab("Freeway Section Creation", panRouteCreation);
 
         cbxSections.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         cbxSections.addActionListener(new java.awt.event.ActionListener() {
@@ -1624,7 +1624,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         jLabel12.setText("Detector Data");
 
         jLabel13.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
-        jLabel13.setText("Measurments");
+        jLabel13.setText("Traffic Flow Measurments");
 
         jLabel23.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
         jLabel23.setText("Detector Filter");
@@ -1710,7 +1710,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                                 .addComponent(tbxLaneCapacity, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(tbxCongestionThresholdSpeed, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(tbxCriticalDensity, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(34, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1824,7 +1824,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
 
         btnEvaluate.setFont(new java.awt.Font("Verdana", 1, 14)); // NOI18N
         btnEvaluate.setForeground(new java.awt.Color(255, 0, 0));
-        btnEvaluate.setText("Extract");
+        btnEvaluate.setText("Traffic Data/Measures Extraction");
         btnEvaluate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEvaluateActionPerformed(evt);
@@ -2071,7 +2071,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Simulation & Simulation Data Extraction", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 10), java.awt.Color.black)); // NOI18N
+        jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Simulation/Emulation & Simulation Output Extraction", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 10), java.awt.Color.black)); // NOI18N
 
         cbxsimulationresult.setPreferredSize(new java.awt.Dimension(400, 20));
 
@@ -2095,7 +2095,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         cbxPlugins.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
 
         btnRunSimulationPlugin.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
-        btnRunSimulationPlugin.setText("Run Simulation");
+        btnRunSimulationPlugin.setText("Run");
         btnRunSimulationPlugin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRunSimulationPluginActionPerformed(evt);

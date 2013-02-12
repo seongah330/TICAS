@@ -32,7 +32,7 @@ import javax.swing.JOptionPane;
  * @author Chongmyung Park
  */
 public class TICASVersion {
-    public static final String version = " 3.3";    
+    public static final String version = " 3.31";    
     public static final boolean ISINIT = true;
     public static final boolean ISOPTIONINIT = true;
     public static String currentVersion;
@@ -95,6 +95,7 @@ public class TICASVersion {
         new File("infra.dat").delete();
         if(ISOPTIONINIT){
             new File("ticas.cfg").delete();
+            new File("config\\VSLConfig.config").delete();
         }
         System.out.println("Clear All Cache.....");
         tmo.clearAllCache();

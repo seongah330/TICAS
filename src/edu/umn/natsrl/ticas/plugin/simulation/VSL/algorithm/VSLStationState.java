@@ -44,8 +44,8 @@ public class VSLStationState extends StationState{
     protected VSLStationState upstreamVSLState;
     protected VSLStationState downstreamVSLState;
     
-    public int VSLCONTROLTHRESHOLD = 0;
-    public double VSLCONTROLDISTANCE = 0;
+    public int VSLCONTROLTHRESHOLD = 0; //VSL Control Threshold
+    public double VSLCONTROLDISTANCE = 0; // VSL Control Distance
     
     public VSLStationState(Station _station, Section _section, SimObjects simObjects){
         super(_station, _section, simObjects);
@@ -286,7 +286,7 @@ public class VSLStationState extends StationState{
     
     /** Get the control deceleration threshold */
     protected int getControlThreshold() {
-            return VSLConfig.VSL_CONTROL_THRESHOLD;
+            return -1 * VSLConfig.VSL_CONTROL_THRESHOLD;
     }
     
     public int getSpeedLimit(){

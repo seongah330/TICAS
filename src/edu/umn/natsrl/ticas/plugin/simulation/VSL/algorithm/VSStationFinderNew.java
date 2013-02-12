@@ -26,39 +26,28 @@ public class VSStationFinderNew extends VSStationFinder{
         super(m);
     }
 
-    /**
-     * Updated
-     * @param m
-     * @param s
-     * @return 
-     */
-    @Override
-    public boolean check(Double m, VSLStationState s) {
-//        System.out.print(s.getID()+"-"+s.getMilePoint()+", "+m+", ma="+ma);
-        if(m < ma){
-            su = s;
-            mu = m;
-        }else if(md == null || md > m){
-            sd = s;
-            md = m;
-        }
-        
-        if((vss_mp == null || vss_mp < m) && s.isBottleneckFor(m - ma)){
-            vss = s;
-            vss_mp = m;
-        }
-//        if(su != null)
-//            System.out.print("su:"+su.getID());
-//        if(sd != null)
-//            System.out.print(", sd:"+sd.getID());
-//        if(vss != null)
-//            System.out.print(", vss:"+vss.getID());
-//        if(vss_mp != null)
-//            System.out.println(", vssmp:"+vss_mp);
-//        else
-//            System.out.println();
-        return false;
-    }
+//    /**
+//     * Updated
+//     * @param m
+//     * @param s
+//     * @return 
+//     */
+//    @Override
+//    public boolean check(Double m, VSLStationState s) {
+//        if(m < ma){
+//            su = s;
+//            mu = m;
+//        }else if(md == null || md > m){
+//            sd = s;
+//            md = m;
+//        }
+//        
+//        if((vss_mp == null || vss_mp < m) && s.isBottleneckFor(m - ma)){
+//            vss = s;
+//            vss_mp = m;
+//        }
+//        return false;
+//    }
     
     /** Calculate a speed advisory.
     * @param spd Average speed at VSS.
@@ -66,14 +55,13 @@ public class VSStationFinderNew extends VSStationFinder{
     * @return Speed advisory. */
     @Override
     protected Double calculateSpeedAdvisory(double spd, double d){
+        System.out.println("Yeah! ");
         if(d > 0){
             int acc = -vss.getControlThreshold();
             double s2 = spd * spd + 2.0 * acc * d;
-//            System.out.print(", acc="+acc+", spd="+spd+", spd*spd="+(spd*spd)+", d="+d+" s2="+s2+", set vss : "+vss.getID());
             if(s2 < 0){
                 return null;
             }
-//            System.out.println(", adv="+(double)Math.sqrt(s2));
             return (double)Math.sqrt(s2);
         }else{
             return spd;

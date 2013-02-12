@@ -36,7 +36,7 @@ public class VSLConfig extends ticasConfig{
      * Not Fixed Value
      */
     public static int VSL_VSS_DECISION_ACCEL = 1500;  //VSL VDA VSS Decision Acceleration (unit : mile / h^2)
-    public static int VSL_CONTROL_THRESHOLD = -1000; //VSL ZDA 
+    public static int VSL_CONTROL_THRESHOLD = 1000; //VSL ZDA 
     public static int VSL_BS_THRESHOLD = 55;
     public static int VSL_TURNOFF_ACCEL = 750; //VSL TOA 
     public static double VSL_MIN_STATION_MILE = 0.2d;

@@ -39,6 +39,9 @@ class VSLSimulationResultSaveDialog extends SimulationResultSaveDialog{
     protected void saveResult(){
         super.saveResult();
         
+        if(vslresults.getPeriod() == null){
+            vslresults.setPeriod(period);
+        }
         VSLResultManager vm = new VSLResultManager(fname, desc, vslresults);
         try {
             vm.save();

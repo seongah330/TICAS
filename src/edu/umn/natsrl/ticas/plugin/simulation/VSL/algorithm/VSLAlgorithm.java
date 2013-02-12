@@ -116,12 +116,12 @@ public class VSLAlgorithm{
             //set VSS State
             Integer setSpeed = null;
             if(vss_finder.foundVSS()){
-//                System.out.println(" - Found!!");
+                System.out.println(" - Found!!");
                 Integer lim = vss_finder.getSpeedLimit();
                 if(lim != null){
                     Double a = vss_finder.calculateSpeedAdvisory();
-                    aVSA = a;
                     if(a != null){
+                        aVSA = a;
                         a = Math.max(a, getMinDisplay());
                         int sa = round5Mph(a);
                         if(sa < lim && sa <= getMaxDisplay()){

@@ -24,7 +24,7 @@ import edu.umn.natsrl.ticas.Simulation.StationState;
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
 public enum VSLVersion {
-    NEWVERSIONFULLSEARCH_PRO(4,"New Version_Full_Search_Professor"),
+    NEWVERSIONFULLSEARCH_PRO(4,"Travel Time - Based Version 1"),
 //    NEWVERSIONFULLSEARCH(3,"New Version_Full_Search"),
 //    NEWVERSION(2,"New Version_old"),
     OLDVERSION(1,"Old Version");

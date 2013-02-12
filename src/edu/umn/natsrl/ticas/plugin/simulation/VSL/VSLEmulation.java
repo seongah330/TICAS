@@ -80,6 +80,7 @@ public class VSLEmulation extends Emulation implements EmulationImpl{
         Debug();
         ml = new VSLMilePointList(VSLStationStates,section.getDMS());
         vslresult = new VSLResults(section,ml,vslversion);
+        vslresult.setPeriod(period);
     }
     
     @Override
