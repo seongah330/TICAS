@@ -86,15 +86,18 @@ public class Infra implements Serializable {
     }
 
 
-//    /**
-//     * delete cache and re-configurate infra
-//     */
+    /**
+     * delete cache and re-configurate infra
+     */
 //    public void reloadInfra() {
 //        (new File(cacheFile)).delete();
 //        this.isLoaded = false;
 //        this.infraObjects.clear();
 //        this.load();
 //    }
+    public void reflash(Corridor _cor) {
+        set_rnodes(_cor);
+    }
 
 
     /**
@@ -134,7 +137,7 @@ public class Infra implements Serializable {
     /**
      * Caching all infra : corridor, station, detector, meter, entrance, exit
      */
-    private void saveCache() {
+    public void saveCache() {
         FileOutputStream fileOut = null;
         try {
             File cacheDir = new File(this.cachePath);
@@ -210,7 +213,12 @@ public class Infra implements Serializable {
     {
         for (Corridor co : this.getCorridors())
         {
-//            System.out.println("================="+co.getId()+"=========================");
+            set_rnodes(co);
+        }       
+    }    
+    
+    private void set_rnodes(Corridor co){
+        //            System.out.println("================="+co.getId()+"=========================");
             int nodeCnt = 1;
             for(RNode r_node : co.getRnodes())
             {       
@@ -276,8 +284,7 @@ public class Infra implements Serializable {
 //        System.out.print("real EN ====");
 //        System.out.println("easting : "+r_node.getEasting()+", northing : "+r_node.getNorthing());
             }
-        }       
-    }    
+    }
     
     private void set_dms() {
         System.out.print("Organizing DMS to RNode ....................");

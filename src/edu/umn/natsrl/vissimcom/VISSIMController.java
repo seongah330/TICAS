@@ -582,13 +582,13 @@ public class VISSIMController {
     private void insertDetectorInfra(int Id,int cnt,Infra infra) {
         detectorData[cnt] = new DetectorData();
         Detector det = infra.getDetector(""+Id);
-        if (det.getLaneType() == LaneType.QUEUE) {
+        if (det != null && det.getLaneType() == LaneType.QUEUE) {
             queueDetectorList[cnt] = det;
         } else {
             queueDetectorList[cnt] = null;
         }
 
-        if (det.getStation() != null) {
+        if (det != null && det.getStation() != null) {
             speedLimits[cnt] = det.getStation().getSpeedLimit();
         } else {
             speedLimits[cnt] = 0;

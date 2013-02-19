@@ -23,6 +23,7 @@
 package edu.umn.natsrl.ticas;
 
 import edu.umn.natsrl.infra.TMO;
+import edu.umn.natsrl.util.FileHelper;
 import edu.umn.natsrl.util.PropertiesWrapper;
 import java.io.File;
 import javax.swing.JOptionPane;
@@ -32,9 +33,10 @@ import javax.swing.JOptionPane;
  * @author Chongmyung Park
  */
 public class TICASVersion {
-    public static final String version = " 3.31";    
-    public static final boolean ISINIT = true;
-    public static final boolean ISOPTIONINIT = true;
+    public static final String version = " 3.322";    
+    public static final boolean ISINIT = false;
+    public static final boolean ISOPTIONINIT = false;
+    public static final boolean ISVSLSIMULATIONINIT = false;
     public static String currentVersion;
     
     private static String versionFoler = "config";
@@ -96,6 +98,9 @@ public class TICASVersion {
         if(ISOPTIONINIT){
             new File("ticas.cfg").delete();
             new File("config\\VSLConfig.config").delete();
+        }
+        if(ISVSLSIMULATIONINIT){
+            FileHelper.deleteDirectory(new File("simulationresults\\VSL"));
         }
         System.out.println("Clear All Cache.....");
         tmo.clearAllCache();

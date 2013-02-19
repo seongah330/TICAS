@@ -18,7 +18,10 @@
 
 package edu.umn.natsrl.infra.infraobjects;
 
+import edu.umn.natsrl.infra.InfraProperty;
+import edu.umn.natsrl.infra.types.InfraType;
 import edu.umn.natsrl.infra.types.StationType;
+import edu.umn.natsrl.infra.types.TransitionType;
 import java.util.HashMap;
 import org.w3c.dom.Element;
 
@@ -54,6 +57,25 @@ public class Station extends RNode {
         sType = StationType.getStationType(station_id);
         if(this.sid / 100 == 17) this.isWavetronicsStation = true;
         if(!sType.isOriginStation()) this.isWavetronicsStation = true;
+    }
+
+    public Station(String id, String stationId, String label, int lanes, int easting, int northing, InfraType itype) {
+        this.id = id;
+        this.sid = StationType.getStationIDbyType(stationId);
+        sType = StationType.getStationType(stationId);
+        this.infraType = itype;
+        setProperty(InfraProperty.station_id,stationId);
+        setProperty(InfraProperty.label,label);
+        setProperty(InfraProperty.lanes,lanes);
+        setProperty(InfraProperty.shift,0);
+        setProperty(InfraProperty.transition,"None");
+        setProperty(InfraProperty.attach_side,"right");
+        setProperty(InfraProperty.s_limit,55);
+        this.transitionType = TransitionType.None;
+        
+        this.isAvailable = true;
+        this.easting = easting;
+        this.northing = northing;
     }
 
     public void setDownstreamStation(String sectionName, Station s) {

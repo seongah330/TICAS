@@ -61,12 +61,23 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
     protected boolean isAccHistoryValid(){
         return AccelerationHistory.length == s_count;
     }
+    
+    protected double[] RollingSpeedHistory = new double[s_count];
+    protected void updateRollingSpeed(double u){
+        System.arraycopy(RollingSpeedHistory, 0, RollingSpeedHistory, 1,
+                    RollingSpeedHistory.length - 1);
+            // Clamp the speed to 10 mph above the speed limit
+            RollingSpeedHistory[0] = u;
+    }
+    protected boolean isRollingSpeedValid(){
+        return RollingSpeedHistory.length == s_count;
+    }
         
     @Override
     public void calculateBottleneck(double m,
         NavigableMap<Double, VSLStationState> upstream)
     {
-        System.out.println("Calculate VSL - NEW");
+//        System.out.println("Calculate VSL - NEW");
         Double mp = upstream.lowerKey(m);
         while(mp != null && isTooClose(m - mp)){
             mp = upstream.lowerKey(mp);
@@ -77,21 +88,70 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
             Double d = m - mp;
             acceleration = calculateAcceleration(sp, d);
             updateAcceleration(acceleration); //added
+            updateRollingSpeed(getAggregateRollingSpeed());
 
+//            System.out.print(this.getStation()+"-");
             checkThresholds();
-            
-            if(isAboveBottleneckSpeed()){
-                setBottleneck(false);
-            }else if(isAccTrend()){ //add acceleration trend
+//            System.out.print("-"+this.n_bottleneck+"-");
+            if(isAccidentSpeed()){
+//                System.out.println("Yeah-1");
                 setBottleneck(true);
+            }else if(isAboveBottleneckSpeed()){
+//                System.out.println("Yeah-2");
+                setBottleneck(false);
             }else if(isBeforeStartCount()){
+//                System.out.print("-"+this.n_bottleneck+"-");
+//                System.out.println("Yeah-3");
                 setBottleneck(false);
             }else{
+//                System.out.println("4 Time!");
                 setBottleneck(true);
             }
             adjustStream(m,upstream);
         }else{
             clearBottleneck();
+        }
+    }
+    
+    @Override
+    protected void checkThresholds() {
+        if(isBeforeStartCount()){ //Start Threshold
+            AccCheckThreshold ac = VSLConfig.accCheckThreshold;
+            if(ac.isBASEON()){
+//                System.out.print("-BASEON-");
+                checkBasedThresholds();
+            }
+            else if(ac.isTRENDON())
+                checkTrendThresholds();
+            else
+                checkBasedThresholds();
+        }else
+            checkStopThreshold();
+    }
+    
+    protected void checkStopThreshold(){
+        if(isAccelerationValid() && acceleration < getStopThreshold()){
+            n_bottleneck++;
+        }else{
+            n_bottleneck = 0;
+        }
+    }
+    
+    protected void checkBasedThresholds(){
+        if(isAccelerationValid() && acceleration < getStartThreshold()){
+//            System.out.print(n_bottleneck);
+            n_bottleneck++;
+//            System.out.print("=N++-"+n_bottleneck);
+        }else{
+            n_bottleneck = 0;
+        }
+    }
+    
+    protected void checkTrendThresholds(){
+        if(isAccTrend()){
+            n_bottleneck = 3;
+        }else{
+            n_bottleneck = 0;
         }
     }
     
@@ -134,7 +194,7 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
             if(ap != null && ap >= 0)
                 isUpdate = true;
 //            System.out.print(", ap="+ap+", u="+sp.getAggregateRollingSpeed()+", bot="+!isAboveBottleneckSpeed(sp.getAggregateRollingSpeed())+", end="+isUpdate);
-            if(ap != null && !isAboveBottleneckSpeed(sp.getAggregateRollingSpeed())
+            if(ap != null && !isBottleneckSpeed(sp.getAggregateRollingSpeed())
                     && ap < this.getVSLMovingAcc() && !isUpdate){
 //                System.out.print(" Change Bottleneck! ");
                 s.bottleneck = false;
@@ -173,7 +233,8 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
             sp = upstream.get(mp);
             Double ap = sp.acceleration;
 //            System.out.println(sp.getID());
-            if(ap != null && ap >= 0 && sp.getAggregateRollingSpeed() > getVSLRangeThreshold())
+            if(ap != null && ap >= 0 && sp.getAggregateRollingSpeed() > getVSLRangeThreshold()
+                    && !(mp == m && sp.p_bottleneck))
                 break;
             else{
                 if(sp.bottleneck || sp.p_bottleneck)
@@ -192,15 +253,11 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
     
     @Override
     public void calculateControlThreshold(double m, NavigableMap<Double, VSLStationState> upstream){
-        if(VSLConfig.vsaControlMODE.isTTMODE())
-            calculateControlThreshold_TTMODE(m,upstream);
-        else if(VSLConfig.vsaControlMODE.isTTNOLIMIT())
-            calculateControlThreshold__TTMODE_NOLIMIT(m,upstream);
-        
+            calculateControlThreshold__TTMODE_NOLIMIT(m,upstream);   
     }
     
     private void calculateControlThreshold__TTMODE_NOLIMIT(double m, NavigableMap<Double, VSLStationState> upstream) {
-        System.out.println("CALC NOLIMIT");
+//        System.out.println("CALC NOLIMIT");
         double cm = m;
         double mp = m; // milepoint : most end station
         double uMax = getAggregateRollingSpeed(); //Max u
@@ -209,7 +266,7 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
         Map.Entry<Double, VSLStationState> entry = upstream.lowerEntry(mp);
         while(entry != null){ //calculate Travel Time Boundary
             mp = entry.getKey();
-            if(isCalculateDistance(cm-mp,2.0d)){
+            if(isCalculateDistance(cm-mp,VSLConfig.VSL_ZONE_LENGTH_MILE)){
                 VSLStationState s = entry.getValue();
                 double u = s.getAggregateRollingSpeed();
             
@@ -438,10 +495,7 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
     /** Get the control deceleration threshold */
     @Override
     protected int getControlThreshold() {
-        if(VSLConfig.vsaControlMODE.isTTMODE() || VSLConfig.vsaControlMODE.isTTNOLIMIT())
             return VSLCONTROLTHRESHOLD;
-        else
-            return -1 * VSLConfig.VSL_CONTROL_THRESHOLD;
     }
     
     private int getVSLMovingAcc() {
@@ -452,9 +506,46 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
         return VSLConfig.VSL_RANGE_THRESHOLD;
     }
     
-    protected boolean isAboveBottleneckSpeed(double speed){
+    @Override
+    protected boolean isAboveBottleneckSpeed(){
+        BottleneckSpeed bspd = VSLConfig.bottleneckSpeedType;
+        
+        if(bspd.isBASEON())
+            return isBasedBottleneckSpeed();
+        else if(bspd.isTRENDON())
+            return isTrendBottleneckSpeed();
+        else
+            return isBasedBottleneckSpeed();
+    }
+    
+    protected boolean isBasedBottleneckSpeed(){
+        return this.getAggregateRollingSpeed() > VSLConfig.VSL_BS_THRESHOLD;
+    }
+    
+    protected boolean isTrendBottleneckSpeed(){
+        double u = VSLConfig.VSL_BS_THRESHOLD;
+        if(isRollingSpeedValid() && 
+                RollingSpeedHistory[0] <= u && RollingSpeedHistory[1] <= u && RollingSpeedHistory[2] <= u)
+            return false;
+        else
+            return true;
+    }
+    
+    private boolean isAccidentSpeed() {
+        if(!VSLConfig.isAccidentSpeed)
+            return false;
+        
+        if(getAggregateRollingSpeed() <= VSLConfig.AccidentSpeed)
+            return true;
+        else
+            return false;
+    }
+    
+    protected boolean isBottleneckSpeed(double speed){
         return speed > VSLConfig.VSL_BS_THRESHOLD;
     }
+    
+    
     
     
 }

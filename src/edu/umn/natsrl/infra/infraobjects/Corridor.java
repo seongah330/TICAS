@@ -20,6 +20,7 @@ package edu.umn.natsrl.infra.infraobjects;
 
 import edu.umn.natsrl.infra.InfraObject;
 import edu.umn.natsrl.infra.types.InfraType;
+import edu.umn.natsrl.util.DistanceUtil;
 import java.util.Properties;
 import java.util.Vector;
 import org.w3c.dom.Element;
@@ -77,12 +78,31 @@ public class Corridor extends InfraObject implements Comparable {
     {
         if(n == null) return;
         this.rnodes.add(n);
-        if(n.isAvailableStation()) this.stations.add((Station)n);
+        if(n.isAvailableStation())this.stations.add((Station)n);
+        else if(n.isEntrance()) this.entrances.add((Entrance)n);
+        else if(n.isExit()) this.exits.add((Exit)n);
+    }
+    
+    public void addRNodeForEditor(RNode n){
+        if(n == null) return;
+        int idx = getRnodeIndexbyMile(n,this.rnodes);
+        if(idx != 0 && idx == rnodes.size())
+            this.rnodes.add(n);
+        else
+            this.rnodes.add(idx, n);
+        System.out.println("RNode List");
+        for(RNode r : rnodes){
+            System.out.println("-"+r.getId()+"-"+r.getStationId()+"-");
+        }
+        if(n.isAvailableStation()){
+//            getRnodeIndexbyMile(n,stations);
+            System.out.println("Add RNode : "+n.getId()+"-"+n.getStationId());
+            this.stations.add((Station)n);}
         else if(n.isEntrance()) this.entrances.add((Entrance)n);
         else if(n.isExit()) this.exits.add((Exit)n);
     }
 
-    void removeRNode(RNode n) {
+    public void removeRNode(RNode n) {
         this.rnodes.remove(n);
         if(n.isAvailableStation()) this.stations.remove((Station)n);
         if(n.isEntrance()) this.entrances.remove((Entrance)n);
@@ -169,5 +189,40 @@ public class Corridor extends InfraObject implements Comparable {
                 if(dr.toString().equals(d)) return dr;
             return ALL;
         }
+    }
+    
+    private int getRnodeIndexbyMile(RNode r, Vector<RNode> _rnodes){
+        if(_rnodes.isEmpty() || isFirstRNode(r,_rnodes))
+            return 0;
+        
+        RNode preNode = _rnodes.get(0);
+        System.out.println("Distance Check!");
+        int distanceToFirst = DistanceUtil.getDistanceInFeet(preNode, r);
+        int idx = 0;
+        for(int i=1;i<_rnodes.size();i++){
+            int distance = DistanceUtil.getDistanceInFeet(preNode, _rnodes.get(i));
+            System.out.println(_rnodes.get(i)+" : " +distance+",=="+r.getId()+" : "+distanceToFirst);
+            if(distance >= distanceToFirst){
+                idx = i;
+                break;
+            }
+            else if(i == _rnodes.size()-1)
+                idx = i+1;
+        }
+        
+        return idx;
+    }
+    
+    private boolean isFirstRNode(RNode r, Vector<RNode> _rnodes) {
+        if(_rnodes.isEmpty())
+            return true;
+        int mindistance = DistanceUtil.getDistanceInFeet(r, _rnodes.get(0));
+        for(int i=1;i<_rnodes.size();i++){
+            int dis = DistanceUtil.getDistanceInFeet(r, _rnodes.get(i));
+            if(dis < mindistance)
+                return false;
+        }
+        
+        return true;
     }
 }

@@ -78,6 +78,26 @@ public class Detector extends InfraObject implements Comparable {
         }else
             this.id = tempID;
     }
+    
+    /**
+     * direct Input
+     * @param id
+     * @param lb
+     * @param ab
+     * @param lanetype
+     * @param lanes 
+     */
+    public Detector(int id, String lb, String ab, String lanetype, int lanes){
+        laneType = LaneType.get(lanetype);
+        this.id = String.valueOf(id);
+        this.detector_id = id;
+        this.infraType = InfraType.DETECTOR;
+        dType = DetectorType.getDetectorType(this.id);
+        setProperty(InfraProperty.category,lanetype);
+        setProperty(InfraProperty.abandoned,ab);
+        setProperty(InfraProperty.lane,lanes);
+        setProperty("label",lb);
+    }
        
     /**
      * Read traffic data from cache or remote data
@@ -490,7 +510,7 @@ public class Detector extends InfraObject implements Comparable {
     }
 
     public int getLane() {        
-        return Math.min(getPropertyInt(InfraProperty.lane), 0);
+        return Math.max(getPropertyInt(InfraProperty.lane), 0);
     }
 
     public int compareTo(Object o) {

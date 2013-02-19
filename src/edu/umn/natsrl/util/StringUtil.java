@@ -21,6 +21,8 @@ package edu.umn.natsrl.util;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -42,5 +44,12 @@ public class StringUtil {
             }
         }
         return buffer.toString();
+    }
+    
+    public static boolean isNumber(String str){
+        if(str == null) return false;
+        Pattern p = Pattern.compile("([\\p{Digit}]+)?");
+        Matcher m = p.matcher(str);
+        return m.matches();
     }
 }

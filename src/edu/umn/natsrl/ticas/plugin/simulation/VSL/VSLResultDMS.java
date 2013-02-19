@@ -28,6 +28,7 @@ class VSLResultDMS extends VSLResultInfra{
     ArrayList<Boolean> isStarted = new ArrayList<Boolean>();
     ArrayList<Double> speedlimit = new ArrayList<Double>();
     ArrayList<Double> actualSpeedLimit = new ArrayList<Double>();
+    ArrayList<Integer> SLOWTRAFFICAHEAD = new ArrayList<Integer>();
     
     VSLResultDMS(Double _milePoint, String _id) {
         super(_id,_milePoint);
@@ -35,25 +36,28 @@ class VSLResultDMS extends VSLResultInfra{
     }
 
     public void addData(DMSImpl d) {
-        addData(d.isStarted(),d.getSpeedLimit(),d.getActualSpeedLimit());
+        addData(d.isStarted(),d.getSpeedLimit(),d.getActualSpeedLimit(),d.getSTA());
     }
     
-    public void addData(boolean isStart, double _speed, double _aspeed){
+    public void addData(boolean isStart, double _speed, double _aspeed, int _sta){
         isStarted.add(isStart);
         speedlimit.add(_speed);
         actualSpeedLimit.add(_aspeed);
+        SLOWTRAFFICAHEAD.add(_sta);
     }
     
-    void addAllDatas(double[] slimit, double[] started, double[] aslimit) {
+    void addAllDatas(double[] slimit, double[] started, double[] aslimit, int[] _sta) {
         addAllDatas(slimit, speedlimit);
         addAllDatas(convertDoubletoBooleanArray(started),isStarted);
         addAllDatas(aslimit,actualSpeedLimit);
+        addAllDatas(_sta,SLOWTRAFFICAHEAD);
     }
     
     private void clear() {
         isStarted.clear();
         speedlimit.clear();
         actualSpeedLimit.clear();
+        SLOWTRAFFICAHEAD.clear();
     }
     
     public double[] getSpeedLimit(){
@@ -66,6 +70,10 @@ class VSLResultDMS extends VSLResultInfra{
     
     public double[] getActualSpeedLimit(){
         return getArraytoDouble(actualSpeedLimit);
+    }
+    
+    public int[] getSTA(){
+        return getArraytoInt(SLOWTRAFFICAHEAD);
     }
 
     

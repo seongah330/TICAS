@@ -153,10 +153,10 @@ public class SectionCreatorPanel extends javax.swing.JPanel {
         mapHelper.clear();
         if (cbxCorridors.getSelectedIndex() != 0) {
             Corridor c = (Corridor) cbxCorridors.getSelectedItem();
-            if(this.selectedCorridorIndex == 0) {
+//            if(this.selectedCorridorIndex == 0) {
                 RNode rn = c.getRnodes().get(0);
                 mapHelper.setCenter(rn);
-            }
+//            }
             mapHelper.showCorridor(c);
         }
         // initialize on-makining-section
@@ -341,9 +341,9 @@ public class SectionCreatorPanel extends javax.swing.JPanel {
         btnCancel = new javax.swing.JButton();
         jmKit = new org.jdesktop.swingx.JXMapKit();
 
-        popupMenu.setFont(new java.awt.Font("Verdana", 0, 11));
+        popupMenu.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
 
-        menuItemSectionStart.setFont(new java.awt.Font("Verdana", 0, 11));
+        menuItemSectionStart.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         menuItemSectionStart.setText("Section start from here");
         menuItemSectionStart.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -352,7 +352,7 @@ public class SectionCreatorPanel extends javax.swing.JPanel {
         });
         popupMenu.add(menuItemSectionStart);
 
-        menuItemSectionThroughHere.setFont(new java.awt.Font("Verdana", 0, 11));
+        menuItemSectionThroughHere.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         menuItemSectionThroughHere.setText("Through this exit");
         menuItemSectionThroughHere.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -361,7 +361,7 @@ public class SectionCreatorPanel extends javax.swing.JPanel {
         });
         popupMenu.add(menuItemSectionThroughHere);
 
-        menuItemSectionEnd.setFont(new java.awt.Font("Verdana", 0, 11));
+        menuItemSectionEnd.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         menuItemSectionEnd.setText("Section end to here");
         menuItemSectionEnd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -370,7 +370,7 @@ public class SectionCreatorPanel extends javax.swing.JPanel {
         });
         popupMenu.add(menuItemSectionEnd);
 
-        menuItemProperties.setFont(new java.awt.Font("Verdana", 0, 11));
+        menuItemProperties.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         menuItemProperties.setText("Properties");
         menuItemProperties.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -381,17 +381,23 @@ public class SectionCreatorPanel extends javax.swing.JPanel {
 
         jSplitPane1.setDividerLocation(220);
 
-        jLabel2.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel2.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel2.setText("Select starting corridor :");
 
-        tbxRoutes.setColumns(20);
+        cbxCorridors.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbxCorridorsActionPerformed(evt);
+            }
+        });
+
         tbxRoutes.setEditable(false);
-        tbxRoutes.setFont(new java.awt.Font("Verdana", 0, 10));
+        tbxRoutes.setColumns(20);
+        tbxRoutes.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         tbxRoutes.setLineWrap(true);
         tbxRoutes.setRows(5);
         jScrollPane1.setViewportView(tbxRoutes);
 
-        jLabel3.setFont(new java.awt.Font("Verdana", 0, 10));
+        jLabel3.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         jLabel3.setText("Routes :");
 
         btnSaveSection.setText("Save Section");
@@ -435,7 +441,7 @@ public class SectionCreatorPanel extends javax.swing.JPanel {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 414, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnCancel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -461,7 +467,7 @@ public class SectionCreatorPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 571, Short.MAX_VALUE)
+                .addComponent(jSplitPane1)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -600,6 +606,11 @@ public class SectionCreatorPanel extends javax.swing.JPanel {
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         setSectionPoints();
     }//GEN-LAST:event_btnCancelActionPerformed
+
+    private void cbxCorridorsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxCorridorsActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbxCorridorsActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnSaveSection;

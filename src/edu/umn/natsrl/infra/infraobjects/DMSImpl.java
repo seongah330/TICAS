@@ -52,7 +52,7 @@ public class DMSImpl extends InfraObject implements Comparable{
     private boolean isVSAStarted = false;
     private int speedlimit = 0;
     private double ActualSpeedlimit = 0;
-
+    private int sta = 0; //SLOW TRAFFIC AHEAD
     public DMSImpl(){
         this.infraType = InfraType.DMSImpl;
     }
@@ -319,5 +319,13 @@ public class DMSImpl extends InfraObject implements Comparable{
         }
         
         return hdms;
+    }
+
+    public void setSTA(int i) {
+        sta = i;
+    }
+
+    public int getSTA() {
+        return sta;
     }
 }

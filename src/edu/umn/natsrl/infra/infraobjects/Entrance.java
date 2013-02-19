@@ -18,6 +18,9 @@
 
 package edu.umn.natsrl.infra.infraobjects;
 
+import edu.umn.natsrl.infra.InfraProperty;
+import edu.umn.natsrl.infra.types.InfraType;
+import edu.umn.natsrl.infra.types.TransitionType;
 import java.util.ArrayList;
 import org.w3c.dom.Element;
 
@@ -34,6 +37,22 @@ public class Entrance extends RNode {
     public Entrance(Element ele) {
         super(ele);
         setEntranceDetectors();
+    }
+
+    public Entrance(String id, String label, int lanes, int easting, int northing, InfraType itype) {
+        this.id = id;
+        this.infraType = itype;
+        setProperty(InfraProperty.label,label);
+        setProperty(InfraProperty.lanes,lanes);
+        setProperty(InfraProperty.shift,0);
+        setProperty(InfraProperty.transition,"Loop");
+        setProperty(InfraProperty.attach_side,"right");
+        setProperty(InfraProperty.s_limit,55);
+        this.transitionType = TransitionType.Loop;
+        
+        this.isAvailable = true;
+        this.easting = easting;
+        this.northing = northing;
     }
 
     private void setEntranceDetectors() {

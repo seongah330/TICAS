@@ -28,6 +28,7 @@ import edu.umn.natsrl.infra.types.TransitionType;
 import edu.umn.natsrl.map.CoordinateConversion;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.JOptionPane;
 import org.w3c.dom.Element;
@@ -55,10 +56,14 @@ public class RNode extends InfraObject {
     /**
      * Location
      */
-    private int easting = 0;
-    private int northing = 0;
+    protected int easting = 0;
+    protected int northing = 0;
 
     protected HashMap<String, Detector> detectors = new HashMap<String, Detector>();   
+    
+    public RNode(){
+        
+    }
     
     public RNode(Element element)
     {
@@ -71,7 +76,7 @@ public class RNode extends InfraObject {
     }
 
     public static RNode create(Element element) {
-        String type = element.getAttribute("n_type");  
+        String type = element.getAttribute("n_type");
         String sid = element.getAttribute("station_id");
         
         
@@ -88,6 +93,13 @@ public class RNode extends InfraObject {
         else if(type.equals("Interchange")) return new Interchange(element);
         else if(type.equals("Access")) return new Access(element);
         else if(type.equals("Intersection")) return new Intersection(element);
+        return null;
+    }
+    
+    public static RNode create(String id,String stationId, String label, int lanes, int easting, int northing, InfraType itype){
+        if(itype.isStation())return new Station(id, stationId, label, lanes, easting, northing, itype);
+        else if(itype.isEntrance()) return new Entrance(id, label, lanes, easting, northing, itype);
+        else if(itype.isExit()) return new Exit(id, label, lanes, easting, northing, itype);
         return null;
     }
 
@@ -599,5 +611,48 @@ public class RNode extends InfraObject {
             }
         }
         return true;
+    }
+    
+    public void setStationId(String text) {
+        setProperty(InfraProperty.station_id,text);
+        System.out.println("ok");
+    }
+
+    public void setLabel(String text) {
+        setProperty(InfraProperty.label, text);
+    }
+
+    public void setLanes(int integer) {
+        setProperty(InfraProperty.lanes, integer);
+    }
+
+    public void setEasting(int _easting) {
+        this.easting = _easting;
+    }
+
+    public void setNorthing(int _northing) {
+        this.northing = _northing;
+    }
+
+    public void addDetectors(List<Detector> adets) {
+        if(detectors == null) detectors = new HashMap<String, Detector>();        
+        
+        TMO tmo = TMO.getInstance();
+        for(Detector dd : adets){
+            String d = dd.getId();
+            Detector det = tmo.getInfra().getDetector(d);
+            if(det != null){
+                detectors.put(det.getId(),det);
+                det.setRNode(this);
+            }
+        }
+    }
+
+    public void setInfraType(InfraType itype) {
+        infraType = itype;
+    }
+
+    public void removeDetector(Detector d) {
+        detectors.remove(d.getId());
     }
 }

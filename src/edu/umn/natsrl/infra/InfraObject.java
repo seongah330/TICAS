@@ -133,6 +133,9 @@ public abstract class InfraObject implements Serializable {
         return splittArray;
     }
 
+    public void setId(String _id){
+        id = _id;
+    }
     public String getId() {
         if(id == null)
             return "null";

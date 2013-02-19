@@ -153,4 +153,35 @@ public class VSLChartXY extends TICASChartXY{
     private void AddDMSActualGraph(double[] xdata, double[] ydata, String name){
         super.addXYGraph(xdata, ydata, name, new TracePainterDisc(4), Color.BLUE);
     }
+    
+    public void AddMapDMSSTAGraph(TreeMap<Integer,VSLResultDMS> dmss, String name){
+        AddMapDMSSTAGraph(dmss,name,null);
+    }
+    public void AddMapDMSSTAGraph(TreeMap<Integer,VSLResultDMS> dmss, String name, Integer idx){
+        double[] xdata = new double[dmss.size()];
+        double[] ydata = new double[dmss.size()];
+        int cnt = 0;
+        for(Integer key : dmss.keySet()){
+            xdata[cnt] = key;
+            
+            int sindx = 0;
+            if(idx == null){
+                sindx = dmss.get(key).getActualSpeedLimit().length - 1;
+            }else{
+                sindx = idx;
+            }
+            
+            if(dmss.get(key).getSTA()[sindx] == 1)
+                ydata[cnt] = dmss.get(key).getActualSpeedLimit()[sindx];
+            else
+                ydata[cnt] = -1;
+            cnt++;
+        }
+        AddDMSSTAGraph(xdata,ydata,name);
+    }
+    
+    private void AddDMSSTAGraph(double[] xdata, double[] ydata, String name){
+//        super.addXYGraph(xdata, ydata, name, new TracePainterDisc(6), Color.RED);
+        super.addXYGraph(xdata, ydata, name, new TracePainterVerticalBar(2,chart), Color.ORANGE);
+    }
 }

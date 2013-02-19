@@ -15,29 +15,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package edu.umn.natsrl.ticas.plugin.simulation.VSL;
+package edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm;
 
 /**
  *
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
-public enum VSAControlMode {
-    TT_NOLIMIT("Travel Time_NEW"),
-    TT_MODE("Travel Time_Old"),
-    STATIC_MODE("STATIC MODE");
+public enum AccCheckThreshold {
+    BASEDCHECKTHRESHOLD(0,"ai,t-2, ai,t-1, ai,t <= X"),
+    TRENDCHECKTHRESHOLD(1,"ai,t-2 >= ai,t-1 >= ai,t, ai,t <= X");
     
-    String str = null;
-    
-    VSAControlMode(String s){
-        str = s;
+    int sid;
+    String name;
+    AccCheckThreshold(int _sid, String _name){
+        sid = _sid;
+        name = _name;
     }
     
-    public boolean isSTATICMODE(){return this==STATIC_MODE;}
-    public boolean isTTMODE(){return this==TT_MODE;}
-    public boolean isTTNOLIMIT(){return this==TT_NOLIMIT;}
+    public int getSID(){
+        return sid;
+    }
+    
+    public static AccCheckThreshold getbyID(int id){
+        for(AccCheckThreshold sa : AccCheckThreshold.values()){
+            if(sa.getSID() == id){
+                return sa;
+            }
+        }
+        return null;
+    }
     
     @Override
     public String toString(){
-        return str;
+        return name;
     }
+    
+    boolean isBASEON(){return this == this.BASEDCHECKTHRESHOLD;}
+    boolean isTRENDON(){return this == this.TRENDCHECKTHRESHOLD;}
 }

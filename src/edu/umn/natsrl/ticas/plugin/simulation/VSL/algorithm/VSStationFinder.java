@@ -63,6 +63,9 @@ public class VSStationFinder {
      */
     protected Double vss_mp;
     
+    /**
+     * for NEAR Station
+     */
     public VSStationFinder(Double m){
         ma = m;
     }
@@ -81,6 +84,41 @@ public class VSStationFinder {
             vss_mp = m;
         }
         return false;
+    }
+    
+//    public boolean isDownStreamVSS(){
+//        if(vss != null && sd != null){
+//            if(su != null && vss.getID().equals(su.getID())){
+//                return false;
+//            }else
+//                return true;
+//        }else
+//            return false;
+//    }
+    
+    public VSLStationState getNearStation(){
+        if(su != null && sd != null){
+            System.out.print("mu("+su.getID()+"):"+mu+", md("+sd.getID()+"):"+md+", ");
+            System.out.print("ma-mu:"+Math.abs(ma-mu)+", ma-md:"+Math.abs(ma-md));
+            if(Math.abs(ma-mu) <= Math.abs(ma-md)){
+                System.out.print(", S"+su.getID()+"-"+su.getAggregateRollingSpeed()+" : "+getSpeedLimit());
+                return su;
+            }
+            else{
+                System.out.print(", S"+sd.getID()+"-"+sd.getAggregateRollingSpeed()+" : "+getSpeedLimit());
+                return sd;
+            }
+        }else if(su != null){
+            System.out.print("mu("+su.getID()+"):"+mu);
+            System.out.print(", S"+su.getID()+"-"+su.getAggregateRollingSpeed()+" : "+getSpeedLimit());
+            return su;
+        }else if(sd != null){
+            System.out.print("mu("+sd.getID()+"):"+md);
+            System.out.print(", S"+sd.getID()+"-"+sd.getAggregateRollingSpeed()+" : "+getSpeedLimit());
+            return sd;
+        }else{
+            return null;
+        }
     }
     
     /** Check if a valid VSS was found */
@@ -165,5 +203,27 @@ public class VSStationFinder {
             }
         }
         return null;
+    }
+
+    boolean checkBound(Integer setSpeed) {
+        if(su != null && sd != null){
+            Double uu = su.getAggregateRollingSpeed();
+            Double du = sd.getAggregateRollingSpeed();
+            if(uu <= 0 || du <= 0)
+                return true;
+            
+            if(setSpeed >= uu && setSpeed > du)
+                return false;
+            else
+                return true;
+        }else
+            return true;
+    }
+
+    boolean isUpstreamVSS() {
+        if(su != null && vss != null && su.getID().equals(vss.getID()))
+            return true;
+        else
+            return false;
     }
 }

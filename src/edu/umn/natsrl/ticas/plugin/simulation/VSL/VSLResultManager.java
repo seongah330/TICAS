@@ -200,9 +200,11 @@ public class VSLResultManager {
             
             double[] slimit = rd.getSpeedLimit(), isstart = rd.getisStarted();
             double[] aslimit = rd.getActualSpeedLimit();
+            int[] sta = rd.getSTA();
             prop.put(setKey(key, VSLTrafficType.SPEEDLIMIT), slimit);
             prop.put(setKey(key, VSLTrafficType.ISSTARTED), isstart);
             prop.put(setKey(key, VSLTrafficType.ACTUALSPEEDLIMIT), aslimit);
+            prop.put(setKey(key, VSLTrafficType.SLOWTRAFFICAHEAD), getCsv(sta));
             
         }
         
@@ -255,8 +257,8 @@ public class VSLResultManager {
         double[] slimit = prop.getDoubleArray(setKey(dkey,VSLTrafficType.SPEEDLIMIT));
         double[] isstarted = prop.getDoubleArray(setKey(dkey,VSLTrafficType.ISSTARTED));
         double[] aslimit = prop.getDoubleArray(setKey(dkey,VSLTrafficType.ACTUALSPEEDLIMIT));
-        
-        ndms.addAllDatas(slimit,isstarted,aslimit);
+        int[] sta = prop.getIntegerArray(setKey(dkey,VSLTrafficType.SLOWTRAFFICAHEAD));
+        ndms.addAllDatas(slimit,isstarted,aslimit,sta);
         
         vresult.addDMS(dkey, ndms);
         
@@ -313,7 +315,8 @@ public class VSLResultManager {
         SPEEDLIMIT(11),
         ISSTARTED(12),
         CONTROLTHRESHOLD(13),
-        ACTUALSPEEDLIMIT(14);
+        ACTUALSPEEDLIMIT(14),
+        SLOWTRAFFICAHEAD(15);
         
         int id;
         VSLTrafficType(int n){

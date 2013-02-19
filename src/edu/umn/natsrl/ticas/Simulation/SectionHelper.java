@@ -182,7 +182,7 @@ public class SectionHelper {
                 return false;
             }
             for (SimDetector sd : detectors) {
-                if (sd.getDetectorId() == d.getDetectorId()) {
+                if (sd != null && sd.getDetectorId() == d.getDetectorId()) {
                     return true;
                 }
             }

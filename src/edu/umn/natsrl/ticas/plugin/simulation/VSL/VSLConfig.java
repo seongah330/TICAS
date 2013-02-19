@@ -17,6 +17,8 @@
  */
 package edu.umn.natsrl.ticas.plugin.simulation.VSL;
 
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.AccCheckThreshold;
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.BottleneckSpeed;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.DensityAggregation;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.MaxSpeed;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.SpeedAggregation;
@@ -44,6 +46,7 @@ public class VSLConfig extends ticasConfig{
     public static double VSL_RANGE_THRESHOLD = 35;
     public static int VSL_MOVING_ACCEL = 600;
     public static double VSL_VSS_CONTINUE_SPEED = 5.0d;
+    public static double VSL_ZONE_LENGTH_MILE = 1.5d;
     
     public static SpeedAggregation SPEED_SPEED_AGGREGATION = SpeedAggregation.LAB;
     public static DensityAggregation SPEED_DENSITY_AGGREGATION = DensityAggregation.MovingKAvg;
@@ -54,13 +57,17 @@ public class VSLConfig extends ticasConfig{
      * Fixed Value
      */
     public static double VSL_MIN_SPEED = 30.0;
-    public static double VSL_MAX_SPEED = 60.0;
+    public static double VSL_MAX_SPEED = 50.0;
     public static double VSL_MIN_CHANGE = 5.0;
     public static int FTM = 5280;   // 1 mile = 5280 feets
     
     public static int Interval = 30;
     
-    public static VSAControlMode vsaControlMODE= VSAControlMode.TT_NOLIMIT;
+    //VSS Identification
+    public static BottleneckSpeed bottleneckSpeedType = BottleneckSpeed.BASEDBOTTLENECKSPEED;
+    public static AccCheckThreshold accCheckThreshold = AccCheckThreshold.BASEDCHECKTHRESHOLD;
+    public static boolean isAccidentSpeed = false;
+    public static double AccidentSpeed = 25;
     
     public static void save(){
         prop.put("VSL_VDA", VSL_VSS_DECISION_ACCEL);
@@ -74,6 +81,11 @@ public class VSLConfig extends ticasConfig{
         prop.put("SMS", SPEED_MAX_SPEED.getSRC());
         prop.put("MOVE_DEC", VSL_MOVING_ACCEL);
         prop.put("MOVE_SPD", VSL_RANGE_THRESHOLD);
+        prop.put("ACCIDENTSPEED", AccidentSpeed);
+        prop.put("ACT", accCheckThreshold.getSID());
+        prop.put("BST", bottleneckSpeedType.getSID());
+        prop.put("ISACCSPEED", isAccidentSpeed);
+        prop.put("VSLZONEMILE", VSL_ZONE_LENGTH_MILE);
         saveConfig(configFile);
     }
     public static void load(){
@@ -91,6 +103,11 @@ public class VSLConfig extends ticasConfig{
             SPEED_DENSITY_AGGREGATION = DensityAggregation.getTypebyID(p.getInteger("DA"));
             SPEED_SPEED_FOR_LOW_K = SpeedforLowK.getTypebyID(p.getInteger("SLK"));
             SPEED_MAX_SPEED = MaxSpeed.getTypebyID(p.getInteger("SMS"));
+            AccidentSpeed = p.getDouble("ACCIDENTSPEED");
+            accCheckThreshold = AccCheckThreshold.getbyID(p.getInteger("ACT"));
+            bottleneckSpeedType = BottleneckSpeed.getbyID(p.getInteger("BST"));
+            isAccidentSpeed = p.getBoolean("ISACCSPEED");
+            VSL_ZONE_LENGTH_MILE = p.getDouble("VSLZONEMILE");
         }   
     }
 }

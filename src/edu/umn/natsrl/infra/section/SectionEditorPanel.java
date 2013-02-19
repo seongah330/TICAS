@@ -67,6 +67,17 @@ public class SectionEditorPanel extends javax.swing.JPanel {
             }
         });
         this.panCreateSection.add(scp);        
+        
+        //SectionInfraCreator
+        SectionInfraCreatorPanel sicp = new SectionInfraCreatorPanel();
+        sicp.setChangeListener(new ISectionChanged() {
+            @Override
+            public void sectionChanged(SectionChangedStatus status) {
+                sectionIsChanged(status);                
+            }
+        });
+        this.panCreateInfra.add(sicp); 
+        
         if(!tmo.isLoaded()) tmo.setup();
         infra = tmo.getInfra();
         corridors = infra.getCorridors();
@@ -161,6 +172,7 @@ public class SectionEditorPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        asyncRequestAdapter1 = new org.jdesktop.http.async.event.AsyncRequestAdapter();
         tabMainTab = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
@@ -174,6 +186,7 @@ public class SectionEditorPanel extends javax.swing.JPanel {
         btnDeleteSelection = new javax.swing.JButton();
         jxMap = new org.jdesktop.swingx.JXMapKit();
         panCreateSection = new javax.swing.JPanel();
+        panCreateInfra = new javax.swing.JPanel();
 
         tabMainTab.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
         tabMainTab.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -289,6 +302,9 @@ public class SectionEditorPanel extends javax.swing.JPanel {
         panCreateSection.setLayout(new java.awt.BorderLayout());
         tabMainTab.addTab("Create Freeway Section", panCreateSection);
 
+        panCreateInfra.setLayout(new java.awt.BorderLayout());
+        tabMainTab.addTab("Infra Editor", panCreateInfra);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -317,6 +333,7 @@ public class SectionEditorPanel extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private org.jdesktop.http.async.event.AsyncRequestAdapter asyncRequestAdapter1;
     private javax.swing.JButton btnDeleteSelection;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -325,6 +342,7 @@ public class SectionEditorPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private org.jdesktop.swingx.JXMapKit jxMap;
+    private javax.swing.JPanel panCreateInfra;
     private javax.swing.JPanel panCreateSection;
     private javax.swing.JTabbedPane tabMainTab;
     private javax.swing.JTable tbSectionList;

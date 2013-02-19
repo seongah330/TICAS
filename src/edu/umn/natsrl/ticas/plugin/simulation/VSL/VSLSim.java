@@ -259,6 +259,7 @@ public class VSLSim extends Simulation implements SimulationImpl{
                 chart.AddVSLResultStationSpeedGraph(vslresult.getMapStations(), "StationSpeed");
                 chart.AddMapDMSSpeedGraph(vslresult.getMapDMSs(), "DMSSpeedLimit");
                 chart.AddMapDMSActualSpeedGraph(vslresult.getMapDMSs(), "DMSActualSpeedLimit");
+                chart.AddMapDMSSTAGraph(vslresult.getMapDMSs(), "SLOW TRAFFIC AHEAD");
                 cpn.setSize(chartPanel.getSize());
                 chartPanel.getParent().validate();
             }

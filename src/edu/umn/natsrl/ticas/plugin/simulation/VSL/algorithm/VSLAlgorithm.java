@@ -105,9 +105,14 @@ public class VSLAlgorithm{
      */
     private void setDMS() {
         List<DMSImpl> cdms = section.getDMS();
+        boolean hasFirstDMS = false;
+        VSLStationState cvss = null;
+        DMSImpl prevDMS = null;
+        boolean isValidDMS = false;
         for(DMSImpl dms : cdms){
             VSStationFinder vss_finder = vslversion.getVSStationFinder(dms.getMilePoint(section.getName()));
             double aVSA = 0;
+            dms.setSTA(0);
 //            System.out.println("Find Station for DMS"+"-"+dms.getId());
             
             findStation(vss_finder);
@@ -116,7 +121,7 @@ public class VSLAlgorithm{
             //set VSS State
             Integer setSpeed = null;
             if(vss_finder.foundVSS()){
-                System.out.println(" - Found!!");
+//                System.out.println(" - Found!!");
                 Integer lim = vss_finder.getSpeedLimit();
                 if(lim != null){
                     Double a = vss_finder.calculateSpeedAdvisory();
@@ -131,6 +136,56 @@ public class VSLAlgorithm{
                         }
                     }
                 }
+                
+                /**
+                 * Check Safe Traffic Ahead
+                 */
+                if(cvss == null || !cvss.getID().equals(vss_finder.vss.getID())){
+                    cvss = vss_finder.vss;
+                    prevDMS = null;
+                    isValidDMS = false;
+                    
+                    if(setSpeed != null){
+                        if(setSpeed >= 50){
+                            dms.setSTA(1);
+                        }
+                    }
+                }
+
+                if(setSpeed != null){
+                    isValidDMS = true;
+                }
+
+                if(!isValidDMS){
+                    if(prevDMS != null){
+                        prevDMS.setSTA(0);
+                    }
+
+                    if(!vss_finder.isUpstreamVSS())
+                        dms.setSTA(1);
+                    prevDMS = dms;
+                }
+                
+                //Check outbound signal
+                if(setSpeed != null && !vss_finder.checkBound(setSpeed))
+                    setSpeed = null;
+                    
+                
+//                if(!hasFirstDMS){
+//                    cvss = vss_finder.vss;
+//                    hasFirstDMS = true;
+//                    dms.setSTA(1);
+//                }else{
+//                    if(!cvss.getID().equals(vss_finder.vss.getID())){
+//                        cvss = vss_finder.vss;
+//                        
+//                        System.out.print(dms.getId()+"("+dms.getMilePoint(section.getName())+") = ");
+//                        if(vss_finder.getNearStation().getAggregateRollingSpeed() > lim){
+//                            dms.setSTA(1);
+//                        }
+//                        System.out.println();
+//                    }
+//                }
             }
             
             dms.setVSA(setSpeed);

@@ -89,11 +89,11 @@ public class VSLStationStateFullSearch extends VSLStationState{
             if(ap != null && ap >= 0){
                 break;
             }
-            System.out.println(">>ComStation : "+s.getID()+", acc:"+s.acceleration+", isbSpd:"+s.isAboveBottleneckSpeed()+", a:"+a);
-            System.out.println(">>Com2Station : "+sp.getID()+", acc:"+sp.acceleration+", isbSpd:"+sp.isAboveBottleneckSpeed()+", ap:"+ap);
+//            System.out.println(">>ComStation : "+s.getID()+", acc:"+s.acceleration+", isbSpd:"+s.isAboveBottleneckSpeed()+", a:"+a);
+//            System.out.println(">>Com2Station : "+sp.getID()+", acc:"+sp.acceleration+", isbSpd:"+sp.isAboveBottleneckSpeed()+", ap:"+ap);
             if(a != null && ap != null && !sp.isAboveBottleneckSpeed()
                     && ap < this.getVSLMovingAcc() && a >= ap){
-                System.out.println("CStation : "+sp.getID()+", acc:"+sp.acceleration+", isbSpd:"+sp.isAboveBottleneckSpeed());
+//                System.out.println("CStation : "+sp.getID()+", acc:"+sp.acceleration+", isbSpd:"+sp.isAboveBottleneckSpeed());
                 s.bottleneck = false;
                 s.n_bottleneck = 0;
                 s = sp;
@@ -103,7 +103,7 @@ public class VSLStationStateFullSearch extends VSLStationState{
                     s.n_bottleneck++;
                 }
             }else{
-                System.out.println("--NStation : "+sp.getID()+", acc:"+sp.acceleration+", isbSpd:"+sp.isAboveBottleneckSpeed());
+//                System.out.println("--NStation : "+sp.getID()+", acc:"+sp.acceleration+", isbSpd:"+sp.isAboveBottleneckSpeed());
                 sp.bottleneck = false;
                 sp.n_bottleneck = 0;
             }

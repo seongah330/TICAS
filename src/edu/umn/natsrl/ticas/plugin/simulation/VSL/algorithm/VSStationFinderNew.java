@@ -55,7 +55,7 @@ public class VSStationFinderNew extends VSStationFinder{
     * @return Speed advisory. */
     @Override
     protected Double calculateSpeedAdvisory(double spd, double d){
-        System.out.println("Yeah! ");
+//        System.out.println("Yeah! ");
         if(d > 0){
             int acc = -vss.getControlThreshold();
             double s2 = spd * spd + 2.0 * acc * d;
@@ -67,7 +67,7 @@ public class VSStationFinderNew extends VSStationFinder{
             return spd;
         }
     }
-//    /** Calculate the advisory speed */
+    /** Calculate the advisory speed */
 //    @Override
 //    public Double calculateSpeedAdvisory() {
 //        Double splimit = null;
@@ -84,10 +84,10 @@ public class VSStationFinderNew extends VSStationFinder{
 //        }
 //        
 //        Double sdSpeed = sd.getAggregateRollingSpeed();
-//        if(!sd.getID().equals(vss.getID()) &&
-//            sdSpeed < splimit){
-//            splimit = null;
-//        }
+////        if(!sd.getID().equals(vss.getID()) &&
+////            sdSpeed < splimit){
+////            splimit = null;
+////        }
 //        
 //        return splimit;
 //    }

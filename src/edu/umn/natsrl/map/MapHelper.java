@@ -528,10 +528,11 @@ public class MapHelper {
             }
             rnode = d.getRNode();
         }
+        if(rnode != null){
+            double[] lat = converter.utm2LatLon("15 T " + rnode.getEasting() + " " + rnode.getNorthing());
 
-        double[] lat = converter.utm2LatLon("15 T " + rnode.getEasting() + " " + rnode.getNorthing());
-
-        map.setCenterPosition(new GeoPosition(lat[0], lat[1]));        
+            map.setCenterPosition(new GeoPosition(lat[0], lat[1]));        
+        }
     }
     
     public void setCenter(InfraPoint infraPoint)
@@ -581,5 +582,9 @@ public class MapHelper {
     public void clear() {
         this.setMarkers(new HashSet<InfraPoint>());
         this.sectionList = null;
+    }
+    
+    public GeoPosition getGeoPosition(Point2D d){
+        return map.convertPointToGeoPosition(d);
     }
 }
