@@ -18,6 +18,7 @@
 package edu.umn.natsrl.ticas.Simulation;
 
 import edu.umn.natsrl.infra.Section;
+import edu.umn.natsrl.infra.infraobjects.Detector;
 import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.infra.simobjects.SimDMS;
 import edu.umn.natsrl.infra.simobjects.SimDetector;
@@ -41,6 +42,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JPanel;
 import jxl.Workbook;
 import jxl.write.Label;
 import jxl.write.Number;
@@ -67,7 +69,7 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     protected ArrayList<EntranceState> entrancestates;
     
     private ISimEndSignal signalListener;            
-    private int samples = 0;    
+    protected int samples = 0;    
     
     private int simDuration = 0;
     
@@ -84,6 +86,9 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     private boolean isDebug_StationInfo = true;
     private boolean isDebug_EntranceInfo = true;
     
+    //chart Option
+    protected JPanel chartPanel = null;
+    
     public Simulation(String caseFile, int seed, Section section, VISSIMVersion v){
         try{
             this.caseFile = caseFile;
@@ -92,6 +97,7 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
             version = v;
             loadSignalGroupFromCasefile(this.caseFile);
             detectors = loadDetectorFromCasefile(this.caseFile);
+            checkDetector(detectors);
             this.simDuration = VISSIMHelper.loadSimulationDuration(this.caseFile);
             simDMSs = loadDMSsFromCasefile(this.caseFile);
             sectionHelper = new SectionHelper(section, detectors,meters,simDMSs);
@@ -99,6 +105,10 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         }catch(IOException ex){
             ex.printStackTrace();
         }
+    }
+    
+    public void SimInit(){
+        
     }
     
     @Override
@@ -190,7 +200,7 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     
     protected void DebugMassage(){
         DisplayStationState();
-        DisplayMeterState();
+        DisplayMeterState(entrancestates);
     }
     
     private void loadSignalGroupFromCasefile(String casefile) throws IOException{
@@ -345,12 +355,12 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         }
     }
 
-    public void DisplayMeterState() {
+    public void DisplayMeterState(ArrayList<EntranceState> enstates) {
         if(this.isDebug_EntranceInfo){
             System.err.println("clearlog");
             System.err.println("=====Metering State======================");
-            for(int i=0;i<entrancestates.size();i++){
-                EntranceState es = entrancestates.get(i);
+            for(int i=0;i<enstates.size();i++){
+                EntranceState es = enstates.get(i);
                 if(es.hasMeter())
                     System.err.println(es.meter.getId() + " : " + "Queue Demand="+es.getQueueVolume()+", Passage="+es.getPassageVolume()+", Rate="+es.getCurrentRate());
             }
@@ -396,6 +406,25 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         }
         return simDets;
     }
+
+    private void checkDetector(ArrayList<SimDetector> detectors) {
+        System.out.println("Check Detector VISSIM to TICAS Section");
+        for(Station s : section.getStations()){
+            System.out.println("Check Station - "+s.getStationId());
+            for(Detector d : s.getDetectors()){
+                boolean hasdec = false;
+                for(SimDetector sd : detectors){
+                    if(sd.getId().equals(d.getId()))
+                        hasdec = true;
+                }
+                if(!hasdec){
+                    System.out.println(d.getId() + "-missing");
+                }else
+                    System.out.println(d.getId() + "-ok");
+                
+            }
+        }
+    }
     
     public static interface ISimEndSignal {
         public void signalEnd(int code);
@@ -423,5 +452,9 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     }
     public void setDebugEntranceInfo(boolean is){
         this.isDebug_EntranceInfo = is;
+    }
+    
+    public void setChartPanel(JPanel PanelChart) {
+        chartPanel = PanelChart;
     }
 }

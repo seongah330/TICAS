@@ -331,7 +331,7 @@ public class Metering {
                 boolean shouldStop = false;
                 // COMMON STOP CONDITION : segment density is low for n times
                 for (int k = 0; k < N; k++) {
-                    Double sk = es.getSegmentDensity(this.dataCount - k);
+                    Double sk = es.getSegmentDensity(k);
                     if (sk > MeteringConfig.Kd) {
                         shouldStop = true;
                         break;
@@ -581,7 +581,7 @@ public class Metering {
             Kt = sectionHelper.getAverageDensity(upstream, bottleneck);
         }
 
-        entrance.saveSegmentDensityHistory(this.dataCount, Kt);
+        entrance.saveSegmentDensityHistory(Kt);
 
         boolean cooridnated = false;
         double Kc = bottleneck.Kc;
@@ -589,83 +589,71 @@ public class Metering {
             cooridnated = true;
             Kc = bottleneck.coordinateKc;
         }
-        double Kd = Kc * MeteringConfig.Kd_Rate;
+        
         double Rmin = entrance.getMinimumRate();
-        double Rmax = MAX_RATE;
+        double Rmax = entrance.getMaximumRate();
         double Rt = entrance.getRate();
-        double d = entrance.getDemandVolume() * 120;
-        double q = entrance.getMergingVolume() * 120;
-        double x = Kd - Kt;
-
-        KPoint p0 = new KPoint(Kd - Kjam, Rmin / Rt);
-        KPoint p1 = new KPoint((Kd - Kjam) / 3, Rmin / Rt + (1 - Rmin / Rt) / 3);
+        
+        double K_DES = MeteringConfig.Kd;
+        double x = K_DES - Kt;
+        double K_JAM = MeteringConfig.Kjam;
+        
+//        System.out.println(entrance.meter.getId() + " : Rmin-"+Rmin+", Rmax-"+Rmax+", Rt-"+Rt);
+        
+        KPoint p0 = new KPoint(K_DES - K_JAM, Rmin / Rt);
+        KPoint p1 = new KPoint((K_DES - K_JAM) / 3,
+                Rmin / Rt + (1 - Rmin / Rt) / 3);
         KPoint p2 = new KPoint(0, 1);
-        if (Rmin >= Rt) {
-            p0.y = p1.y = p2.y = Rmin / Rt;
-        }
-        //KPoint p3 = new KPoint( Kd*2/3, p2.y+(Rmax/Rt-p2.y)/3 );
-        KPoint p4 = new KPoint(Kd, Rmax / Rt);
-        KPoint start = p0, end = p1;
+        if(Rmin >= Rt)
+                p0.y = p1.y = p2.y = Rmin / Rt;
+        KPoint p4 = new KPoint(K_DES, Rmax / Rt);
 
-        // select point to get alpha (line graph's start and end point)
-//        KPoint[] points = new KPoint[]{p0, p1, p2, p4};
-//        for(int i=1; i<points.length-1; i++) {
-//            KPoint p = points[i];
-//            if(x > p.x) {
-//                start = p;
-//                end = points[i+1];
-//            }
-//            
-//        }
-
-        if (x >= 0) {
-            start = p2;
-            end = p4;
-        } else {
-            start = p0;
-            end = p2;
-        }
-
-        // line graph connection 2 points
-        double alpha = ((end.y - start.y) / (end.x - start.x)) * (x - start.x) + start.y;
-//        System.out.println("p1=("+start.x+", "+start.y+"), p2=("+end.x+", "+end.y+"), x="+x+", y="+alpha);
+        // Mainline graph connection 2 points
+        double alpha = getAlpha(p0, p2, p4, x);
 
         // Ramp meter rate for next time interval
         double Rnext = Rt * alpha;
 
-        // Check minimum / max rate
-        Rnext = Math.max(Rnext, Rmin);
-        Rnext = Math.min(Rnext, Rmax);
-
-        if (Rt == 0) {
-            Rnext = Rmax;
-        }
-
-        // Calculate Red Time for debug ///////////////////////////////////////
-        double cycle = 3600 / Rnext;
-        double redTime = Math.round(Math.max(cycle - 2, 0.1) * 10) / 10f;
-        if (upstream == null) {
-            System.out.print("    " + bottleneck.id
-                    + "(" + entrance.meter.getId() + ")");
-        } else {
-            System.out.print("    " + bottleneck.id
-                    + " ~ " + upstream.id + "(" + entrance.meter.getId() + ")");
-        }
-        System.out.println(
-                " : Rnext=" + String.format("%.2f", Rnext)
-                + ", Kc=" + String.format("%.2f", Kc) + "(" + cooridnated + ")"
-                + ", Kd=" + String.format("%.2f", Kd)
-                + ", redTime=" + String.format("%.2f", redTime)
-                + ", k=" + String.format("%.2f", Kt));
-//                + ", alpha=" + String.format("%.2f", alpha)
-//                + ", Rmin=" + String.format("%.2f", Rmin)
-//                + ", Rt=" + String.format("%.2f", Rt)
-//                + ", ent_demand=" + String.format("%.2f", d)
-//                + ", ent_flow=" + String.format("%.2f", q));
-        ///////////////////////////////////////////////////////////////////////
-
-
+//        double cycle = 3600 / Rnext;
+//        double redTime = Math.round(Math.max(cycle - 2, 0.1) * 10) / 10f;
+//        if (upstream == null) {
+//            System.out.print("    " + bottleneck.id
+//                    + "(" + entrance.meter.getId() + ")");
+//        } else {
+//            System.out.print("    " + bottleneck.id
+//                    + " ~ " + upstream.id + "(" + entrance.meter.getId() + ")");
+//        }
+//        System.out.println(
+//                " : Rnext=" + String.format("%.2f", Rnext)
+//                + ", Kc=" + String.format("%.2f", Kc) + "(" + cooridnated + ")"
+//                + ", Kd=" + String.format("%.2f", K_DES)
+//                + ", redTime=" + String.format("%.2f", redTime)
+//                + ", k=" + String.format("%.2f", Kt));
+////                + ", alpha=" + String.format("%.2f", alpha)
+////                + ", Rmin=" + String.format("%.2f", Rmin)
+////                + ", Rt=" + String.format("%.2f", Rt)
+////                + ", ent_demand=" + String.format("%.2f", d)
+////                + ", ent_flow=" + String.format("%.2f", q));
+//        ///////////////////////////////////////////////////////////////////////
         return Rnext;
+    }
+    
+    /** Calculate Alpha Value */
+    private double getAlpha(KPoint P0, KPoint P2, KPoint P4, double x) {
+        KPoint start = P0, end = P2;
+        if(x >= 0) {
+            start = P2;
+            end = P4;
+        } else {
+            start = P0;
+            end = P2;
+        }
+        double yd = end.y - start.y;
+        double xd = end.x - start.x;
+        if(xd != 0)
+            return (yd / xd) * (x - start.x) + start.y;
+        else
+            return 0;
     }
 
     /**
@@ -834,15 +822,14 @@ public class Metering {
             }
 
             // display
-            System.out.println(
-                    "  !! " + e.meter.getId()
-                    + ", flow=" + String.format("%.2f", e.getMergingVolume()*120)
-                    + ", demand=" + String.format("%.2f", e.getDemandVolume()*120)
-                    + ", rate=" + String.format("%.2f", e.meter.getReleaseRate()));
+//            System.out.println(
+//                    "  !! " + e.meter.getId()
+//                    + ", flow=" + String.format("%.2f", e.getMergingVolume()*120)
+//                    + ", demand=" + String.format("%.2f", e.getDemandVolume()*120)
+//                    + ", rate=" + String.format("%.2f", e.meter.getReleaseRate()));
 
             rateLog.print("," + e.meter.getReleaseRate());
 //            waitTimeLog.print("," + ( (e.maxWaitTimeIndex+1)/2));
-            rampDensityLog.print("," + String.format("%.2f", e.getRampDensity()));
         }
 
         rateLog.println("");
@@ -869,6 +856,16 @@ public class Metering {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+
+    public void printEntrance() {
+            System.err.println("=====Metering State======================");
+            for(int i=0;i<sectionHelper.getEntranceStates().size();i++){
+                EntranceState es = sectionHelper.getEntranceStates().get(i);
+                if(es.hasMeter())
+                    System.err.println(es.meter.getId() + " : " + "Queue Demand="+es.getDemandVolume()+"("+es.getDemandVolume_ex()+")"
+                            +", Passage="+es.getMergingVolume()+",Queue="+es.queueLength()+", Rate="+es.meter.getReleaseRate()+", occ="+es.getMaxOccupancy());
+            }
     }
 
 

@@ -294,12 +294,15 @@ public class VISSIMController {
 //                        System.out.println("v="+v+", u="+u+", k="+k+", occ=" + occupancy);
         if (queuedetector != null) {
 //                            Detector d = TMO.getInstance().getInfra().getDetector("D" + this.detectorList[i].getID());
+            if(detectorOption.isDETECTOR()){
             double total_occupancy = occ;
             occupancy = Math.min(total_occupancy / RUNNING_STEP * 100, 100);
 //                            double scanData = occupancy * InfraConstants.MAX_SCANS / 100;
 //                            double sk = occupancy * 5280 / d.getFieldLength() / 100;                            
 //                            double su = q / sk;
-
+            }else{
+                occupancy = occ;
+            }
         }
 
         if (k > 300) {

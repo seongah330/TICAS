@@ -47,7 +47,6 @@ import javax.swing.JPanel;
 public class VSLSim extends Simulation implements SimulationImpl{
     
     VSLAlgorithm vsl;
-    JPanel chartPanel = null;
     private ArrayList<VSLStationState> VSLStationStates = new ArrayList<VSLStationState>();
     TreeMap<Double, VSLStationState> StationMap = new TreeMap<Double, VSLStationState>();
     
@@ -65,10 +64,11 @@ public class VSLSim extends Simulation implements SimulationImpl{
         super(caseFile,seed,section,v);
         
         vslversion = _vv;
-        init();
+        SimInit();
     }
     
-    private void init() {
+    @Override
+    public void SimInit() {
         /*
          * Set VSLStationState
          * set Up, down VSLStation
@@ -93,7 +93,7 @@ public class VSLSim extends Simulation implements SimulationImpl{
         initDebug();
         ml = new VSLMilePointList(VSLStationStates,section.getDMS());
         vslresult = new VSLResults(section,ml,vslversion);
-
+//        vslresult.setPeriod(period);
     }
     
     @Override
@@ -246,10 +246,6 @@ public class VSLSim extends Simulation implements SimulationImpl{
         for(SimDMS sdms : this.simDMSs){
             sdms.setVSAtoVISSIM(vc);
         }
-    }
-
-    void setChartPanel(JPanel PanelChart) {
-        chartPanel = PanelChart;
     }
 
     private void updateChart() {

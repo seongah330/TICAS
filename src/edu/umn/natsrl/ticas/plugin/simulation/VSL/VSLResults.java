@@ -22,6 +22,7 @@ import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLStationState;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.DMSImpl;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLVersion;
+import edu.umn.natsrl.util.PropertiesWrapper;
 import java.io.File;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -48,6 +49,7 @@ public class VSLResults implements Comparable{
     private TreeMap<Integer,String> map = new TreeMap<Integer,String>();
     private TreeMap<Integer,VSLResultStation> mapStation = new TreeMap<Integer,VSLResultStation>();
     private TreeMap<Integer,VSLResultDMS> mapDMSs = new TreeMap<Integer,VSLResultDMS>();
+    private VSLResultConfig config = new VSLResultConfig();
     
     VSLVersion vslversion;
     
@@ -60,6 +62,7 @@ public class VSLResults implements Comparable{
         vslversion = vv;
         section = _section;
         Name = section.getName();
+        config.setConfig();
         setNodes(ml);
     }
 
@@ -324,7 +327,7 @@ public class VSLResults implements Comparable{
         mapDMSs.clear();
     }
 
-    ArrayList<VSLResultStation> getNearStationbyID(String iD) {
+    public ArrayList<VSLResultStation> getNearStationbyID(String iD) {
         Integer key = null;
         ArrayList<VSLResultStation> rstation = new ArrayList<VSLResultStation>();
         for(int k : mapStation.keySet()){
@@ -363,12 +366,27 @@ public class VSLResults implements Comparable{
     }
     
     public Period getPeriod() {
-        return period.clone();
+        if(period == null)
+            return null;
+        else
+            return period.clone();
     }
     
     public boolean equalData(Object tm){
         VSLResults tv = (VSLResults)tm;
         return tv.Name.equals(this.Name);
             
+    }
+
+    void saveConfig(PropertiesWrapper prop) {
+        config.save(prop);
+    }
+
+    void loadConfig(PropertiesWrapper prop) {
+        config.load(prop);
+    }
+
+    public VSLResultConfig getConfig() {
+        return config;
     }
 }

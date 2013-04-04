@@ -205,19 +205,32 @@ public class VSStationFinder {
         return null;
     }
 
-    boolean checkBound(Integer setSpeed) {
+    /*
+     * Check DMS Signal condition
+     * When the Speed of Upstream and Downstream Station speed from the DMS are slower than DMS Speed
+     * the speed of DMS is maintained.
+     * Speed of DMS must be lower than actual speed.
+     * else,
+     * DMS speed = MIN(speed of Upstream Station, Speed of Downstream Station);
+     */
+    Double checkBound(Integer s) {
+        if(s == null)
+            return null;
+        Double setSpeed = (double)s;
+        
         if(su != null && sd != null){
             Double uu = su.getAggregateRollingSpeed();
             Double du = sd.getAggregateRollingSpeed();
             if(uu <= 0 || du <= 0)
-                return true;
+                return setSpeed;
             
-            if(setSpeed >= uu && setSpeed > du)
-                return false;
+            if(setSpeed >= uu && setSpeed > du){
+                return Math.min(uu, du);
+            }
             else
-                return true;
+                return setSpeed;
         }else
-            return true;
+            return setSpeed;
     }
 
     boolean isUpstreamVSS() {

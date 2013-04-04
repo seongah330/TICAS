@@ -69,6 +69,13 @@ public class VSLConfig extends ticasConfig{
     public static boolean isAccidentSpeed = false;
     public static double AccidentSpeed = 25;
     
+    //Slow Traffic Ahead Sign
+    static public Double coverDistance = 1.0d;
+    public static Integer coverageSpeed = 45;
+    
+    //VSL STA Type
+    public static VSLSTAType vslSTAtype = VSLSTAType.OPTION2;
+    
     public static void save(){
         prop.put("VSL_VDA", VSL_VSS_DECISION_ACCEL);
         prop.put("ZDA", VSL_CONTROL_THRESHOLD);
@@ -86,6 +93,8 @@ public class VSLConfig extends ticasConfig{
         prop.put("BST", bottleneckSpeedType.getSID());
         prop.put("ISACCSPEED", isAccidentSpeed);
         prop.put("VSLZONEMILE", VSL_ZONE_LENGTH_MILE);
+        prop.put("STA_COVERDISTANCE", coverDistance);
+        prop.put("STA_COVERSPEED", coverageSpeed);
         saveConfig(configFile);
     }
     public static void load(){
@@ -108,6 +117,8 @@ public class VSLConfig extends ticasConfig{
             bottleneckSpeedType = BottleneckSpeed.getbyID(p.getInteger("BST"));
             isAccidentSpeed = p.getBoolean("ISACCSPEED");
             VSL_ZONE_LENGTH_MILE = p.getDouble("VSLZONEMILE");
+            coverDistance = p.getDouble("STA_COVERDISTANCE");
+            coverageSpeed = p.getInteger("STA_COVERSPEED");
         }   
     }
 }

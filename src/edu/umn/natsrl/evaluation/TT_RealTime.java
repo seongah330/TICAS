@@ -34,6 +34,8 @@ public class TT_RealTime extends Evaluation {
     @Override
     protected void process() {
         
+        if(!caching()) return;
+        
         // get station speeds
         StationSpeed stationSpeedEvaluator = new StationSpeed();
         stationSpeedEvaluator.setOptions(opts);

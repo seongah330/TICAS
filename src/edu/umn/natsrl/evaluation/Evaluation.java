@@ -948,6 +948,19 @@ public abstract class Evaluation {
         int maxRow = 65536;
         int colSize = 0;
         int rowSize = 0;
+        
+//        EvaluationResult ev = null;
+//        for(int i=0;i<results.size();i++){
+//            if(results.get(i) != null){
+//                ev = results.get(i);
+//                break;
+//            }
+//        }
+//        if(ev == null){
+//            colSize = 0;
+//            rowSize = 0;
+//        }
+        
         if (this.opts.getOutputDirection().isToRight()) {
             colSize = this.results.get(0).getRowSize(0);
             rowSize = this.results.get(0).getColumnSize();
@@ -955,6 +968,7 @@ public abstract class Evaluation {
             colSize = this.results.get(0).getColumnSize();
             rowSize = this.results.get(0).getRowSize(0);
         }
+        
         return (maxColumn > colSize) && (maxRow > rowSize);
     }
 

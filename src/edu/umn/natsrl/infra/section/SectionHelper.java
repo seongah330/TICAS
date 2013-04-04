@@ -481,7 +481,7 @@ public class SectionHelper {
                 if(queue.size() - dcount == 0){
                     // if no queue detector, 
                     // use passage flow * 1.15
-                    double[] p_flow = getRampFlow();
+                    double[] p_flow = getRampFlowNew();
                     if(p_flow == null) return null;
                     for(int i=0; i<p_flow.length; i++) {
                         p_flow[i] *= PASSAGE_DEMAND_FACTOR;
@@ -568,7 +568,7 @@ public class SectionHelper {
             } else {
                 // if no queue detector, 
                 // use passage flow * 1.15
-                double[] p_flow = getRampFlow();
+                double[] p_flow = getRampFlowNew();
                 if(p_flow == null) return null;
                 for(int i=0; i<p_flow.length; i++) {
                     p_flow[i] *= PASSAGE_DEMAND_FACTOR;
@@ -600,7 +600,9 @@ public class SectionHelper {
                             if(bypassFlow[i]>0) p_flow[i] = Math.max(p_flow[i]-bypassFlow[i], 0);
                         }
                     }                                      
-                }   
+                }else if(bypass != null){
+                    p_flow = bypass.getData(TrafficType.FLOW);
+                }
             }    
             
             return p_flow;
@@ -629,6 +631,8 @@ public class SectionHelper {
                             if(bypassFlow[i]>0) p_flow[i] = Math.max(p_flow[i]-bypassFlow[i], 0);
                         }
                     }                                      
+                }else if(bypass != null){
+                    p_flow = bypass.getData(TrafficType.FLOW);
                 }   
             }    
             

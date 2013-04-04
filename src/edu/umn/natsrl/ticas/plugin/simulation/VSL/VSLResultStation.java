@@ -24,7 +24,7 @@ import java.util.ArrayList;
  *
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
-class VSLResultStation extends VSLResultInfra{    
+public class VSLResultStation extends VSLResultInfra{    
     private ArrayList<Double> q = new ArrayList<Double>();
     private ArrayList<Double> aq = new ArrayList<Double>();
     private ArrayList<Double> k = new ArrayList<Double>();
@@ -38,12 +38,12 @@ class VSLResultStation extends VSLResultInfra{
     private ArrayList<Integer> ControlThreshold = new ArrayList<Integer>();
     
     
-    VSLResultStation(VSLStationState s) {
+    public VSLResultStation(VSLStationState s) {
         super(s.getID(),s.getMilePoint());
         initData();
     }
 
-    VSLResultStation(Double dkey, String did) {
+    public VSLResultStation(Double dkey, String did) {
         super(did,dkey);
         initData();
     }

@@ -24,7 +24,8 @@ package edu.umn.natsrl.infra.types;
 public enum StationType {
     ORIGINSTATION("S",1),
     TEMPSTATION_T("T",100000),
-    TEMPSTATION_ST("ST",10000);
+    TEMPSTATION_ST("ST",10000),
+    TEMPSTATION_SQ("SQ",1000000);
     
     String sType;
     int plot;
@@ -83,4 +84,5 @@ public enum StationType {
     public boolean isOriginStation(){return this == ORIGINSTATION;}
     public boolean isTempStation_ST(){return this == TEMPSTATION_ST;}
     public boolean isTempStation_T(){return this == TEMPSTATION_T;}
+    public boolean isTempStation_SQ(){return this == TEMPSTATION_SQ;}
 }

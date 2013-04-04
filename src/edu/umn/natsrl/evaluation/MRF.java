@@ -108,13 +108,13 @@ public class MRF extends Evaluation {
                 
                 // get data from rnode
                 double[] data = this.getTrafficData(rn);
-                
+
                 // variable to save traffic data
                 ArrayList stationData = new ArrayList();
                 
                 // add station name at first element
                 stationData.add(getTitle(rn));
-                
+
                 // for all time series traffic data
                 for (int row = 0; row < data.length; row++) 
                 {
@@ -182,7 +182,7 @@ public class MRF extends Evaluation {
             if(this.opts.hasOption(OptionType.USE_INPUT_FLOW_FOR_MRF)) {
                 return sectionHelper.getEntrance((Entrance)rn).getRampDemand();
             } else {
-                return sectionHelper.getEntrance((Entrance)rn).getRampFlow();
+                return sectionHelper.getEntrance((Entrance)rn).getRampFlowNew();
             }
         }
         
@@ -193,7 +193,7 @@ public class MRF extends Evaluation {
         if(rn.isStation()) {
             return rn.getTotalFlow(detectorChecker);
         }
-        
+
         return null;
     }
 

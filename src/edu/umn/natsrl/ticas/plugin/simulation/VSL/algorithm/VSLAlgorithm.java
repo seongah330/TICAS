@@ -22,6 +22,7 @@ import edu.umn.natsrl.infra.infraobjects.DMSImpl;
 import edu.umn.natsrl.ticas.Simulation.StationState;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLConfig;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -98,6 +99,19 @@ public class VSLAlgorithm{
             }
         }
     }
+    
+    Integer getAdjustSpeed(Double par, Integer lim){
+        if(par != null){
+            par = Math.max(par, getMinDisplay());
+            int sa = round5Mph(par);
+            if(sa < lim && sa <= getMaxDisplay()){
+                return sa;
+            }else{
+                return null;
+            }
+        }else
+            return null;
+    }
 
     /**
      * Adjust VSS to DMS
@@ -107,8 +121,13 @@ public class VSLAlgorithm{
         List<DMSImpl> cdms = section.getDMS();
         boolean hasFirstDMS = false;
         VSLStationState cvss = null;
+        
         DMSImpl prevDMS = null;
         boolean isValidDMS = false;
+        
+        TreeMap<Double, DMSImpl> dmsMap = new TreeMap<Double, DMSImpl>();
+        boolean isFirstDMS = true;
+//        System.out.println("======================================Test DMS============================");
         for(DMSImpl dms : cdms){
             VSStationFinder vss_finder = vslversion.getVSStationFinder(dms.getMilePoint(section.getName()));
             double aVSA = 0;
@@ -125,52 +144,41 @@ public class VSLAlgorithm{
                 Integer lim = vss_finder.getSpeedLimit();
                 if(lim != null){
                     Double a = vss_finder.calculateSpeedAdvisory();
-                    if(a != null){
+                    if(a != null)
                         aVSA = a;
-                        a = Math.max(a, getMinDisplay());
-                        int sa = round5Mph(a);
-                        if(sa < lim && sa <= getMaxDisplay()){
-                            setSpeed =sa;
-                        }else{
-                            setSpeed = null;
-                        }
-                    }
+                    
+                    setSpeed = getAdjustSpeed(a,lim);
+                    setSpeed = getAdjustSpeed(vss_finder.checkBound(setSpeed),lim);
                 }
                 
                 /**
                  * Check Safe Traffic Ahead
                  */
-                if(cvss == null || !cvss.getID().equals(vss_finder.vss.getID())){
-                    cvss = vss_finder.vss;
-                    prevDMS = null;
-                    isValidDMS = false;
-                    
-                    if(setSpeed != null){
-                        if(setSpeed >= 50){
-                            dms.setSTA(1);
-                        }
-                    }
-                }
-
-                if(setSpeed != null){
-                    isValidDMS = true;
-                }
-
-                if(!isValidDMS){
-                    if(prevDMS != null){
-                        prevDMS.setSTA(0);
-                    }
-
-                    if(!vss_finder.isUpstreamVSS())
-                        dms.setSTA(1);
-                    prevDMS = dms;
-                }
-                
-                //Check outbound signal
-                if(setSpeed != null && !vss_finder.checkBound(setSpeed))
-                    setSpeed = null;
-                    
-                
+//                if(cvss == null || !cvss.getID().equals(vss_finder.vss.getID())){
+//                    prevDMS = null;
+//                    isValidDMS = false;
+//                    
+//                    if(setSpeed != null){
+//                        if(setSpeed >= 50){
+//                            dms.setSTA(1);
+//                        }
+//                    }
+//                }
+//
+//                if(setSpeed != null){
+//                    isValidDMS = true;
+//                }
+//
+//                if(!isValidDMS){
+//                    if(prevDMS != null){
+//                        prevDMS.setSTA(0);
+//                    }
+//
+//                    //STA must be in the upstream of the VSS.
+//                    if(!vss_finder.isUpstreamVSS())
+//                        dms.setSTA(1);
+//                    prevDMS = dms;
+//                }
 //                if(!hasFirstDMS){
 //                    cvss = vss_finder.vss;
 //                    hasFirstDMS = true;
@@ -190,6 +198,14 @@ public class VSLAlgorithm{
             
             dms.setVSA(setSpeed);
             dms.setActualVSA(aVSA);
+            if(vss_finder.isUpstreamVSS())
+               dms.setUpstreamVSS(true); 
+            else
+                dms.setUpstreamVSS(false);
+            
+            dmsMap.put(dms.getMilePoint(section.getName()), dms);
+            VSLSTAImpl staproc = VSLConfig.vslSTAtype.getVSLType(section,StationMap);
+            isFirstDMS = staproc.findSAT(dmsMap,vss_finder,isFirstDMS);
         }
     }
     
@@ -208,6 +224,22 @@ public class VSLAlgorithm{
         }
         return null;
     }
+    
+//    private void findSAT(List<DMSImpl> cdms) {
+//        boolean isFirstDMS = true;
+//        
+//        for(int i = 0 ; i < cdms.size() ; i++){
+//            DMSImpl currentDMS = cdms.get(i);
+//            DMSImpl nextDMS = i+1 == cdms.size() ? null : cdms.get(i+1);
+//            initSTA(currentDMS);
+//            
+//            if(nextDMS == null || !nextDMS.isStarted())
+//                continue;
+//            
+//            setSAT(currentDMS, nextDMS, isFirstDMS);
+//            isFirstDMS = false;
+//        }
+//    }
 
     private void Debug() {
         if(!isDebug)

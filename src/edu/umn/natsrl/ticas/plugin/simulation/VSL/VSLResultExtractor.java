@@ -34,7 +34,7 @@ import jxl.write.Label;
 public class VSLResultExtractor {
     VSLResults vslresult;
     
-    VSLResultExtractor(VSLResults res) {
+    public VSLResultExtractor(VSLResults res) {
         vslresult = res;
     }
     

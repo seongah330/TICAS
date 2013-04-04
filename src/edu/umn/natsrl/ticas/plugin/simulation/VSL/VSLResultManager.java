@@ -156,7 +156,7 @@ public class VSLResultManager {
         prop.put(PERIOD_END, speriod.endDate);
         prop.put(PERIOD_INTERVAL, speriod.interval);
         prop.put(DATAKEY, keys1);
-
+        vresult.saveConfig(prop);
         saveMainData(vresult);
     }
 
@@ -222,7 +222,7 @@ public class VSLResultManager {
                 addDMS(key,vresult);
             }
         }
-        
+        vresult.loadConfig(prop);
         return vresult;
     }
     

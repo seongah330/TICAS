@@ -401,6 +401,9 @@ public class SectionHelper {
                 
                 if(dm.hasAllSimDMS()){
                     System.out.println(dm.getId() + " : Correct All DMS");
+                    for(DMS d : dm.getDMSList()){
+                        System.out.println("  ---"+d.getId()+" : "+d.hasSimDMS());
+                    }
                 }else{
                     System.out.println(dm.getId() + " : Incorrect DMS");
                     for(DMS d : dm.getDMSList()){

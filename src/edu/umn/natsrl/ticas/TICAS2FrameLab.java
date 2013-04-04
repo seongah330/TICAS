@@ -61,6 +61,7 @@ import edu.umn.natsrl.ticas.plugin.datareader.DataReader;
 import edu.umn.natsrl.ticas.plugin.detecterdatareader.DetecterDataReader;
 import edu.umn.natsrl.ticas.plugin.fixedmetering.FixedMeteringSimulation;
 import edu.umn.natsrl.ticas.plugin.rampmeterevaluator.RampMeterEvaluatorPlugin;
+import edu.umn.natsrl.ticas.plugin.simulation.IRIS.IRISSimulation;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLSimulation;
 import edu.umn.natsrl.ticas.plugin.simulation.basicmetering.BasicMetering;
 import edu.umn.natsrl.ticas.plugin.srte.TICASPluginSRTE;
@@ -439,6 +440,9 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         
         PluginInfo vslPlugin = new PluginInfo("VSL Simulation/Emulation", PluginType.SIMULATION, VSLSimulation.class);
         addSimulationPlugins(vslPlugin);
+        
+//        PluginInfo irisPlugin = new PluginInfo("IRIS Simulation/Emulation", PluginType.SIMULATION, IRISSimulation.class);
+//        addSimulationPlugins(irisPlugin);
         
         if(addSFIMPlugin) {
             PluginInfo sfimPlugin = new PluginInfo("IRIS_in_Loop Simulation", PluginType.SIMULATION, SfimTicasPlugin.class);
@@ -1387,6 +1391,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         chkWOWAVE = new EvaluationCheckBox("TICAS", OptionType.WITHOUT_WAVETRONICS);
         chkONLYHOV = new EvaluationCheckBox("TICAS", OptionType.ONLY_HOV);
         chkWOAUX = new EvaluationCheckBox("TICAS", OptionType.WITHOUT_AUXLANE);
+        chkTT_REALTIME = new EvaluationCheckBox("TICAS", OptionType.EVAL_TT_REALTIME);
         jPanel11 = new javax.swing.JPanel();
         chkExcel = new EvaluationCheckBox("TICAS", OptionType.OUT_EXCEL);
         chkCSV = new EvaluationCheckBox("TICAS", OptionType.OUT_CSV);
@@ -1641,6 +1646,9 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         chkWOAUX.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
         chkWOAUX.setText("w/o Aux");
 
+        chkTT_REALTIME.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
+        chkTT_REALTIME.setText("Snapshot Travel Time (STT)");
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -1648,6 +1656,44 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel23, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
+                                .addComponent(chkWOHOV)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkWOWAVE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(chkONLYHOV)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(chkWOAUX))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkDVH)
+                            .addComponent(chkLVMT)
+                            .addComponent(chkVMT)
+                            .addComponent(chkVHT))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkTT)
+                            .addComponent(chkTT_REALTIME)))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(chkMRF)
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chkCMH)
+                            .addComponent(chkCM)
+                            .addComponent(chkSV)))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel9))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(tbxLaneCapacity, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(tbxCongestionThresholdSpeed, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(tbxCriticalDensity, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel4Layout.createSequentialGroup()
@@ -1673,43 +1719,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                             .addComponent(jLabel12)
                             .addComponent(chkWithLaneConfig)
                             .addComponent(chkWithoutLaneConfig)
-                            .addComponent(chkDetectorOccupancy)))
-                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(jLabel23, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
-                                    .addComponent(chkWOHOV)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(chkWOWAVE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(chkONLYHOV)))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(chkWOAUX)
-                            .addGap(88, 88, 88))
-                        .addGroup(jPanel4Layout.createSequentialGroup()
-                            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(chkDVH)
-                                .addComponent(chkLVMT)
-                                .addComponent(chkVMT)
-                                .addComponent(chkVHT))
-                            .addGap(18, 18, 18)
-                            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(chkCMH)
-                                .addComponent(chkCM)
-                                .addComponent(chkSV)
-                                .addComponent(chkTT)))
-                        .addComponent(chkMRF)
-                        .addGroup(jPanel4Layout.createSequentialGroup()
-                            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel4)
-                                .addComponent(jLabel7)
-                                .addComponent(jLabel9))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(tbxLaneCapacity, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(tbxCongestionThresholdSpeed, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(tbxCriticalDensity, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                            .addComponent(chkDetectorOccupancy))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
@@ -1740,11 +1750,13 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 .addGap(7, 7, 7)
                 .addComponent(jLabel13)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(chkVMT)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chkLVMT)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(chkLVMT)
+                            .addComponent(chkTT_REALTIME))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(chkVHT)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1753,7 +1765,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                         .addComponent(chkMRF))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(chkTT)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(chkSV)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(chkCM)
@@ -2556,6 +2568,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
     private javax.swing.JCheckBox chkONLYHOV;
     private javax.swing.JCheckBox chkSV;
     private javax.swing.JCheckBox chkTT;
+    private javax.swing.JCheckBox chkTT_REALTIME;
     private javax.swing.JCheckBox chkVHT;
     private javax.swing.JCheckBox chkVMT;
     private javax.swing.JCheckBox chkWOAUX;

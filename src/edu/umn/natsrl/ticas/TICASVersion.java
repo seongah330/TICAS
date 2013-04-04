@@ -33,9 +33,9 @@ import javax.swing.JOptionPane;
  * @author Chongmyung Park
  */
 public class TICASVersion {
-    public static final String version = " 3.322";    
-    public static final boolean ISINIT = false;
-    public static final boolean ISOPTIONINIT = false;
+    public static final String version = " 3.33";    
+    public static final boolean ISINIT = true;
+    public static final boolean ISOPTIONINIT = true;
     public static final boolean ISVSLSIMULATIONINIT = false;
     public static String currentVersion;
     

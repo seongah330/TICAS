@@ -86,7 +86,9 @@ public class InfraInfoDialog extends javax.swing.JDialog {
                 if(d.isHov())
                     dextend += "Hov,";
                 if(d.isWavetronics())
-                    dextend += "Wave";
+                    dextend += "Wave,";
+                if(d.isStationOrCD())
+                    dextend += "in Station";
                 if(!dextend.equals("")){
                     dextend = "("+dextend+")";
                 }

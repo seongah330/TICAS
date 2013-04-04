@@ -54,6 +54,7 @@ public enum OptionType {
     EVAL_DVH(0, DVH.class),
     EVAL_MRF(0, MRF.class),   // mainlane and ramp flow rates
     EVAL_TT(0, TT.class),
+    EVAL_TT_REALTIME(0, TT_RealTime.class),
     EVAL_CM(0, CM.class),
     EVAL_CMH(0, CMH.class),
     EVAL_SV(0, SV.class),

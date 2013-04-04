@@ -53,6 +53,8 @@ public class DMSImpl extends InfraObject implements Comparable{
     private int speedlimit = 0;
     private double ActualSpeedlimit = 0;
     private int sta = 0; //SLOW TRAFFIC AHEAD
+    
+    boolean isUpstreamVSS = false;
     public DMSImpl(){
         this.infraType = InfraType.DMSImpl;
     }
@@ -327,5 +329,17 @@ public class DMSImpl extends InfraObject implements Comparable{
 
     public int getSTA() {
         return sta;
+    }
+
+    public void setUpstreamVSS(boolean is) {
+        isUpstreamVSS = is;
+    }
+    public boolean isUpstreamVSS(){
+        return isUpstreamVSS;
+    }
+    
+    public void clear(){
+        sta = 0;
+        isUpstreamVSS = false;
     }
 }

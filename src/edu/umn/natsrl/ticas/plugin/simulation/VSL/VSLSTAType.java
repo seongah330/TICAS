@@ -17,22 +17,37 @@
  */
 package edu.umn.natsrl.ticas.plugin.simulation.VSL;
 
+import edu.umn.natsrl.infra.Section;
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLSTAImpl;
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLSTAOption1;
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLSTAOption2;
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLStationState;
+import java.util.TreeMap;
+
 /**
  *
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
-public enum SimulationMode {
-    Simulation,
-    Emulation;
+public enum VSLSTAType {
+    OPTION1(0,"option1"),
+    OPTION2(1,"option2");
     
-    SimulationMode(){
-        
+    int src;
+    String name;
+    VSLSTAType(int _src, String _name){
+        src = _src;
+        name = _name;
     }
     
-    public boolean isSimulationMode(){
-        return this == Simulation;
+    public VSLSTAImpl getVSLType(Section s, TreeMap<Double, VSLStationState> smap){
+        if(isOption1()){
+            return new VSLSTAOption1(s);
+        }else if(isOption2()){
+            return new VSLSTAOption2(s,smap);
+        }else
+            return new VSLSTAOption1(s);
     }
-    public boolean isEmulationMode(){
-        return this == Emulation;
-    }
+    
+    boolean isOption1(){return this==OPTION1;}
+    boolean isOption2(){return this==OPTION2;}
 }

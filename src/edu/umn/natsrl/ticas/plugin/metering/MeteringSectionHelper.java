@@ -43,6 +43,7 @@ import edu.umn.natsrl.infra.types.TrafficType;
 import edu.umn.natsrl.util.Logger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import edu.umn.natsrl.ticas.plugin.metering.Interval;
 
 
 /**
@@ -60,13 +61,86 @@ public class MeteringSectionHelper {
     private ArrayList<SimMeter> meters;
     private ArrayList<SimDetector> detectors;
     
+    /** Enum for minimum limit control */
+    enum MinimumRateLimit {
+            pf,	/* passage failure */
+            sl,	/* storage limit */
+            wl,	/* wait limit */
+            tm	/* target minimum */
+    };
+        
+    /** Number of seconds for one time step */
+    static private final int STEP_SECONDS = 30;
+        
+    /** Number fo time steps to check before start metering */
+    static private final int START_STEPS = steps(90);
+
+    /** Number of time steps to check before stop metering */
+    static private final int STOP_STEPS = steps(300);
+
+    /** Number of time steps to check before restart metering */
+    static private final int RESTART_STEPS = steps(300);
+
+    /** Maximum number of time steps needed for sample history */
+    static private final int MAX_STEPS = Math.max(Math.max(START_STEPS,
+            STOP_STEPS), RESTART_STEPS);
+    static private final int MISSING_DATA = -1;
+    
     public float MAX_RATE = MeteringConfig.MAX_RATE;    // 3600/2.1 (red = 0.1s, green + yellow = 2s)
     public float MIN_RATE = MeteringConfig.getMinRate();    // 3600/2.1 (red = 0.1s, green + yellow = 2s)
     public int MAX_RAMP_DENSITY = MeteringConfig.MAX_RAMP_DENSITY;
     public double PASSAGE_DEMAND_FACTOR = MeteringConfig.PASSAGE_DEMAND_FACTOR;
     public double MIN_RED_TIME = MeteringConfig.MIN_RED_TIME;  // minimum red time = 0.1 second
     
+    static private int steps(int seconds) {
+            float secs = seconds;
+            return Math.round(secs / STEP_SECONDS);
+    }
     
+    /** Convert step volume count to flow rate.
+        * @param vol Volume to convert (number of vehicles).
+        * @param n_steps Number of time steps of volume.
+        * @return Flow rate (vehicles / hour) */
+       static private int flowRate(double vol, int n_steps) {
+               if(vol >= 0) {
+                       Interval period = new Interval(n_steps * STEP_SECONDS);
+                       double hour_frac = period.per(Interval.HOUR);
+                       return (int)Math.round(vol * hour_frac);
+               } else
+                       return MISSING_DATA;
+       }
+
+       /** Convert step volume count to flow rate (vehicles / hour) */
+       static private int flowRate(double vol) {
+               return flowRate(vol, 1);
+       }
+    
+    /** Convert flow rate to volume for a given period.
+    * @param flow Flow rate to convert (vehicles / hour).
+    * @param period Period for volume (seconds).
+    * @return Volume over given period. */
+   static private double volumePeriod(int flow, int period) {
+           if(flow >= 0 && period > 0) {
+                   double hour_frac = Interval.HOUR.per(new Interval(period));
+                   return flow * hour_frac;
+           } else
+                   return MISSING_DATA;
+   }
+   
+   /** Filter a release rate for valid range */
+    static public int filterRate(int r){
+        r = Math.max(r, getMinRelease());
+        return Math.min(r,getMaxRelease());
+    }
+    
+    static public int getMinRelease(){
+        return MeteringConfig.getMinRate().intValue();
+    }
+    
+    static public int getMaxRelease(){
+        return MeteringConfig.getMaxRate().intValue();
+    }
+
     public MeteringSectionHelper(Section section, ArrayList<SimMeter> meters, ArrayList<SimDetector> detectors) {
         this.section = section;
         this.meters = meters;
@@ -119,7 +193,9 @@ public class MeteringSectionHelper {
     public double getAverageDensity(StationState upStation, StationState downStation, int prevStep)
     {
         StationState cursor = upStation;
-
+        if(cursor.equals(downStation))
+            return cursor.getAggregatedDensity(prevStep);
+        
         double totalDistance = 0;
         double avgDensity = 0;
         while(true) {
@@ -362,22 +438,86 @@ public class MeteringSectionHelper {
         StationState associatedStation;
         DIR associatedStationDir;
         
-        ArrayList<Double> cumulativeDemand = new ArrayList<Double>();
-        ArrayList<Double> cumulativeMergingVolume = new ArrayList<Double>();
-        ArrayList<Double> rateHistory = new ArrayList<Double>();        
-        HashMap<Integer, Double> segmentDensityHistory = new HashMap<Integer, Double>(); // <dataCount, K>
-        double lastDemand = 0;
-        double lastVolumeOfRamp = 0;
-        double lastRate = 0;
+        /** Queue denand history (vehicles / hour) */
+        private final BoundedSampleHistory demandHist =
+                new BoundedSampleHistory(steps(300));
+        
+        private final BoundedSampleHistory demandvolHist =
+                new BoundedSampleHistory(steps(300));
+        
+        /** Cumulative demand history (vehicles) */
+        private final BoundedSampleHistory demandAccumHist = 
+                new BoundedSampleHistory(steps(300));
+        
+        /** Target queue demand rate (vehicles / hour) */
+        private int target_demand = 0;
+        
+        /** Passage sampling failure (latches until queue empty) */
+        private boolean passage_failure = false;
+        
+        /** Cumulative passage count (vehicles) */
+        private int passage_accum = 0;
+        
+        /** Ramp passage history(vehicles / hour) */
+        private final BoundedSampleHistory passageHist = 
+                new BoundedSampleHistory(MAX_STEPS);
+        
+        /** Cumulative green count (vehicles) */
+        private int green_accum = 0;
+
+        /** Time queue has been empty (steps) */
+        private int queueEmptyCount = 0;
+
+        /** Time queue has been full (steps) */
+        private int queueFullCount = 0;
+
+        /** Controlling minimum rate limit */
+        private MinimumRateLimit limit_control = null;
+
+        /** Metering rate flow history (vehicles / hour) */
+        private final BoundedSampleHistory rateHist =
+                new BoundedSampleHistory(MAX_STEPS);
+
+        /** Segment density history (vehicles / mile) */
+        private final BoundedSampleHistory segmentDensityHist =
+                new BoundedSampleHistory(MAX_STEPS);
+        
+        /** Number of steps queue must be empty before resetting accumulators */
+	private final int QUEUE_EMPTY_STEPS = steps(90);
+        
+        /** Ratio for max rate to target rate */
+	private final float TARGET_MAX_RATIO = MeteringConfig.TARGET_MAX_RATIO;
+
+	/** Ratio for min rate to target rate */
+	private final float TARGET_MIN_RATIO = MeteringConfig.TARGET_MIN_RATIO;
+
+	/** Ratio for target waiting time to max wait time */
+	private final float WAIT_TARGET_RATIO = MeteringConfig.WAIT_TARGET_RATIO;
+
+	/** Ratio for target storage to max storage */
+	private final float STORAGE_TARGET_RATIO = MeteringConfig.STORAGE_TARGET_RATIO;
+        
+//        ArrayList<Double> cumulativeDemand = new ArrayList<Double>();
+//        ArrayList<Double> cumulativeMergingVolume = new ArrayList<Double>();
+//        ArrayList<Double> rateHistory = new ArrayList<Double>();        
+//        HashMap<Integer, Double> segmentDensityHistory = new HashMap<Integer, Double>(); // <dataCount, K>
+//        double lastDemand = 0;
+//        double lastVolumeOfRamp = 0;
+        int lastRate = 0;
         boolean isMetering = false;
         boolean isRateUpdated = false;
         boolean isActiveMetering = false;
-        private double minimumRate = 0;
         int maxWaitTimeIndex = MeteringConfig.MAX_WAIT_TIME_INDEX;
         private int noBottleneckCount;
         private StationState bottleneck;
         public boolean hasBeenStoped = false;
+        
+        int minimumRate = 0;
+        int maximumRate = 0;
+        
 
+        
+        
         public EntranceState(Entrance e) {
             super(e.getId(), e);
             this.entrance = e;
@@ -398,58 +538,81 @@ public class MeteringSectionHelper {
          * Return output in this time interval
          */        
         public double getMergingVolume() {
-            return this.lastVolumeOfRamp;
+            return getMergingVolume(0);
         }
         
         /**
          * Return output before 'prevStep' time step
          */        
         public double getMergingVolume(int prevStep) {
-            int nIdx = cumulativeMergingVolume.size() - prevStep - 1;
-            int pIdx = cumulativeMergingVolume.size() - prevStep - 2;
-            //System.out.println(cumulativeFlow.size() + ", " + prevStep + ", " + pIdx + ", " + nIdx);
-            return cumulativeMergingVolume.get(nIdx) - cumulativeMergingVolume.get(pIdx);
+            return volumePeriod(this.passageHist.get(prevStep).intValue(),STEP_SECONDS);
         }        
         
         /**
          * Return demand in this time interval
          */
         public double getDemandVolume() {
-            return this.lastDemand;
+            return volumePeriod(this.demandHist.get(0).intValue(),STEP_SECONDS);
         }
         
+        public double getDemandVolume_ex(){
+            return demandvolHist.get(0);
+        }
+        
+        /**
+        * Get historical ramp flow.
+        * @param prevStep Time step in past.
+        * @param secs Number of seconds to average.
+        * @return ramp flow at 'prevStep' time steps ago
+        */
+        private int getFlow(int prevStep, int secs){
+            Double p = passageHist.average(prevStep, steps(secs));
+            if(p != null)
+                return (int)Math.round(p);
+            else
+                return getMaxRelease();
+        }
+        
+        private int getFlow(int prevStep){
+            return getFlow(prevStep, 30);
+        }
         /**
          * Return rate in previous time step
          */
         public double getRate() {
-            
+            int r = lastRate;
+            return r > 0 ? r : getFlow(0, 90);
             // initial rate = average(last 3 flows) or MAX_RATE
-            if(this.lastRate == 0 ) {
-//                this.lastRate = MAX_RATE;
-                this.lastRate = this.lastVolumeOfRamp * 120;
-                double flowSum = 0;
-                int cnt = 0;
-                
-                for(int i=0; i<3; i++) {
-                    flowSum += calculateRampVolume(i) * 120;
-                    cnt++;
-                }
-                
-                if(cnt > 0) this.lastRate = flowSum / cnt;
-                else this.lastRate = MAX_RATE;  // no flow
-            }
-            
-            return this.lastRate;
+//            if(this.lastRate == 0 ) {
+////                this.lastRate = MAX_RATE;
+//                this.lastRate = this.getMergingVolume() * 120;
+//                double flowSum = 0;
+//                int cnt = 0;
+//                
+//                for(int i=0; i<3; i++) {
+//                    flowSum += calculateRampVolume(i) * 120;
+//                    cnt++;
+//                }
+//                
+//                if(cnt > 0) this.lastRate = flowSum / cnt;
+//                else this.lastRate = MAX_RATE;  // no flow
+//            }
+//            
+//            return this.lastRate;
         }
         
         public double getRate(int prevStep) {
-            int index = rateHistory.size() - prevStep - 1;
-            return rateHistory.get(index);
+            if(this.rateHist.get(prevStep) == null)
+                return -1;
+            else
+                return this.rateHist.get(prevStep);
+//            int index = rateHistory.size() - prevStep - 1;
+//            return rateHistory.get(index);
         }  
         
         public int countRateHistory()
         {
-            return rateHistory.size();
+            return rateHist.size();
         }               
         
         /**
@@ -458,224 +621,168 @@ public class MeteringSectionHelper {
          *     - max density 
          * @return minimum rates
          */
-        public double getMinimumRate() {
+        public int getMinimumRate() {
             return this.minimumRate;
         }
         
-        /**
-         * Calculate max wait time
-         */
-        private void calculateMaxWaitTime() {
-            // line graph between two points : y = ((y2 - y1) / (x2 - x1)) * (x - x1) + y2;
-            // if Kramp < 100
-            //   then, MaxWaitTime = 4 min
-            // else 
-            //   MaxWaitTime = ((1min - 4min) / (200 - 100)) * (Kramp - 100) + 4min;
-            
-            // parameters
-            int MaxTime = 4;
-            int MinTime = 1;
-            double MaxDensity = 200;
-            double DensityThreshold = 100;
-            
-            // cumulative input and output vehicles at ramp
-            int currentIdx = this.cumulativeDemand.size()-1;
-            if(currentIdx < maxWaitTimeIndex) return;
-
-            // ramp density : ( cumulative input - cumulative output ) / ramp length
-            //                    vehicles in ramp at current time
-            double Kramp = this.getRampDensity();
-                        
-            if(Kramp < DensityThreshold) {
-                this.maxWaitTimeIndex = (MaxTime * 2) - 1;
-                //System.out.println(this.meter.getId() + " -> MaxWaitTimeIndex(1) : " + maxWaitTimeIndex);                
-                return;
-            }
-            
-            // find point at line graph
-            double waitTimePoint = (MinTime - MaxTime) / (MaxDensity - DensityThreshold) * (Kramp - DensityThreshold) + MaxTime;            
-            System.out.println(this.meter.getId() + " -> WaitTimePoint (0) : " + waitTimePoint);
-            
-            // round up by 0.5
-            waitTimePoint = Math.ceil(waitTimePoint * 2) / 2;
-            System.out.println(this.meter.getId() + " -> WaitTimePoint (1) : " + waitTimePoint);
-            
-            // check max value
-            waitTimePoint = Math.min(waitTimePoint, MaxTime);
-            waitTimePoint = Math.max(MinTime, waitTimePoint);
-            System.out.println(this.meter.getId() + " -> WaitTimePoint (2) : " + waitTimePoint);
-            
-            // convert to time index
-            this.maxWaitTimeIndex = (int)(waitTimePoint * 2) - 1;                
-            System.out.println(this.meter.getId() + " -> MaxWaitTimeIndex(2) : " + maxWaitTimeIndex);
-        }        
+        public int getMaximumRate(){
+            return maximumRate;
+        }
         
-        
-        public double getRampDensity()
-        {
-            if(this.cumulativeDemand.isEmpty()) return 0;
-            
-            int currentIdx = this.cumulativeDemand.size()-1;            
-            double It = this.cumulativeDemand.get(currentIdx);
-            double Ot = this.cumulativeMergingVolume.get(currentIdx);
-            
-            // ramp length in mile
-            double L = this.meter.getMeter().getStorage() / 5280D;
-            
-            // if dual type, length should be double
-            if(this.meter.getMeterType() == MeterType.DUAL) {
-                L *= 2;
-            }                    
-            
-            // ramp density : ( cumulative input - cumulative output ) / ramp length
-            //                    vehicles in ramp at current time
-            double k = (It - Ot) / L;               
-            if(k >= 100) {
-                System.out.println(this.meter.getId() + " -> Kramp = " + k + "(i="+It+", o="+Ot+", i-o="+(It-Ot)+", L="+L+")" );                
-            }
-            return k;
+        private int calculateMaximumRate() {
+            int target_max = Math.round(target_demand *
+                    TARGET_MAX_RATIO);
+            return filterRate(Math.max(target_max, getMinimumRate()));
         }
         
         /**
          * Calculate minimum rate
          */
-        private void calculateMinimumRate() {
-
-            //calculateMaxWaitTime();
-            
-            int currentIdx = this.cumulativeDemand.size()-1;
-            if(currentIdx < maxWaitTimeIndex) {
-                minimumRate = this.getMergingVolume() * 120;
-                return;
+        private int calculateMinimumRate() {
+            if(passage_failure){
+                limit_control = MinimumRateLimit.pf;
+                return target_demand;
+            }else{
+                int r = queueStorageLimit();
+                limit_control = MinimumRateLimit.sl;
+                int rr = queueWaitLimit();
+                if(rr > r){
+                    r = rr;
+                    limit_control = MinimumRateLimit.wl;
+                }
+                rr = targetMinRate();
+                if(rr > r){
+                    r = rr;
+                    limit_control = MinimumRateLimit.tm;
+                }
+                
+                return filterRate(r);
             }
-                                   
-            // cumulative demand 4 min ago
-            double Cd_4mAgo = this.cumulativeDemand.get(currentIdx - maxWaitTimeIndex);
+        }
+        
+        /** Caculate queue storage limit.  Project into the future the
+		 * duration of the target wait time.  Using the target demand,
+		 * estimate the cumulative demand at that point in time.  From
+		 * there, subtract the target ramp storage volume to find the
+		 * required cumulative passage volume at that time.
+		 * @return Queue storage limit (vehicles / hour). */
+        private int queueStorageLimit(){
+            double proj_arrive = volumePeriod(target_demand,
+                    targetWaitTime());
+            Double demand_proj = cumulativeDemand() + proj_arrive;
+            int req = Math.round(demand_proj.floatValue() - targetStorage().floatValue());
+            int pass_min = req - passage_accum;
+            return flowRate(pass_min, steps(targetWaitTime()));
+        }
+        
+        /** Calculate the target storage on the ramp (vehicles) */
+        private Double targetStorage(){
+            return maxStorage() * STORAGE_TARGET_RATIO;
+        }
+        
+        /** Get the target wait time(seconds) */
+        private int targetWaitTime(){
+            return Math.round(maxWaitTime() * WAIT_TARGET_RATIO);
+        }
+        
+        /** get the max wait time (seconds) */
+        private int maxWaitTime(){
+            SimMeter m = meter;
+            if(m != null)
+                return m.getMeter().getMaxWait();
+            else
+                return MeteringConfig.DEFAULT_MAX_WAIT;
+        }
+        
+        /** Calculate target minimum rate
+         * @return Target minimum rate (vehicles / hour). */
+        private int targetMinRate(){
+            return Math.round(target_demand * TARGET_MIN_RATIO);
+        }
+        
+        /**Calculate queue wait limit (minimum rate)
+         @return Queue wait limit (vehicles / hour) */
+        private int queueWaitLimit(){
+            int wait_limit = 0;
+            int wait_target = targetWaitTime();
+            int wait_steps = steps(wait_target);
             
-            // current cumulative demand
-            double Cd_current = this.cumulativeDemand.get(currentIdx);
-            
-            // current cumulative passage flow
-            double Cf_current = this.cumulativeMergingVolume.get(currentIdx);
-            
-            // minimum rates to guarantee 4 min waitting time
-            minimumRate = ( Cd_4mAgo - Cf_current ) * 120;
-            
-            // DEBUG
-            //if(minimumRate > 0) {
-                System.out.println(
-                        "    - "+ this.meter.getId()+" Minimum Rate = " + String.format("%.2f", minimumRate) + 
-                        ", Ci = "+String.format("%.2f", Cd_current) +                        
-                        ", Ci4 = " + String.format("%.2f", Cd_4mAgo) + 
-                        ", Co = "+ String.format("%.2f", Cf_current) +
-                        ", Input Volume = "+ String.format("%.2f", this.getDemandVolume()) +
-                        ", Output Volume = "+ String.format("%.2f", this.getMergingVolume())
-
-                );                 
-            //}
-            
-//            if(minimumRate > 0) {
-//                // expected ramp density with calculated min rates
-//                double rampExpectedDensity = getExpectedRampDensity(minimumRate);
+            for(int i = 1;i <= wait_steps; i++){
+                int dem = Math.round(cumulativeDemand(
+                        wait_steps - i).floatValue());
+                int pass_min = dem - passage_accum;
+                int limit = flowRate(pass_min, i);
+                wait_limit = Math.max(limit, wait_limit);
+            }
+            return wait_limit;
+        }
+        
+        /**
+         * Calculate minimum rate
+         */
+//        private void calculateMinimumRate_old() {
 //
-//                // DEBUG
+//            //calculateMaxWaitTime();
+//            
+//            int currentIdx = this.cumulativeDemand.size()-1;
+//            if(currentIdx < maxWaitTimeIndex) {
+//                minimumRate = this.getMergingVolume() * 120;
+//                return;
+//            }
+//                                   
+//            // cumulative demand 4 min ago
+//            double Cd_4mAgo = this.cumulativeDemand.get(currentIdx - maxWaitTimeIndex);
+//            
+//            // current cumulative demand
+//            double Cd_current = this.cumulativeDemand.get(currentIdx);
+//            
+//            // current cumulative passage flow
+//            double Cf_current = this.cumulativeMergingVolume.get(currentIdx);
+//            
+//            // minimum rates to guarantee 4 min waitting time
+//            minimumRate = ( Cd_4mAgo - Cf_current ) * 120;
+//            
+//            // DEBUG
+//            //if(minimumRate > 0) {
 //                System.out.println(
 //                        "    - "+ this.meter.getId()+" Minimum Rate = " + String.format("%.2f", minimumRate) + 
-//                        ", ExpectedDensity = " + String.format("%.2f", rampExpectedDensity) + 
 //                        ", Ci = "+String.format("%.2f", Cd_current) +                        
 //                        ", Ci4 = " + String.format("%.2f", Cd_4mAgo) + 
 //                        ", Co = "+ String.format("%.2f", Cf_current) +
 //                        ", Input Volume = "+ String.format("%.2f", this.getDemandVolume()) +
 //                        ", Output Volume = "+ String.format("%.2f", this.getMergingVolume())
 //
-//                );            
-//
-//
-//                // if expacted ramp density > max ramp density using minRates
-//                if(rampExpectedDensity > MAX_RAMP_DENSITY) {                
-//                    
-//                    minimumRate = getMinimumRateForMaxRampDensity(); 
-//                }
-//            }
-//                        
-            if(minimumRate <= 0) {
-                minimumRate = MeteringConfig.getMinRate();
-            }                        
-        }
-        
-        /**
-         * Return expected ramp density at next time step
-         * @return 
-         */
-        private double getExpectedRampDensity(double minRates) {
-            
-            // * equation : Ke = ( Cd(t+1) - Cf(t+1) ) / L
-            //      - Ke : expected ramp density at next time step
-            //      - Cd(t+1) : cumulative demand volume at next time step
-            //      - Cf(t+1) : cumulative passage volume at next time step
-            //      - L : ramp length in mile (if meter type is dual, L = L*2)
-            
-            // * Cd(t+1) = Cd(t) + current demand
-            // * Cf(t+1) = Cf(t) + minimum rates
-            
-            double Cd_next = this.cumulativeDemand.get(this.cumulativeDemand.size()-1) + this.getDemandVolume();
-            double Cf_next = this.cumulativeMergingVolume.get(this.cumulativeMergingVolume.size()-1) + (minRates/120);
-            
-            // expected vehs for next 30s
-            double expected_vehs = Cd_next - Cf_next; 
-            
-            double rampLength = this.meter.getMeter().getStorage();
-            if(this.meter.getMeterType() == MeterType.DUAL) {
-                rampLength *= 2;
-            }   
-            
-            
-            return expected_vehs / ( rampLength / InfraConstants.FEET_PER_MILE );
-        }
-        
-        /**
-         * Return minimum rate for next time satisfying max ramp density
-         * @return 
-         */
-        private double getMinimumRateForMaxRampDensity() {            
-            
-            // * recalculate min rates when expected density > MAX_RAMP_DENSITY 
-            //        at next time step with min rates
-            
-            // * equation : minRate = Cd(t+1) - Veh@MaxDensity - Cf(t)
-            //    - Cd(t+1) = cumulative demand at next time step
-            //    - Veh@MaxDensity = number of vehicles at max density
-            //    - Cf(t) = cumulative passage flow at current time step
-            
-            // * assume :  demand(t) = demand(t+1)
-            
-            double rampLength = this.meter.getMeter().getStorage();
-            if(this.meter.getMeterType() == MeterType.DUAL) {
-                rampLength *= 2;
-            }
-            
-            double It = this.cumulativeDemand.get(this.cumulativeDemand.size()-1);
-            double Ot = this.cumulativeMergingVolume.get(this.cumulativeMergingVolume.size()-1);           
-            
-            // max number of vehicles in max density as flow
-            double maxVehs = ( MAX_RAMP_DENSITY * (rampLength/InfraConstants.FEET_PER_MILE) );
-
-            double Inext =  It + this.getDemandVolume();
-            double Cf_next = Inext - maxVehs;   // veh / mile
-            //double minRates = ( Cf_next - Ot ) * 120;
-            double minRates = ( Inext - Ot - (MAX_RAMP_DENSITY * (rampLength/InfraConstants.FEET_PER_MILE) ) ) * 120;
-            
-            // DEBUG
-            System.out.println(
-                    "        -> Minimum Rate for Max density = " + String.format("%.2f", minRates) + 
-                    ", maxVeh="+String.format("%.2f", maxVehs)+ 
-                    ", Cd(t+1)="+String.format("%.2f", Inext*120)+ 
-                    ", Cq(t+1)="+String.format("%.2f", Cf_next*120)+
-                    ", L="+String.format("%.2f", rampLength/InfraConstants.FEET_PER_MILE)
-            );
-            
-            return minRates;
-        }
+//                );                 
+//            //}
+//            
+////            if(minimumRate > 0) {
+////                // expected ramp density with calculated min rates
+////                double rampExpectedDensity = getExpectedRampDensity(minimumRate);
+////
+////                // DEBUG
+////                System.out.println(
+////                        "    - "+ this.meter.getId()+" Minimum Rate = " + String.format("%.2f", minimumRate) + 
+////                        ", ExpectedDensity = " + String.format("%.2f", rampExpectedDensity) + 
+////                        ", Ci = "+String.format("%.2f", Cd_current) +                        
+////                        ", Ci4 = " + String.format("%.2f", Cd_4mAgo) + 
+////                        ", Co = "+ String.format("%.2f", Cf_current) +
+////                        ", Input Volume = "+ String.format("%.2f", this.getDemandVolume()) +
+////                        ", Output Volume = "+ String.format("%.2f", this.getMergingVolume())
+////
+////                );            
+////
+////
+////                // if expacted ramp density > max ramp density using minRates
+////                if(rampExpectedDensity > MAX_RAMP_DENSITY) {                
+////                    
+////                    minimumRate = getMinimumRateForMaxRampDensity(); 
+////                }
+////            }
+////                        
+//            if(minimumRate <= 0) {
+//                minimumRate = MeteringConfig.getMinRate();
+//            }                        
+//        }
         
         /**
          * Calculate demand and output
@@ -685,23 +792,172 @@ public class MeteringSectionHelper {
             
             this.isRateUpdated = false;
             
-            double p_volume = calculateRampVolume();
-            double demand = calculateRampDemand();
+            updateDemandState();
+            updatePassageState();
+            updateQueueState();
             
-            double prevCd = 0;
-            double prevCq = 0;
+//            System.out.println(meter.getId()+"- TWaitTime:"+targetWaitTime()+", queueLength:"+this.queueLength()+", qSL:"+queueStorageLimit()+", QwaitLimit:"+queueWaitLimit()
+//                    +"TminRate:"+targetMinRate());
+                    
+            minimumRate = calculateMinimumRate();
+            maximumRate = calculateMaximumRate();
             
-            if(this.cumulativeDemand.size()>0) prevCd = this.cumulativeDemand.get(this.cumulativeDemand.size()-1);
-            if(this.cumulativeMergingVolume.size()>0) prevCq = this.cumulativeMergingVolume.get(this.cumulativeMergingVolume.size()-1);
             
-            this.cumulativeDemand.add(prevCd + demand);
-            this.cumulativeMergingVolume.add(prevCq + p_volume);
-            
-            this.lastDemand = demand;                
-            this.lastVolumeOfRamp = p_volume;   
-            
-            this.calculateMinimumRate();
         }
+        
+        private void updateDemandState(){
+            double demand_vol = calculateQueueDemand();
+            double demand_rate = flowRate(demand_vol);
+            demandHist.push(demand_rate);
+            demandvolHist.push(demand_vol);
+            double demand_accum = cumulativeDemand() + demand_vol;
+            demandAccumHist.push(demand_accum);
+            target_demand = targetDemand();
+        }
+        
+        /** Calculate ramp queue demand.  Normally, this would be an
+		 * integer value, but when estimates are used, it may need to
+		 * have a fractional part.
+		 * @return Ramp queue demand for current period (vehicles) */
+        private double calculateQueueDemand(){
+            double vol = calculateRampDemand();
+            System.out.print(meter.getId()+"-");
+            if(vol >= 0){
+                System.out.print("OK!-");
+                if(isQueueOccupancyHigh()){
+                    queueFullCount++;
+                    System.out.print("OCC_High");
+                }
+                else{
+                    queueFullCount = 0;
+                }
+                if(queueFullCount > 0){
+                    System.out.print("-OCCFULL");
+                    vol += estimateQueueUndercount();
+                }
+                System.out.println();
+                return vol;
+            } else{
+                System.out.print("ERROR");
+                System.out.println();
+                int target = getDefaultTarget(meter);
+                return volumePeriod(target, STEP_SECONDS);
+            }
+        }
+        
+        /** Estimate the queue undercount (vehicles) */
+        private double estimateQueueUndercount() {
+            double full_secs = queueFullCount * STEP_SECONDS;
+            double r = Math.min(2 * full_secs / MeteringConfig.MAX_WAIT_TIME, 1);
+            double under = maxStorage() - queueLength();
+            return Math.max(r * under, 1);
+        }
+        
+        private double maxStorage(){
+            int stor_ft = meter.getMeter().getStorage() * entrance.getLanes();
+            double JAM_VPF = (double)MeteringConfig.MAX_RAMP_DENSITY / MeteringConfig.FEET_PER_MILE;
+            return stor_ft * JAM_VPF;
+        }
+        
+        /** Estimate the length of queue (vehicles) */
+        public double queueLength(){
+            return cumulativeDemand() - passage_accum;
+        }
+        
+        /** Calculate target demand rate at queue detector.
+		 * @return Target demand flow rate (vehicles / hour) */
+        private int targetDemand(){
+            Double avg_demand = demandHist.average();
+            if(avg_demand != null)
+                return (int)Math.round(avg_demand);
+            else
+                return getDefaultTarget(meter);
+        }
+        /**
+         * need fix
+         * Get the default target metering rate (vehicles / hour) */
+        private int getDefaultTarget(SimMeter m){
+            if( m != null)
+                return MeteringConfig.MAX_RATE;
+            else
+                return MeteringConfig.MAX_RATE;
+        }
+        
+        /** Update ramp passage output state */
+        private void updatePassageState(){
+            int passage_vol = calculatePassageCount();
+            if(passage_vol < 0)
+                passage_failure = true;
+            double passage_rate = flowRate(passage_vol);
+            passageHist.push(passage_rate);
+            passage_accum += passage_vol;
+            double green_vol = meter.getGreen().getData(TrafficType.VOLUME);
+            if(green_vol > 0)
+                green_accum += green_vol;
+        }
+        
+        /** Calculate passage count (vehicles).
+		 * @return Passage vehicle count */
+        private int calculatePassageCount(){
+            Double vol = meter.getPassage().getData(TrafficType.VOLUME);
+            if(vol >= 0)
+                return vol.intValue();
+            vol = meter.getMerge().getData(TrafficType.VOLUME);
+            if(vol >= 0){
+                Double b = meter.getByPass().getData(TrafficType.VOLUME);
+                if(b > 0){
+                    vol -= b;
+                    if(vol < 0)
+                        return 0;
+                }
+                return b.intValue();
+            }
+            if(isMetering){
+                vol = meter.getGreen().getData(TrafficType.VOLUME);
+                if(vol >= 0)
+                    return vol.intValue();
+            }
+            return MISSING_DATA;
+        }
+        
+        private void updateQueueState(){
+            if(isQueueEmpty())
+                queueEmptyCount++;
+            else
+                queueEmptyCount = 0;
+            if(queueEmptyCount > QUEUE_EMPTY_STEPS)
+                resetAccumulators();
+        }
+        
+        private boolean isQueueEmpty(){
+            return !isQueueOccupancyHigh() &&
+                    (isDemandBelowpassage() || isPassageBelowGreen());
+        }
+        
+        private boolean isDemandBelowpassage(){
+            return queueLength() < 0;
+        }
+        
+        private boolean isPassageBelowGreen(){
+            return passage_accum < green_accum;
+        }
+                
+//        private void updateDemandState_old() {
+//            double p_volume = calculateRampVolume();
+//            double demand = calculateRampDemand();
+//            
+//            double prevCd = 0;
+//            double prevCq = 0;
+//            
+//            if(this.cumulativeDemand.size()>0) prevCd = this.cumulativeDemand.get(this.cumulativeDemand.size()-1);
+//            if(this.cumulativeMergingVolume.size()>0) prevCq = this.cumulativeMergingVolume.get(this.cumulativeMergingVolume.size()-1);
+//            
+//            this.cumulativeDemand.add(prevCd + demand);
+//            this.cumulativeMergingVolume.add(prevCq + p_volume);
+//            
+//            this.lastDemand = demand;                
+//            this.lastVolumeOfRamp = p_volume;   
+//        }
         
         /**
          * Return ramp demand
@@ -768,6 +1024,32 @@ public class MeteringSectionHelper {
             return p_volume;
         }
         
+        public double getMaxOccupancy(){
+            double occ = 0;
+            for(SimDetector det : meter.getQueue()){
+                double d_occ = det.getData(TrafficType.OCCUPANCY, 0);
+                if(d_occ != -1)
+                    occ = Math.max(d_occ, occ);
+            }
+            return occ;
+        }
+        
+        private boolean isQueueOccupancyHigh() {
+            return getMaxOccupancy() > MeteringConfig.QUEUE_OCC_THRESHOLD;
+        }
+        
+        private Double cumulativeDemand(int i){
+            Double d = demandAccumHist.get(i);
+            if(d != null)
+                return d;
+            else
+                return 0d;
+        }
+        
+        private double cumulativeDemand(){
+            return cumulativeDemand(0);
+        }
+        
 
         /**
          * Set metering rate
@@ -775,8 +1057,11 @@ public class MeteringSectionHelper {
          */
         public void setRate(double Rnext) {
             if(this.meter == null) return;
-            this.lastRate = Rnext;
-            float redTime = calculateRedTime(Rnext);
+            int r = (int)Math.round(Rnext);
+            r = Math.max(r, minimumRate);
+            r = Math.min(r, maximumRate);
+            this.lastRate = r;
+            float redTime = calculateRedTime(lastRate);
             redTime = Math.round(redTime * 10) / 10f;
             this.isRateUpdated = true;
             this.meter.setRate((byte)1);
@@ -785,17 +1070,29 @@ public class MeteringSectionHelper {
         
         public void startMetering() {
             this.isMetering = true;
+            resetAccumulators();
         }
         
         public void stopMetering() {
             this.isMetering = false;
-            this.lastDemand = 0;
-            this.lastVolumeOfRamp = 0;
+            this.rateHist.clear();
+//            this.lastDemand = 0;
+//            this.lastVolumeOfRamp = 0;
             this.lastRate = 0;            
-            this.rateHistory.clear();
+//            this.rateHistory.clear();
             this.noBottleneckCount = 0;
             this.hasBeenStoped = true;
             this.meter.setRate(SimConfig.METER_RATE_FLASH);
+            resetAccumulators();
+        }
+        
+        private void resetAccumulators(){
+            passage_failure = false;
+            demandAccumHist.clear();
+            passage_accum = 0;
+            green_accum = 0;
+            queueEmptyCount = 0;
+            queueFullCount = 0;
         }
         
         /**
@@ -809,16 +1106,16 @@ public class MeteringSectionHelper {
         }
 
         public void saveRateHistory(double Rnext) {
-           this.rateHistory.add(Rnext);
+           this.rateHist.push(Rnext);
         }
 
-        public void saveSegmentDensityHistory(int dataCount, double Kt) {
-            this.segmentDensityHistory.put(dataCount, Kt);
+        public void saveSegmentDensityHistory(double Kt) {
+            this.segmentDensityHist.push(Kt);
         }
         
-        public Double getSegmentDensity(int dataCount)
+        public Double getSegmentDensity(int prev)
         {
-            return segmentDensityHistory.get(dataCount);            
+            return segmentDensityHist.get(prev);            
         }
 
         public void addNoBottleneckCount() {
@@ -840,7 +1137,13 @@ public class MeteringSectionHelper {
         public StationState getBottleneck() {
             return this.bottleneck;
         }
-
+        
+        public boolean hasMeter(){
+            if(meter != null)
+                return true;
+            else
+                return false;
+        }
     }
     
     

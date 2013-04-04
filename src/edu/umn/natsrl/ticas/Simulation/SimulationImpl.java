@@ -25,4 +25,5 @@ public interface SimulationImpl {
     public void ExecuteBeforeRun();
     public void ExecuteAfterRun();
     public void DebugMassage();
+    public void SimInit();
 }
