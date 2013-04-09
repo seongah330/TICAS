@@ -43,13 +43,14 @@ public class StationAverageLaneFlow extends Evaluation {
         
         Period[] periods = this.opts.getPeriods();
         int idx = 0;
-        
+        int periodIdx = 0;
         Station[] stations = this.opts.getSection().getStations(detectorChecker);
-        
         for(int i=0; i<stationSpeed.size(); i++)
         {
             if(printDebug && idx < periods.length) System.out.println("      - " + periods[idx++].getPeriodString());                        
             if(stationSpeed.get(i).isStatistic()) continue;
+            
+            this.opts.getSection().loadData(periods[periodIdx++], this.simulationMode);            
             
             EvaluationResult res = EvaluationResult.copy(stationSpeed.get(i));
             EvaluationResult dRes = EvaluationResult.copy(stationDensity.get(i));
@@ -63,7 +64,6 @@ public class StationAverageLaneFlow extends Evaluation {
             
             for(int c=res.COL_DATA_START(); c<res.getColumnSize(); c++)
             {
-                
                 boolean useFlow = false;
                 String stationName = res.get(c, 0).toString();                
 
@@ -94,7 +94,6 @@ public class StationAverageLaneFlow extends Evaluation {
                     }
                     if(stationName != null) useFlow = true;
                 }
-
                 for(int r=res.ROW_DATA_START(), row=0; r<res.getRowSize(c); r++, row++)
                 {
                     /*

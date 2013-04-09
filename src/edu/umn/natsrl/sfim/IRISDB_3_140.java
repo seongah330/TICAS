@@ -154,6 +154,7 @@ public class IRISDB_3_140 {
             if (res.getRow() == 0) {
                 statement.execute("INSERT INTO iris.system_attribute VALUES('dmsxml_op_timeout_secs', '65')");
             }
+            
             System.out.println(" (OK)");
         } catch (SQLException ex) {
             System.out.println(" (Fail)");
@@ -173,7 +174,7 @@ public class IRISDB_3_140 {
             HashMap<Integer, String> protocolNames = new HashMap<Integer, String>();
 
             // set ntcip_a protocol to dms_xml protocol
-            //statement.execute("UPDATE iris.comm_link SET protocol = "+CommProtocol.DMS_LITE.getId()+" WHERE protocol = "+CommProtocol.NTCIP_A.getId());            
+//            statement.execute("UPDATE iris.comm_link SET protocol = "+CommProtocol.DMS_LITE.getId()+" WHERE protocol = "+CommProtocol.NTCIP_A.getId());            
             //statement.execute("UPDATE iris.comm_link SET protocol = "+CommProtocol.MNDOT_4.getId()+" WHERE protocol = "+CommProtocol.MNDOT_5.getId());
             //statement.execute("UPDATE iris.comm_link SET protocol = "+CommProtocol.MNDOT_5.getId()+" WHERE protocol = "+CommProtocol.MNDOT_4.getId());
 
@@ -216,7 +217,7 @@ public class IRISDB_3_140 {
                 protocolNames.put(result.getInt("id"), result.getString("description"));
             }
 
-            result = statement.executeQuery("SELECT CL.name as commlink_name, CL.description as commlink_desc, CL.timeout as commlink_timeout, CL.protocol as commlink_protocol, CT.name as ctrl_name, CT.drop_id as ctrl_drop, CT.cabinet as ctrl_cabinet, CT.active as ctrl_active, IO.name as io_name, IO.pin as io_pin, DT.field_length as detector_fieldlength, GEO.easting, GEO.northing, LT.description as LaneType from iris.comm_link as CL LEFT JOIN iris.controller as CT ON CT.comm_link = CL.name LEFT JOIN iris._device_io as IO ON IO.controller = CT.name  LEFT JOIN iris._detector as DT ON IO.name = DT.name LEFT JOIN iris._ramp_meter as RM ON IO.name = RM.name LEFT JOIN iris.geo_loc as GEO ON GEO.name = DT.r_node OR GEO.name = RM.geo_loc LEFT JOIN iris.lane_type AS LT ON LT.id = DT.lane_type where CL.name = '" + commlinkName + "'");
+            result = statement.executeQuery("SELECT CL.name as commlink_name, CL.description as commlink_desc, CL.timeout as commlink_timeout, CL.protocol as commlink_protocol, CT.name as ctrl_name, CT.drop_id as ctrl_drop, CT.cabinet as ctrl_cabinet, CT.active as ctrl_active, IO.name as io_name, IO.pin as io_pin, DT.field_length as detector_fieldlength, GEO.lat, GEO.lon, LT.description as LaneType from iris.comm_link as CL LEFT JOIN iris.controller as CT ON CT.comm_link = CL.name LEFT JOIN iris._device_io as IO ON IO.controller = CT.name  LEFT JOIN iris._detector as DT ON IO.name = DT.name LEFT JOIN iris._ramp_meter as RM ON IO.name = RM.name LEFT JOIN iris.geo_loc as GEO ON GEO.name = DT.r_node OR GEO.name = RM.geo_loc LEFT JOIN iris.lane_type AS LT ON LT.id = DT.lane_type where CL.name = '" + commlinkName + "'");
             while (result.next()) {
                 String ctrlName = result.getString("ctrl_name");
                 if (ctrlName == null) {
@@ -226,8 +227,8 @@ public class IRISDB_3_140 {
                     ci.IOs.add(result.getString("io_name"));
                     ci.PINs.add(result.getInt("io_pin"));
                     ci.LaneTypes.add(result.getString("lanetype"));
-                    ci.Eastings.add(result.getInt("easting"));
-                    ci.Northings.add(result.getInt("northing"));
+                    ci.lat.add(result.getDouble("lat"));
+                    ci.lon.add(result.getDouble("lon"));
                 } else {
                     if (ci != null) {
                         cilist.add(ci);
@@ -242,8 +243,8 @@ public class IRISDB_3_140 {
                     ci.IOs.add(result.getString("io_name"));
                     ci.PINs.add(result.getInt("io_pin"));
                     ci.LaneTypes.add(result.getString("lanetype"));
-                    ci.Eastings.add(result.getInt("easting"));
-                    ci.Northings.add(result.getInt("northing"));
+                    ci.lat.add(result.getDouble("lat"));
+                    ci.lon.add(result.getDouble("lon"));
                 }
                 prevCtrl = ctrlName;
             }
@@ -302,7 +303,8 @@ public class IRISDB_3_140 {
         String endtime = (simStopHour < 10 ? "0"+simStopHour : simStopHour)+""+(simStopMin < 10 ? "0"+simStopMin : simStopMin);
         try {
             //3.140 update
-            statement.execute("UPDATE iris.action_plan SET active = false");
+            //Fix Me - temporary source because VSA Sign was turned off every time---
+            statement.execute("UPDATE iris.action_plan SET active = false where name <> 'VSA'");
             if (useMetering) {
                 //update action_plan
                 String ACTION_PLAN_NAME = "METER_"+starttime+"_"+endtime;
@@ -436,4 +438,16 @@ public class IRISDB_3_140 {
             return null;
         }
     }    
+
+    /**
+     * //Fix Me
+     * Init Commlink Protocol
+     * Protocol 1 is not worked in this system
+     * plz check protocol 1
+     * temporary update protocol 1(4bit) -> 2(5bit)
+     */
+    void initCommLinkProtocol(InfoCommLink ic) throws SQLException{
+        if(ic.protocol == CommProtocol.MNDOT_4.getId())
+            statement.execute("update iris.comm_link set protocol=2 where name = '"+ic.name+"'");
+    }
 }

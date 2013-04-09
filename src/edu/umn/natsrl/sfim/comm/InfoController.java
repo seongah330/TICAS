@@ -33,16 +33,16 @@ public class InfoController {
     public String active;
     public Vector<String> IOs;
     public Vector<Integer> PINs;
-    public Vector<Integer> Eastings;
-    public Vector<Integer> Northings;
+    public Vector<Double> lat;
+    public Vector<Double> lon;
     public Vector<String> LaneTypes;
     public float fieldlength = 0;
     
     public InfoController() {
         IOs = new Vector<String>();
         PINs = new Vector<Integer>();
-        Eastings = new Vector<Integer>();
-        Northings = new Vector<Integer>();
+        lat = new Vector<Double>();
+        lon = new Vector<Double>();
         LaneTypes = new Vector<String>();
     }
     

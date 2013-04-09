@@ -76,7 +76,7 @@ public class Controller170 extends Controller implements IStepListener {
                 System.out.println("    - Can not find : commlink="+ci.commlink.name + ", ctrl=" + ci.name + ", device=" + device_name +", pin=" + pin);
                 continue;
             }
-
+            
             manager.addInfraObject(o);            
             
             if(o.getInfraType().isDetector()) {

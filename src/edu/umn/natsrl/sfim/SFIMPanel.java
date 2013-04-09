@@ -37,12 +37,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.ServerSocket;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
@@ -265,7 +268,6 @@ public class SFIMPanel extends javax.swing.JPanel {
 //                for (InfoCommLink ic : clist){
 //                    System.out.println("Llist ->"+ic.name);
 //                }
-                
                 for (InfoCommLink ic : clist) {
                     Vector<InfoController> ctrls = idb.loadControllers(ic.name);
                     // continue if no VSA and protocol type is DMS
@@ -278,7 +280,6 @@ public class SFIMPanel extends javax.swing.JPanel {
                     for (InfoController ctr : ctrls) {
                         for (String io : ctr.IOs) {
                             if (detectors.contains(io)) {
-//                                System.out.println("Selected Detector :" + io + ", ctrl = " + ctr.name);
                                 isInCase = true;
                             } else if (dsds.contains(io)) {
                                 isInCase = true;
@@ -306,9 +307,15 @@ public class SFIMPanel extends javax.swing.JPanel {
                     if (isInCase) {
                         ic.serverPort = getNextPort();
                         System.out.println("Active Link : " + ic.name + "("+ic.protcolName+"),desc="+ic.description);
+                        try {
+                            idb.initCommLinkProtocol(ic);
+                        } catch (SQLException ex) {
+                            Logger.getLogger(SFIMPanel.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                         activeLinks.add(ic);
                     }
                 }
+                
 //                /*
 //                 * soobin
 //                 */

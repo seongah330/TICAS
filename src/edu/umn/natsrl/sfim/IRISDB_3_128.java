@@ -210,8 +210,8 @@ public class IRISDB_3_128 {
                     ci.IOs.add(result.getString("io_name"));
                     ci.PINs.add(result.getInt("io_pin"));
                     ci.LaneTypes.add(result.getString("lanetype"));
-                    ci.Eastings.add(result.getInt("easting"));
-                    ci.Northings.add(result.getInt("northing"));
+                    ci.lat.add(result.getDouble("lat"));
+                    ci.lon.add(result.getDouble("lon"));
                 } else {
                     if (ci != null) {
                         cilist.add(ci);
@@ -226,8 +226,8 @@ public class IRISDB_3_128 {
                     ci.IOs.add(result.getString("io_name"));
                     ci.PINs.add(result.getInt("io_pin"));
                     ci.LaneTypes.add(result.getString("lanetype"));
-                    ci.Eastings.add(result.getInt("easting"));
-                    ci.Northings.add(result.getInt("northing"));
+                    ci.lat.add(result.getDouble("lat"));
+                    ci.lon.add(result.getDouble("lon"));
                 }
                 prevCtrl = ctrlName;
             }

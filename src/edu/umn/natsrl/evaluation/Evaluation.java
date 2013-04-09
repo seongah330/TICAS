@@ -683,7 +683,7 @@ public abstract class Evaluation {
         // data length
         int dataLength = multipleDayData.get(0).size();
 
-        int skipRows = this.results.get(0).ROW_DATA_START() + 1;
+        int skipRows = this.results.get(0).ROW_DATA_START();
 
         // result data
         ArrayList result = new ArrayList();
