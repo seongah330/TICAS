@@ -307,11 +307,11 @@ public class SFIMPanel extends javax.swing.JPanel {
                     if (isInCase) {
                         ic.serverPort = getNextPort();
                         System.out.println("Active Link : " + ic.name + "("+ic.protcolName+"),desc="+ic.description);
-                        try {
-                            idb.initCommLinkProtocol(ic);
-                        } catch (SQLException ex) {
-                            Logger.getLogger(SFIMPanel.class.getName()).log(Level.SEVERE, null, ex);
-                        }
+//                        try {
+////                            idb.initCommLinkProtocol(ic);
+//                        } catch (SQLException ex) {
+//                            Logger.getLogger(SFIMPanel.class.getName()).log(Level.SEVERE, null, ex);
+//                        }
                         activeLinks.add(ic);
                     }
                 }

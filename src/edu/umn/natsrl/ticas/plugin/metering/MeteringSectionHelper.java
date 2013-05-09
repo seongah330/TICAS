@@ -831,10 +831,10 @@ public class MeteringSectionHelper {
                 else{
                     queueFullCount = 0;
                 }
-                if(queueFullCount > 0){
-                    System.out.print("-OCCFULL");
-                    vol += estimateQueueUndercount();
-                }
+//                if(queueFullCount > 0){
+//                    System.out.print("-OCCFULL");
+//                    vol += estimateQueueUndercount();
+//                }
                 System.out.println();
                 return vol;
             } else{
@@ -886,8 +886,8 @@ public class MeteringSectionHelper {
         /** Update ramp passage output state */
         private void updatePassageState(){
             int passage_vol = calculatePassageCount();
-            if(passage_vol < 0)
-                passage_failure = true;
+//            if(passage_vol < 0)
+//                passage_failure = true;
             double passage_rate = flowRate(passage_vol);
             passageHist.push(passage_rate);
             passage_accum += passage_vol;

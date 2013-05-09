@@ -24,8 +24,24 @@ package edu.umn.natsrl.evaluation;
  */
 public enum ContourType {
     
-    SPEED, TOTAL_FLOW, OCCUPANCY, DENSITY;
+    SPEED("Station Speed"),
+    TOTAL_FLOW("Station Total Flow"),
+    OCCUPANCY("OCCUPANCY"),
+    DENSITY("DENSITY"),
+    TT("TRAVEL TIME"),
+    STT("Snapshot Travel Time");
 
+    String str;
+    
+    ContourType(String s){
+            str = s;
+    }
+
+        @Override
+    public String toString(){
+            return str;
+    }
+        
     public boolean isSpeedContour() { 
         return (this == SPEED); 
     }
@@ -37,5 +53,11 @@ public enum ContourType {
     }        
     public boolean isDensityContour() { 
         return (this == DENSITY); 
-    }        
+    }
+    public boolean isTTContour(){
+            return (this == TT);
+    }
+    public boolean isSTTContour(){
+            return (this == STT);
+    }
 }

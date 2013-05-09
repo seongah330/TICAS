@@ -674,13 +674,7 @@ public class EvaluationForCalibration extends TimerTask {
      */
     private void saveContour(Evaluation ev, TICASOption selectedOption, EvaluationOption opts, ContourType cType) {
         ContourPlotter cp = new ContourPlotter(opts.getSection(), opts.getContourSetting(cType), ev, selectedOption.getOutputPath());
-        String Cname = cType.name();
-        
-        if(cType.isTotalFlowContour())
-            Cname = "Station Total Flow";
-        if(cType.isSpeedContour())
-            Cname = "Station Speed";
-        
+        String Cname = cType.toString();
         cp.saveImage(opts.hasOption(OptionType.OPEN_CONTOUR),this.getFileName(Cname,"jpg"));        
     }
     
@@ -716,6 +710,11 @@ public class EvaluationForCalibration extends TimerTask {
                         saveContour(ev, selectedOption, opts, ContourType.OCCUPANCY);
                     } else if (ot.equals(OptionType.STATION_DENSITY)) {
                         saveContour(ev, selectedOption, opts, ContourType.DENSITY);
+                    } else if (ot.equals(OptionType.EVAL_TT)){
+                            System.out.println("EVALTT");
+                            saveContour(ev, selectedOption, opts, ContourType.TT);
+                    } else if (ot.equals(OptionType.EVAL_TT_REALTIME)){
+                            saveContour(ev, selectedOption, opts, ContourType.STT);
                     }
                 }
                 Desktop.getDesktop().open(new File(selectedOption.getOutputPath()));

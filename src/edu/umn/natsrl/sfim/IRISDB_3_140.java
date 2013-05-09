@@ -175,8 +175,9 @@ public class IRISDB_3_140 {
 
             // set ntcip_a protocol to dms_xml protocol
 //            statement.execute("UPDATE iris.comm_link SET protocol = "+CommProtocol.DMS_LITE.getId()+" WHERE protocol = "+CommProtocol.NTCIP_A.getId());            
-            //statement.execute("UPDATE iris.comm_link SET protocol = "+CommProtocol.MNDOT_4.getId()+" WHERE protocol = "+CommProtocol.MNDOT_5.getId());
-            //statement.execute("UPDATE iris.comm_link SET protocol = "+CommProtocol.MNDOT_5.getId()+" WHERE protocol = "+CommProtocol.MNDOT_4.getId());
+//            statement.execute("UPDATE iris.comm_link SET protocol = "+CommProtocol.MNDOT_4.getId()+" WHERE protocol = "+CommProtocol.MNDOT_5.getId());
+            statement.execute("UPDATE iris.comm_link SET protocol = "+CommProtocol.MNDOT_5.getId()+" WHERE protocol = "+CommProtocol.SMARTSENSOR125.getId());
+            statement.execute("UPDATE iris.comm_link SET protocol = "+CommProtocol.MNDOT_5.getId()+" WHERE protocol = "+CommProtocol.MNDOT_4.getId());
 
             ResultSet result = statement.executeQuery("SELECT * FROM iris.comm_protocol");
             while (result.next()) {

@@ -160,7 +160,8 @@ public class ContourPanel extends javax.swing.JPanel {
         Arrays.fill(colors, new Color(-1250856));
         
         for (int i = 0; i < step; i++) {
-            colors[i+1]=Color.getHSBColor((float)(300-(300/(step-1))*i)/360, 1f, 1f);
+//            colors[i+1]=Color.getHSBColor((float)(300-(300/(step-1))*i)/360, 1f, 1f);
+                colors[i+1]=Color.getHSBColor((float)(60+(i*30))/360, 1f, 1f);
         }
         colors[0] = Color.getHSBColor(0, 0, 1.0f);
         if(this.isReverse) reverse();

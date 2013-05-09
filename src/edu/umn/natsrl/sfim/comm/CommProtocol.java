@@ -24,7 +24,8 @@ package edu.umn.natsrl.sfim.comm;
  */
 
 public enum CommProtocol {
-    NTCIP_B(0), MNDOT_4(1), MNDOT_5(2), DMS_LITE(9), NTCIP_A(11);
+    NTCIP_B(0), MNDOT_4(1), MNDOT_5(2), DMS_LITE(9), NTCIP_A(11),
+    SMARTSENSOR125(14);
 
     int id;
 

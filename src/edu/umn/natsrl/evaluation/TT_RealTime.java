@@ -28,7 +28,7 @@ public class TT_RealTime extends Evaluation {
 
     @Override
     protected void init() {
-        this.name = "TT";
+        this.name = "STT";
     }
 
     @Override
