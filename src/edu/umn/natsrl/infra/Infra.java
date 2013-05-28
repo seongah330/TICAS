@@ -340,7 +340,11 @@ public class Infra implements Serializable {
                     if(d.getId().contains(did)){
                         String[] spid = d.getId().split("_");
                         if(spid.length > 1){
-                            d.setGID(Integer.parseInt(spid[1]));
+                            try{
+                                d.setGID(Integer.parseInt(spid[1]));
+                            }catch(Exception e){
+                                    System.err.println("DMS getting Error : Origin DId : "+d.getId()+ ", DGID : "+spid[1]);
+                            }
                         }
                         tdms.put(d.getId(), d);
                     }

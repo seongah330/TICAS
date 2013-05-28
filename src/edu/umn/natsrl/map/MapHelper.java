@@ -36,6 +36,10 @@ import edu.umn.natsrl.infra.infraobjects.RampMeter;
 import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.infra.types.InfraType;
 import edu.umn.natsrl.map.InfraPoint.LABEL_LOC;
+import edu.umn.natsrl.map.InfraPoint.MarkerType;
+import edu.umn.natsrl.weatherRWIS.RWIS;
+import edu.umn.natsrl.weatherRWIS.site.Site;
+import edu.umn.natsrl.weatherRWIS.site.SiteInfra;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics2D;
@@ -78,7 +82,9 @@ public class MapHelper {
     private double initLatitude = 44.974878;
     private double initLongitude = -93.233414;
     private int initZoom = 6;
-    
+    private InfraRWISMenu RWISPopmenu;
+    private Section SelectedSection;
+    private MapHelper thishelper;
     /**
      * Constructor
      * @param jmKit 
@@ -87,6 +93,7 @@ public class MapHelper {
         this.jmKit = jmKit;
         this.map = jmKit.getMainMap();
         this.infra = tmo.getInfra();
+        thishelper = this;
         init();
     }
 
@@ -179,8 +186,18 @@ public class MapHelper {
                 ip.setName(ip.getName() + " - [" + meter.getId() + "]");
             }
         }
-
+        
+        SiteInfra sinfra = RWIS.getInstance().getInfra();
+        if(sinfra != null){
+                for(Site s : sinfra.getSites()){
+                        InfraPoint ip = new InfraPoint(s.getName(),s.getEasting(), s.getNorthing(),s, section);
+        //                ip.setInfraObject(d);
+        //                ip.setLabelLoc(getLabelLoc(co.getDirection()));
+                        markers.add(ip);
+                }
+        }
         this.setMarkers(markers);
+        this.SelectedSection = section;
     }
     
     /**
@@ -285,7 +302,7 @@ public class MapHelper {
         for(Corridor co : cinfo.values()){
             Vector<DMSImpl> dmss = co.getDMS();
             for(DMSImpl d : dmss){
-                InfraPoint ip = new InfraPoint(d.getId(),d.getEasting(), d.getNorthing());
+                InfraPoint ip = new InfraPoint(d.getId(),d.getEasting(), d.getNorthing(),MarkerType.BLUE);
                 ip.setInfraObject(d);
                 ip.setLabelLoc(getLabelLoc(co.getDirection()));
                 markers.add(ip);
@@ -425,7 +442,9 @@ public class MapHelper {
      */
     private void init() {
         mouseListner = new MouseAdapter() {
-
+            public void mousePressed(MouseEvent e){
+                    ClearPopup();
+            }
             @Override
             public void mouseClicked(MouseEvent e) {
                 InfraPoint ip = getClickedMarker(e.getPoint());
@@ -446,6 +465,21 @@ public class MapHelper {
                         rid.setLocation(sx, sy);
                         rid.setVisible(true);
                     }
+                    
+                    /** Site Management */
+                    Site s = ip.getSite();
+                    if(s != null && SelectedSection != null){
+                            RWISPopmenu = new InfraRWISMenu(s,frame,thishelper,ip,SelectedSection);
+                            int w = RWISPopmenu.getWidth();
+                            int h = RWISPopmenu.getHeight();
+                            int sx = e.getXOnScreen();
+                            int sy = e.getYOnScreen();
+                            Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+                            if(dim.width < sx+w) sx -= w;
+                            if(dim.height < sy+h) sy -= h;
+                            RWISPopmenu.setPopup(sx,sy);
+                    }
+                    
                 } else {
                     if (ip.isShowLabel()) {
                         ip.setLabelVisible(false);
@@ -460,6 +494,12 @@ public class MapHelper {
         GeoPosition initCenter = new GeoPosition(initLatitude, initLongitude);
         jmKit.setAddressLocation(initCenter);
         jmKit.setZoom(initZoom);        
+    }
+    
+    private void ClearPopup() {
+            if(RWISPopmenu != null){
+                    RWISPopmenu.setPopup(false);
+            }
     }
     
     /**

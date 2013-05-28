@@ -26,6 +26,7 @@ import edu.umn.natsrl.infra.infraobjects.RampMeter;
 import edu.umn.natsrl.infra.types.InfraType;
 import edu.umn.natsrl.infra.section.SectionEditor;
 import edu.umn.natsrl.util.ModalFrameUtil;
+import edu.umn.natsrl.weatherRWIS.site.SiteInfra;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ public class TMO implements Serializable {
 
     private static TMO realInstance = new TMO();
     transient private Infra infra;
+    transient private SiteInfra rwisinfra;
     transient private SectionManager sectionManager;
     private boolean isLoaded = false;
     
@@ -50,6 +52,10 @@ public class TMO implements Serializable {
 
     public static TMO getInstance() {
         return realInstance;
+    }
+    
+    public SiteInfra getRWISInfra(){
+            return rwisinfra;
     }
 
     public Infra getInfra() {
@@ -139,6 +145,7 @@ public class TMO implements Serializable {
     public void setup()
     {
         if(this.isLoaded) return;
+        /* Load Traffic Infra */
         infra = new Infra();
         infra.load();    
         sectionManager = new SectionManager();        

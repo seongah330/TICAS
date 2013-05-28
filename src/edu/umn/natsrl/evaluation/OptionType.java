@@ -58,6 +58,8 @@ public enum OptionType {
     EVAL_CM(0, CM.class),
     EVAL_CMH(0, CMH.class),
     EVAL_SV(0, SV.class),
+    
+    RWIS_WEATHER(0,RWISWeather.class),
         
     OUT_EXCEL(-1),
     OUT_CSV(-1),

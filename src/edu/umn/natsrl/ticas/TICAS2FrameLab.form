@@ -137,11 +137,11 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
-                      <EmptySpace min="0" pref="306" max="32767" attributes="0"/>
+                  <Component id="mainTab" pref="920" max="32767" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="mainTab" alignment="0" pref="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -151,10 +151,10 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="mainTab" min="-2" pref="680" max="-2" attributes="0"/>
+              <Component id="mainTab" min="-2" pref="685" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel8" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -206,13 +206,13 @@
                       <Component id="jPanel10" min="-2" max="-2" attributes="1"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="jPanel8" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jPanel4" max="32767" attributes="1"/>
                           </Group>
                           <Component id="jPanel11" alignment="0" max="32767" attributes="1"/>
+                          <Component id="jPanel8" alignment="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -229,14 +229,13 @@
                           </Group>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="jPanel4" min="-2" max="-2" attributes="1"/>
-                                  <Component id="jPanel1" min="-2" max="-2" attributes="1"/>
+                                  <Component id="jPanel4" alignment="0" min="-2" pref="378" max="-2" attributes="1"/>
+                                  <Component id="jPanel1" alignment="0" min="-2" max="-2" attributes="1"/>
                               </Group>
-                              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
-                              <Component id="jPanel8" min="-2" pref="121" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
+                              <Component id="jPanel8" min="-2" pref="121" max="-2" attributes="0"/>
+                              <EmptySpace pref="7" max="32767" attributes="0"/>
                               <Component id="jPanel11" max="-2" attributes="1"/>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -321,6 +320,16 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="chkRWIS" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                                  <Component id="tbxLaneCapacity" min="-2" max="-2" attributes="1"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="jLabel9" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="tbxCriticalDensity" min="-2" pref="35" max="-2" attributes="1"/>
+                              </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="1" attributes="0">
                                       <Component id="jLabel23" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -357,40 +366,27 @@
                                       <Component id="chkSV" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabel7" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jLabel9" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                                      <Component id="tbxLaneCapacity" alignment="0" max="32767" attributes="1"/>
-                                      <Component id="tbxCongestionThresholdSpeed" alignment="0" max="32767" attributes="1"/>
-                                      <Component id="tbxCriticalDensity" alignment="1" min="-2" pref="62" max="-2" attributes="1"/>
-                                  </Group>
-                              </Group>
                               <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" attributes="0">
+                                      <Component id="jLabel13" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Component id="jLabel11" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" alignment="0" attributes="0">
                                           <Group type="103" groupAlignment="0" attributes="0">
                                               <Component id="cbxStationDataTotalFlow" alignment="0" min="-2" max="-2" attributes="0"/>
                                               <Component id="cbxStationDataSpeed" alignment="0" min="-2" max="-2" attributes="0"/>
                                               <Component id="cbxStationDataDensity" alignment="0" min="-2" max="-2" attributes="0"/>
-                                              <Component id="jLabel13" alignment="0" min="-2" max="-2" attributes="0"/>
                                           </Group>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <EmptySpace type="separate" max="-2" attributes="0"/>
                                           <Group type="103" groupAlignment="0" attributes="0">
                                               <Component id="cbxStationDataAlaneFlow" min="-2" max="-2" attributes="0"/>
                                               <Component id="cbxStationDataOccupancy" min="-2" max="-2" attributes="0"/>
                                               <Component id="cbxStationDataAcceleration" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                       </Group>
-                                      <Component id="jLabel11" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" attributes="0">
+                                      <Group type="102" alignment="0" attributes="0">
                                           <Component id="chkDetectorSpeed" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="chkDetectorDensity" min="-2" max="-2" attributes="0"/>
@@ -403,8 +399,13 @@
                                       <Component id="chkDetectorOccupancy" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="tbxCongestionThresholdSpeed" min="-2" pref="34" max="-2" attributes="1"/>
+                              </Group>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace pref="34" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -466,19 +467,18 @@
                               </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
+                          <Component id="chkRWIS" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jLabel4" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="tbxCongestionThresholdSpeed" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="jLabel7" alignment="3" min="-2" pref="15" max="-2" attributes="0"/>
-                              <Component id="tbxLaneCapacity" alignment="3" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="tbxCriticalDensity" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jLabel7" alignment="3" min="-2" pref="15" max="-2" attributes="0"/>
+                              <Component id="tbxLaneCapacity" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="jLabel23" min="-2" max="-2" attributes="0"/>
@@ -878,6 +878,20 @@
                   </Properties>
                   <AuxValues>
                     <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new EvaluationCheckBox(&quot;TICAS&quot;, OptionType.EVAL_TT_REALTIME)"/>
+                  </AuxValues>
+                </Component>
+                <Component class="javax.swing.JCheckBox" name="chkRWIS">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Verdana" size="10" style="0"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="Weather Data (RWIS)"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chkRWISActionPerformed"/>
+                  </Events>
+                  <AuxValues>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new EvaluationCheckBox(&quot;TICAS&quot;, OptionType.RWIS_WEATHER)"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
@@ -1733,7 +1747,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Component id="jPanel2" alignment="0" max="32767" attributes="0"/>
-                          <Component id="jTabbedPane2" alignment="0" pref="567" max="32767" attributes="0"/>
+                          <Component id="jTabbedPane2" alignment="0" pref="572" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="btnSaveConfig" min="-2" pref="43" max="-2" attributes="0"/>

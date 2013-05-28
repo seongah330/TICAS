@@ -69,6 +69,7 @@ import edu.umn.natsrl.ticas.plugin.srte.TestFrame;
 import edu.umn.natsrl.ticas.plugin.vissimcalibration2.VissimCalibration2;
 import edu.umn.natsrl.ticas.plugin.traveltimeIndexer.TTIndexterPlugin;
 import edu.umn.natsrl.ticas.plugin.vissimtoexcel.VISSIMtoExcel;
+import edu.umn.natsrl.weatherRWIS.RWIS;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -107,6 +108,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
     //temporary empty - soobin Jeon
     static SplashDialog sd = new SplashDialog(null, true);
     static TMO tmoInit = TMO.getInstance();
+    static RWIS rwis = RWIS.getInstance();
     
     public static void main(String[] args) {
        
@@ -130,7 +132,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 TICASVersion.CheckVersion();
                 // setup TMO object after 10ms
                 tmoInit.setup();
-                               
+                rwis.setup();
                 // clear all chaches older than 365 days
                 //tmo.clearAllCache(365);
                 
@@ -257,6 +259,12 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         // load option saved perviously
         TICASOption ticasOption = TICASOption.load("ticas.cfg");
         EvaluationOption opt = ticasOption.getEvaluationOption();
+        
+        //Check RWIS Data, not connected Enable = false
+        if(!RWIS.getInstance().isLoaded()){
+                opt.removeOption(OptionType.RWIS_WEATHER);
+                this.chkRWIS.setEnabled(false);
+        }
         
         // if ticas option is loaded
         if (ticasOption.isLoaded()) {
@@ -1409,6 +1417,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 chkONLYHOV = new EvaluationCheckBox("TICAS", OptionType.ONLY_HOV);
                 chkWOAUX = new EvaluationCheckBox("TICAS", OptionType.WITHOUT_AUXLANE);
                 chkTT_REALTIME = new EvaluationCheckBox("TICAS", OptionType.EVAL_TT_REALTIME);
+                chkRWIS = new EvaluationCheckBox("TICAS", OptionType.RWIS_WEATHER);
                 jPanel11 = new javax.swing.JPanel();
                 chkExcel = new EvaluationCheckBox("TICAS", OptionType.OUT_EXCEL);
                 chkCSV = new EvaluationCheckBox("TICAS", OptionType.OUT_CSV);
@@ -1667,6 +1676,14 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 chkTT_REALTIME.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
                 chkTT_REALTIME.setText("Snapshot Travel Time (STT)");
 
+                chkRWIS.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
+                chkRWIS.setText("Weather Data (RWIS)");
+                chkRWIS.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                chkRWISActionPerformed(evt);
+                        }
+                });
+
                 javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
                 jPanel4.setLayout(jPanel4Layout);
                 jPanel4Layout.setHorizontalGroup(
@@ -1674,6 +1691,15 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                         .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(chkRWIS)
+                                        .addGroup(jPanel4Layout.createSequentialGroup()
+                                                .addComponent(jLabel7)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(tbxLaneCapacity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabel9)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(tbxCriticalDensity, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                                         .addGroup(jPanel4Layout.createSequentialGroup()
                                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                                         .addComponent(jLabel23, javax.swing.GroupLayout.Alignment.LEADING)
@@ -1704,29 +1730,19 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                                                         .addComponent(chkSV)))
                                         .addGroup(jPanel4Layout.createSequentialGroup()
                                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(jLabel4)
-                                                        .addComponent(jLabel7)
-                                                        .addComponent(jLabel9))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                        .addComponent(tbxLaneCapacity, javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(tbxCongestionThresholdSpeed, javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(tbxCriticalDensity, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                        .addGroup(jPanel4Layout.createSequentialGroup()
-                                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(jLabel13)
+                                                        .addComponent(jLabel11)
                                                         .addGroup(jPanel4Layout.createSequentialGroup()
                                                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                                         .addComponent(cbxStationDataTotalFlow)
                                                                         .addComponent(cbxStationDataSpeed)
-                                                                        .addComponent(cbxStationDataDensity)
-                                                                        .addComponent(jLabel13))
-                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                        .addComponent(cbxStationDataDensity))
+                                                                .addGap(18, 18, 18)
                                                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                                         .addComponent(cbxStationDataAlaneFlow)
                                                                         .addComponent(cbxStationDataOccupancy)
-                                                                        .addComponent(cbxStationDataAcceleration)))
-                                                        .addComponent(jLabel11))
-                                                .addGap(18, 18, 18)
+                                                                        .addComponent(cbxStationDataAcceleration))))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                         .addGroup(jPanel4Layout.createSequentialGroup()
                                                                 .addComponent(chkDetectorSpeed)
@@ -1737,8 +1753,12 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                                                         .addComponent(jLabel12)
                                                         .addComponent(chkWithLaneConfig)
                                                         .addComponent(chkWithoutLaneConfig)
-                                                        .addComponent(chkDetectorOccupancy))))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                        .addComponent(chkDetectorOccupancy)))
+                                        .addGroup(jPanel4Layout.createSequentialGroup()
+                                                .addComponent(jLabel4)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(tbxCongestionThresholdSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addContainerGap(34, Short.MAX_VALUE))
                 );
                 jPanel4Layout.setVerticalGroup(
                         jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1790,17 +1810,17 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(chkCMH)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(chkRWIS)
+                                .addGap(8, 8, 8)
                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel4)
                                         .addComponent(tbxCongestionThresholdSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel9)
+                                        .addComponent(tbxCriticalDensity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(tbxLaneCapacity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel9)
-                                        .addComponent(tbxCriticalDensity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabel23)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -2182,12 +2202,12 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                                 .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(tbDataPerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addGroup(tbDataPerformanceLayout.createSequentialGroup()
                                                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                        .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addContainerGap())
                 );
                 tbDataPerformanceLayout.setVerticalGroup(
@@ -2200,13 +2220,12 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                                                 .addContainerGap())
                                         .addGroup(tbDataPerformanceLayout.createSequentialGroup()
                                                 .addGroup(tbDataPerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 378, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                .addGap(8, 8, 8)
-                                                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(0, 0, Short.MAX_VALUE))))
+                                                .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
+                                                .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 );
 
                 mainTab.addTab("Data Extraction & Simulation", tbDataPerformance);
@@ -2279,7 +2298,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                                 .addContainerGap()
                                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                         .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jTabbedPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 567, Short.MAX_VALUE))
+                                        .addComponent(jTabbedPane2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 572, Short.MAX_VALUE))
                                 .addGap(18, 18, 18)
                                 .addComponent(btnSaveConfig, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addContainerGap())
@@ -2370,20 +2389,20 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGap(0, 306, Short.MAX_VALUE)
-                                                .addComponent(jLabel8))
-                                        .addComponent(mainTab, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                                        .addComponent(mainTab, javax.swing.GroupLayout.PREFERRED_SIZE, 920, Short.MAX_VALUE)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                .addGap(0, 0, Short.MAX_VALUE)
+                                                .addComponent(jLabel8)))
                                 .addContainerGap())
                 );
                 layout.setVerticalGroup(
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(mainTab, javax.swing.GroupLayout.PREFERRED_SIZE, 680, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(mainTab, javax.swing.GroupLayout.PREFERRED_SIZE, 685, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel8)
-                                .addContainerGap())
+                                .addGap(6, 6, 6))
                 );
 
                 pack();
@@ -2549,6 +2568,10 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         changedSection();
     }//GEN-LAST:event_cbxSectionsActionPerformed
 
+        private void chkRWISActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkRWISActionPerformed
+                // TODO add your handling code here:
+        }//GEN-LAST:event_chkRWISActionPerformed
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JCheckBox CbxFixmissingstationdata;
         private javax.swing.JCheckBox CbxmissingstationdataZero;
@@ -2587,6 +2610,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         private javax.swing.JCheckBox chkLVMT;
         private javax.swing.JCheckBox chkMRF;
         private javax.swing.JCheckBox chkONLYHOV;
+        private javax.swing.JCheckBox chkRWIS;
         private javax.swing.JCheckBox chkSV;
         private javax.swing.JCheckBox chkTT;
         private javax.swing.JCheckBox chkTT_REALTIME;
@@ -2636,8 +2660,10 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         private javax.swing.JPanel jPanel10;
         private javax.swing.JPanel jPanel11;
         private javax.swing.JPanel jPanel2;
+        private javax.swing.JPanel jPanel3;
         private javax.swing.JPanel jPanel4;
         private javax.swing.JPanel jPanel5;
+        private javax.swing.JPanel jPanel6;
         private javax.swing.JPanel jPanel8;
         private javax.swing.JTabbedPane jTabbedPane2;
         private org.jdesktop.swingx.JXMapKit jmKit;

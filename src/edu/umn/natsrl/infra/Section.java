@@ -32,6 +32,9 @@ import edu.umn.natsrl.infra.types.InfraType;
 import edu.umn.natsrl.infra.types.TransitionType;
 import edu.umn.natsrl.util.DistanceUtil;
 import edu.umn.natsrl.util.PropertiesWrapper;
+import edu.umn.natsrl.weatherRWIS.RWIS;
+import edu.umn.natsrl.weatherRWIS.site.Site;
+import edu.umn.natsrl.weatherRWIS.site.SiteInfra;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -56,6 +59,7 @@ public class Section implements Serializable {
     public static final String K_SECTION_DESC = "section.desc";
     public static final String K_SECTION_RNODES = "section.rnodes" ;
     public static final String K_SECTION_DETECTORS = "section.detectors";
+    public static final String K_SECTION_SITE = "section.site";
     
     private PropertiesWrapper prop;
     private transient List<RNode> section = new ArrayList<RNode>();    
@@ -66,7 +70,7 @@ public class Section implements Serializable {
     private List<String> rnode_ids = new ArrayList<String>();
     private String name;
     private String description;
-    
+    private Site RWISSite;
     /**
      * Construct
      * @param name section name
@@ -77,7 +81,7 @@ public class Section implements Serializable {
         this.description = desc;
         this.tmo = TMO.getInstance();
         this.infra = tmo.getInfra();
-        prop =  new PropertiesWrapper();        
+        prop =  new PropertiesWrapper();
     }
     
     /**
@@ -98,6 +102,10 @@ public class Section implements Serializable {
         prop.put(K_SECTION_DESC, getDescription());
         prop.put(K_SECTION_DETECTORS, getDetectorIds());
         prop.put(K_SECTION_RNODES, getRNodeIds());        
+        if(RWISSite != null)
+                prop.put(K_SECTION_SITE, RWISSite.getID());
+        else
+                prop.put(K_SECTION_SITE, -1);
         
         String eName = getCacheFileName(this.name);
         String filename = this.section_dir + File.separator + eName;
@@ -122,6 +130,13 @@ public class Section implements Serializable {
             s.organizeDMS();
 //            s.organizeStations_OLD();
             s.organizeStationsandDMSs();
+            int siteid = prop.getInteger(Section.K_SECTION_SITE);
+            if(RWIS.getInstance().isLoaded()){
+                if(siteid > 0)
+                        s.setSite(s.getSiteById(siteid));
+                else
+                    s.setSite();
+            }
             return s;
         } catch (Exception ex) {
             //ex.printStackTrace();
@@ -845,5 +860,41 @@ public class Section implements Serializable {
 //        System.out.println(", Insert : "+pdms.getId());
         this.dms.add(pdms);
     }
+
+        private void setSite() {
+                RWISSite = getNearSite();
+        }
+        
+        private Site getSiteById(int siteid) {
+                return RWIS.getInstance().getInfra().getSite(siteid);
+        }
+
+        private Site getNearSite() {
+                Site minsite = null;
+                int minDistance = Integer.MAX_VALUE;
+                SiteInfra si = RWIS.getInstance().getInfra();
+                ArrayList<Site> sites = RWIS.getInstance().getInfra().getSites();
+                if(sites == null)
+                        return null;
+                for(Station s : this.getStations()){
+                        for(Site site : sites){
+                                int cmin = DistanceUtil.getDistanceInFeet(s.getEasting(), site.getEasting(), s.getNorthing(), site.getNorthing());
+                                if(minDistance > cmin){
+                                        minDistance = cmin;
+                                        minsite = site;
+                                }
+                        }
+                }
+                
+                return minsite;
+        }
+
+        public Site getSite() {
+                return RWISSite;
+        }
+
+        public void setSite(Site csite) {
+                RWISSite = csite;
+        }
     
 }

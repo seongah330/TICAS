@@ -19,7 +19,9 @@
 package edu.umn.natsrl.map;
 
 import edu.umn.natsrl.infra.InfraObject;
+import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.RNode;
+import edu.umn.natsrl.weatherRWIS.site.Site;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Point;
@@ -35,9 +37,9 @@ import org.jdesktop.swingx.mapviewer.Waypoint;
 public class InfraPoint extends Waypoint {
 
     public enum LABEL_LOC { TOP, BOTTOM, RIGHT, LEFT; }
-    public enum MarkerType { RED("red"), BLUE("blue"), PURPLE("purple"), GREEN("green"), GRAY("gray");
+        public enum MarkerType { RED("red"), BLUE("blue"), PURPLE("purple"), GREEN("green"), GRAY("gray"),JBLUE("jblue"),YELLOW("yellow"), SITENONE("gray"),SITEON("jblue");
         String desc;
-        private MarkerType(String desc) {
+        MarkerType(String desc) {
             this.desc = desc;
         }        
     }
@@ -47,7 +49,8 @@ public class InfraPoint extends Waypoint {
     private CoordinateConversion converter = new CoordinateConversion();
     private Color color = Color.black;
     private LABEL_LOC labelLoc = LABEL_LOC.RIGHT;
-    private InfraObject infraObject;    
+    private InfraObject infraObject;
+    private Site site;
     public int offset_x = 0;
     public int offset_y = 0;
     
@@ -88,6 +91,24 @@ public class InfraPoint extends Waypoint {
         this.setPosition(new GeoPosition(lat[0], lat[1]));
         this.name = name;        
         setMarkerType(MarkerType.RED);
+    }
+    
+    public InfraPoint(String name, int easting, int northing, MarkerType mtype) {        
+        double[] lat = converter.utm2LatLon("15 T " + easting + " " + northing);
+        this.setPosition(new GeoPosition(lat[0], lat[1]));
+        this.name = name;        
+        setMarkerType(mtype);
+    }
+    
+    public InfraPoint(String name, int easting, int northing, Site _site, Section section) {        
+        double[] lat = converter.utm2LatLon("15 T " + easting + " " + northing);
+        this.setPosition(new GeoPosition(lat[0], lat[1]));
+        this.name = name;        
+        site = _site;
+        if(section.getSite().getID() == site.getID())
+                setMarkerType(MarkerType.JBLUE);
+        else
+                setMarkerType(MarkerType.GRAY);
     }
     
     
@@ -159,5 +180,9 @@ public class InfraPoint extends Waypoint {
 
     public InfraObject getInfraObject() {
         return infraObject;
+    }
+    
+    public Site getSite() {
+            return site;
     }
 }
