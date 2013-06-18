@@ -44,7 +44,7 @@ public class TICASOption implements Serializable {
     
     private boolean isLoaded;
     private int seletedSectionIndex = 0;
-    private int seletedIntervalIndex = 0;
+    private int seletedIntervalSecond = 0;
     private String trafficDataUrl = InfraConstants.TRAFFIC_DATA_URL;
     private String trafficConfigUrl = InfraConstants.TRAFFIC_CONFIG_URL;
     private int duration = -1;
@@ -148,12 +148,12 @@ public class TICASOption implements Serializable {
         return seletedSectionIndex;
     }
 
-    public void setSelectedIntervalIndex(int selectedIndex) {
-        this.seletedIntervalIndex = selectedIndex;
+    public void setSelectedIntervalSeconds(int selectedIndex) {
+        this.seletedIntervalSecond = selectedIndex;
     }
     
-    public int getSelectedIntervalIndex() {
-        return this.seletedIntervalIndex;
+    public int getSelectedIntervalSeconds() {
+        return this.seletedIntervalSecond;
     }
 
     public String getTrafficDataUrl() {

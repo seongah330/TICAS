@@ -529,7 +529,7 @@ public class SFIMManager implements ITravelTimeListener {
             // param 2 : signal control id for detector (see case file)
             // param 3 : random seed (if -1, use random seed of case file)
 //            System.err.println("tests1");
-            vc.initialize(vissimCaseFile, 1, randomSeed,VISSIMVersion.VISSIM540x64);
+            vc.initialize(vissimCaseFile, 1, randomSeed,VISSIMVersion.VISSIM540x64,SFIMConfig.DEFAULT_TIME_UNIT);
             vc.initializeTravelTimeMeasuring();
             vc.addTravelTimeListener(this);
             // param 1 : signal control id for metering (see case file)

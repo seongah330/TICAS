@@ -17,6 +17,7 @@
  */
 package edu.umn.natsrl.vissimcom;
 
+import edu.umn.natsrl.evaluation.Interval;
 import edu.umn.natsrl.infra.Infra;
 import edu.umn.natsrl.infra.InfraConstants;
 import edu.umn.natsrl.infra.TMO;
@@ -91,8 +92,8 @@ public class VISSIMController {
     /** Simulation Setting */
     private final int DEFAULT_SC_FOR_DETECTOR = 1;
     //soobin Jeon modify
-    private final int RUNNING_STEP = 30; // runStepListener for 30 second     
-    private final int FLOW_CONSTANT = 3600 / RUNNING_STEP;    // flow is calculated by volume for runningStep * flowConstant
+    private int RUNNING_STEP = Interval.getMinSimulationInterval(); // runStepListener for 30 second     
+    private int FLOW_CONSTANT = 3600 / RUNNING_STEP;    // flow is calculated by volume for runningStep * flowConstant
     private final int DEFAULT_TIME_TRAVEL_INTERVAL = 5 * 60;    // 5min
     private int simResolution;
     private int simPeriod;
@@ -313,6 +314,10 @@ public class VISSIMController {
         simDetector.addData(v, q, u, k, occupancy);
     }
 
+        private void setFlowConstant(int RUNNING_STEP) {
+                FLOW_CONSTANT = 3600 / RUNNING_STEP;
+        }
+
     class CollectDataThread extends Thread {
         int fromIdx;
         int toIdx;
@@ -410,12 +415,12 @@ public class VISSIMController {
             //     (assume : driver increase speed after passing DMS
             IDesiredSpeedDecision dsd = this.desiredSpeedDecisionList.get(dmsName);
             IDesiredSpeedDecision dsd_alt = this.desiredSpeedDecisionList.get(dmsName + "A");
-            System.out.println("set VSA : "+dmsName+" - "+vsa.speed);
+//            System.out.println("set VSA : "+dmsName+" - "+vsa.speed);
             if (dsd == null) {
                 System.out.println("  - Warnning!! VISSIMController.setVSA() : can not find DMS(" + dmsName + ")");
                 return;
             }
-            System.out.println("  - " + dmsName + " : vsa=" + vsa.speed);
+//            System.out.println("  - " + dmsName + " : vsa=" + vsa.speed);
 
             for (VehicleClass v : VehicleClass.values()) {
                 int classId = v.getVehicleClassId();
@@ -434,8 +439,8 @@ public class VISSIMController {
      * set signal controller for detector to DEFAULT_SC_FOR_DETECTOR(1) and
      * use random seed of case file
      */
-    public int initialize(String casefile,VISSIMVersion v) {
-        return initialize(casefile, this.DEFAULT_SC_FOR_DETECTOR, -1,v);
+    public int initialize(String casefile,VISSIMVersion v, int rinterval) {
+        return initialize(casefile, this.DEFAULT_SC_FOR_DETECTOR, -1,v,rinterval);
     }
 
     /**
@@ -443,8 +448,8 @@ public class VISSIMController {
      * set signal controller for detector to DEFAULT_SC_FOR_DETECTOR(1)
      * @param randomSeed 
      */
-    public int initialize(String casefile, int randomSeed, VISSIMVersion v) {
-        return initialize(casefile, 1, randomSeed,v);
+    public int initialize(String casefile, int randomSeed, VISSIMVersion v, int rinterval) {
+        return initialize(casefile, DEFAULT_SC_FOR_DETECTOR,randomSeed,v,rinterval);
     }
 
     /**
@@ -452,8 +457,11 @@ public class VISSIMController {
      * @param signalControlIdForDetector
      * @param randomSeed 
      */
-    public int initialize(String casefile, int signalControlIdForDetector, int randomSeed, VISSIMVersion vversion) {
+    public int initialize(String casefile, int signalControlIdForDetector, int randomSeed, 
+            VISSIMVersion vversion,int rinterval) {
         try {
+            this.RUNNING_STEP = rinterval;
+            setFlowConstant(RUNNING_STEP);
             // set casefile
             this.caseFile = casefile;
 
@@ -642,7 +650,7 @@ public class VISSIMController {
      * @param second travel time measuring interval
      */
     public boolean initializeTravelTimeMeasuring(int second) {
-        if (second < 0 || second % 30 != 0) {
+        if (second < 0 || second % RUNNING_STEP != 0) {
             return false;
         }
         this.travelTimeInterval = second;
@@ -862,5 +870,5 @@ public class VISSIMController {
     
     private int getInt(Object res) {
         return Integer.parseInt(res.toString());
-    }       
+    }
 }

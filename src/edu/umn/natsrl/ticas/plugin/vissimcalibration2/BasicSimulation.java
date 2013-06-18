@@ -28,8 +28,8 @@ import edu.umn.natsrl.vissimcom.VISSIMVersion;
  */
 public class BasicSimulation extends Simulation implements SimulationImpl{
     
-    public BasicSimulation(String caseFile, int seed, Section section, VISSIMVersion v) {
-        super(caseFile,seed,section,v);
+    public BasicSimulation(String caseFile, int seed, Section section, VISSIMVersion v, int SimIntv) {
+        super(caseFile,seed,section,v,SimIntv);
     }
 
     @Override

@@ -33,10 +33,11 @@ import javax.swing.JOptionPane;
  * @author Chongmyung Park
  */
 public class TICASVersion {
-    public static final String version = " 3.4";    
+    public static final String version = " 3.41";    
     public static final boolean ISINIT = true;
     public static final boolean ISOPTIONINIT = true;
     public static final boolean ISVSLSIMULATIONINIT = false;
+    public static final boolean ISSIMULATIONINIT = true;
     public static String currentVersion;
     
     private static String versionFoler = "config";
@@ -101,6 +102,9 @@ public class TICASVersion {
         }
         if(ISVSLSIMULATIONINIT){
             FileHelper.deleteDirectory(new File("simulationresults\\VSL"));
+        }
+        if(ISSIMULATIONINIT){
+                FileHelper.deleteDirectory(new File("simulationresults"));
         }
         System.out.println("Clear All Cache.....");
         tmo.clearAllCache();

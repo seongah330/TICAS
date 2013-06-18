@@ -52,7 +52,7 @@ public abstract class ADetectorWithLaneConfig extends Evaluation {
             if(printDebug) System.out.println("      - " + period.getPeriodString());
             
             // data load from all detectors in the section
-            section.loadData(period, this.simulationMode);                 
+            section.loadData(period, this.dataLoadOption);                 
             
             // variable to save results
             EvaluationResult res = new EvaluationResult();            

@@ -17,6 +17,8 @@
  */
 package edu.umn.natsrl.ticas.plugin.rampmeterevaluator;
 
+import edu.umn.natsrl.evaluation.Interval;
+import edu.umn.natsrl.infra.DataLoadOption;
 import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.Detector;
@@ -101,11 +103,11 @@ public class RampMeterCalculator {
          * if not simulation
          */
         if(sr == null){
-            section.loadData(p,false);
+            section.loadData(p,DataLoadOption.setEvaluationMode());
         }else{
             SimObjects.getInstance().reset();
             sr.setTrafficDataToDetectors();
-            section.loadData(p,true,null);
+            section.loadData(p,DataLoadOption.setSimulationMode(Interval.get(sr.getRunningSeconds())),null);
         }
         
         for(EntranceState es : entrances){

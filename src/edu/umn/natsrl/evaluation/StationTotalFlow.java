@@ -50,7 +50,7 @@ public class StationTotalFlow extends Evaluation {
         for(int i=0; i<stationSpeed.size(); i++)
         {
             if(stationSpeed.get(i).isStatistic()) continue;
-            this.opts.getSection().loadData(periods[periodIdx++], this.simulationMode);            
+            this.opts.getSection().loadData(periods[periodIdx++], this.dataLoadOption);            
             
             if(printDebug) {
                 System.out.println("      - " + periods[idx++].getPeriodString());

@@ -17,6 +17,7 @@
  */
 package edu.umn.natsrl.ticas.Simulation;
 
+import edu.umn.natsrl.evaluation.Interval;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.Detector;
 import edu.umn.natsrl.infra.infraobjects.Station;
@@ -81,16 +82,16 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     
     private boolean isStop = false;
     
-    private int DebugInterval = 30;
-    
     private boolean isDebug_StationInfo = true;
     private boolean isDebug_EntranceInfo = true;
-    
+    protected int runInterval = Interval.I30SEC.getSecond();
+    protected int DebugInterval = 30;
     //chart Option
     protected JPanel chartPanel = null;
     
-    public Simulation(String caseFile, int seed, Section section, VISSIMVersion v){
+    public Simulation(String caseFile, int seed, Section section, VISSIMVersion v,int rinterval){
         try{
+            runInterval = rinterval;
             this.caseFile = caseFile;
             this.seed = seed;
             this.section = section;
@@ -101,6 +102,7 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
             this.simDuration = VISSIMHelper.loadSimulationDuration(this.caseFile);
             simDMSs = loadDMSsFromCasefile(this.caseFile);
             sectionHelper = new SectionHelper(section, detectors,meters,simDMSs);
+            saveSimulationConfig();
 
         }catch(IOException ex){
             ex.printStackTrace();
@@ -116,7 +118,7 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         isStop = false;
         System.out.print("Starting VISSIM Simulator......");
         vc = new VISSIMController();
-        ComError ce = ComError.getErrorbyID(vc.initialize(caseFile,seed,version));
+        ComError ce = ComError.getErrorbyID(vc.initialize(caseFile,seed,version,runInterval));
         if(!ce.isCorrect()){
             this.signalListener.signalEnd(ce.getErrorType());
             this.vc.stop();
@@ -135,12 +137,12 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         System.out.println("Ok");
         
          int totalExecutionStep = vc.getTotalExecutionStep();
-        int totalSamples = totalExecutionStep / 300;
+        int totalSamples = totalExecutionStep / (runInterval * 10);
         System.out.println("total Running Time : " +totalExecutionStep+", "+totalSamples);
         samples = 0;
         long sTime = new Date().getTime();
         simcount=0; //30sec interval
-        int runInterval = 30;
+        
         
         /**
          * Running Initialize
@@ -425,6 +427,11 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
             }
         }
     }
+
+        private void saveSimulationConfig() {
+                SimulationConfig.RunningInterval = runInterval;
+                SimulationConfig.saveConfig();
+        }
     
     public static interface ISimEndSignal {
         public void signalEnd(int code);
@@ -444,8 +451,12 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     public void setDebugInterval(int t){
         this.DebugInterval = t;
     }
+    
+    public int getRunningInterval(){
+            return runInterval;
+    }
     public int getDebugIntervalIndex(){
-        return this.DebugInterval / 30;
+        return this.DebugInterval / runInterval;
     }
     public void setDebugStationInfo(boolean is){
         this.isDebug_StationInfo = is;
@@ -456,5 +467,9 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     
     public void setChartPanel(JPanel PanelChart) {
         chartPanel = PanelChart;
+    }
+    
+    public void setRunningTime(int rtime){
+            runInterval = rtime;
     }
 }

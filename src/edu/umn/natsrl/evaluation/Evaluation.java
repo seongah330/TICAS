@@ -18,6 +18,8 @@
 
 package edu.umn.natsrl.evaluation;
 
+import edu.umn.natsrl.infra.DataLoadOption;
+import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.Detector;
 import edu.umn.natsrl.infra.infraobjects.Station;
@@ -63,6 +65,7 @@ public abstract class Evaluation {
     protected boolean hasResult = false;
     protected boolean printDebug = true;
     protected boolean simulationMode = false;
+    protected DataLoadOption dataLoadOption = DataLoadOption.setEvaluationMode();
     
     protected IDetectorChecker detectorChecker = new IDetectorChecker() {   
         public boolean check(Detector d) {
@@ -82,6 +85,10 @@ public abstract class Evaluation {
     
     protected void setOptions(EvaluationOption opts) {
         this.opts = opts;
+        if(opts.isSimulationMode()){
+                dataLoadOption = DataLoadOption.setSimulationMode(opts.getSimulationInterval());
+        }else
+                dataLoadOption = DataLoadOption.setEvaluationMode();
         simulationMode = opts.isSimulationMode();
         init();
     }
@@ -138,7 +145,7 @@ public abstract class Evaluation {
         
         Evaluation eval = Evaluation.createEvaluate(klass, opts);
         if(!eval.hasResult()) {
-            eval.setPrintDebug(false);
+            eval.setPrintDebug(true);
             eval.process();
         }
         return eval.getResult();
@@ -164,6 +171,10 @@ public abstract class Evaluation {
     private static String getCacheKey(Class klass, EvaluationOption opts)
     {
         String time = opts.getStartHour()+""+opts.getStartMin()+"-"+opts.getEndHour()+""+opts.getEndMin();
+        for(Period p : opts.getPeriods()){
+                time += "-"+p.getPeriodStringHWithoutTime();
+        }
+        time += "-"+opts.getSection().getName();
         return klass.getSimpleName() + "_" + time + "_" + opts.getInterval().second;
     }
     

@@ -296,7 +296,7 @@ public class SimDetector extends SimObject {
         else if(trafficType.isSpeed()) target = this.speed;
         else if(trafficType.isVolume()) target = this.volume;
         
-        
+        System.err.println(this.id+" - vcnt : "+values.length);
         int cnt = 0;
         for(double v : values){
             if((trafficType.isDensity()&&avgCnt==0) || (!trafficType.isDensity()&&avgCnt==1))
@@ -390,6 +390,7 @@ public class SimDetector extends SimObject {
             double temp = data.get(i);
             tmpv.add((double)Math.round(temp/getAvg()));
         }
+        System.err.println(this.id+ " : orgin-"+data.size()+", re-"+tmpv.size());
         return tmpv;
     }
     

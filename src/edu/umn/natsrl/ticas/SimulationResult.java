@@ -18,6 +18,7 @@
 
 package edu.umn.natsrl.ticas;
 
+import edu.umn.natsrl.evaluation.Interval;
 import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.Detector;
@@ -53,6 +54,7 @@ public class SimulationResult implements Comparable {
     final String K_SECTION_DESC = "section.desc";
     final String K_SECTION_RNODES = "section.rnodes" ;
     final String K_SECTION_DETECTORS = "section.detectors";
+    final String K_RUNNING_INTV = "rintv";
     public final static String SAVE_PROP_DIR = "simulationresults";    
     public final static String SAVE_DATA_DIR = SAVE_PROP_DIR+File.separator+"data";
     public final static String SAVE_PROP_DIR_SUB = SAVE_PROP_DIR+ File.separator + "subdata";    
@@ -60,6 +62,7 @@ public class SimulationResult implements Comparable {
     private String name;
     private String desc;
     private Date created;
+    private int RIntv;
     
     transient Section section;
     private Period period;
@@ -78,32 +81,33 @@ public class SimulationResult implements Comparable {
     public final static int DESC_POINT = 2;
     public final static int DESC_KEY = 3;
     
-    public SimulationResult(String name, String desc, Section section, Period period) {
-        SimulationResultInit(name,desc,section,period);
+    public SimulationResult(String name, String desc, Section section, Period period,int RunningInterval) {
+        SimulationResultInit(name,desc,section,period,RunningInterval);
     }
     
-    public SimulationResult(String name, String desc, Section section, Period period, boolean subData, String _key) {
+    public SimulationResult(String name, String desc, Section section, Period period, int RunningInterval, boolean subData, String _key) {
         this.isSubData = subData;
         this.DataKey = _key;
-        SimulationResultInit(name,desc,section,period);
+        SimulationResultInit(name,desc,section,period,RunningInterval);
     }
-    public SimulationResult(String name, String desc, Section section, Period period, boolean subData, String _key, int _length) {
+    public SimulationResult(String name, String desc, Section section, Period period, int RunningInterval, boolean subData, String _key, int _length) {
         this.isSubData = subData;
         this.DataKey = _key;
         this.DataLength = String.valueOf(_length);
-        SimulationResultInit(name,desc,section,period);
+        SimulationResultInit(name,desc,section,period,RunningInterval);
     }
     
-    private void SimulationResultInit(String name, String desc, Section section, Period period){
+    private void SimulationResultInit(String name, String desc, Section section, Period period, int RunningInterval){
         this.name = name;
         this.desc = desc;
         this.section = section;
         this.period = period;
+        this.RIntv = RunningInterval;
         this.created = new Date();  
         
         prop.put(K_NAME, name);
         prop.put(K_DESC, desc);
-        
+        prop.put(K_RUNNING_INTV, RIntv);
         if(this.DataKey != null){
             prop.put(K_DATAKEY, this.DataKey);
         }
@@ -130,6 +134,7 @@ public class SimulationResult implements Comparable {
         this.prop = p.clone();
         this.name = prop.get(K_NAME);
         this.desc = prop.get(K_DESC);
+        RIntv = prop.getInteger(K_RUNNING_INTV) == 0 ? Interval.getMinTMCInterval() : prop.getInteger(K_RUNNING_INTV);
         
         try{
             this.DataKey = prop.get(K_DATAKEY);
@@ -149,6 +154,13 @@ public class SimulationResult implements Comparable {
         this.period = new Period(prop.getDate(K_PERIOD_START), prop.getDate(K_PERIOD_END), prop.getInteger(K_PERIOD_INTERVAL));
         this.created = prop.getDate(K_CREATED);
     }       
+    
+    public int getRunningSeconds(){
+            return this.RIntv;
+    }
+    public Interval getRunningInterval(){
+            return Interval.get(RIntv);
+    }
  
     public boolean IsListData(){
         if(this.DataKey != null && !this.isSubData)
@@ -216,6 +228,8 @@ public class SimulationResult implements Comparable {
     
     private void addTrafficData(Detector d) {
         double[] k=d.getDensity(), q=d.getFlow(), o=d.getOccupancy(), c=d.getScan(), u=d.getSpeed(), v=d.getVolume();
+//        System.err.println("-"+d.getDensity().length+ ", "+d.getFlow().length+", "+d.getOccupancy().length
+//                + ", "+d.getScan().length+ ", "+d.getSpeed().length+", "+d.getVolume().length);
         data.put(getKey(d.getId(), TrafficType.DENSITY), getCsv(k));
         data.put(getKey(d.getId(), TrafficType.FLOW), getCsv(q));
         data.put(getKey(d.getId(), TrafficType.OCCUPANCY), getCsv(o));

@@ -18,6 +18,7 @@
 package edu.umn.natsrl.ticas.plugin.srte;
 
 import edu.umn.natsrl.evaluation.Interval;
+import edu.umn.natsrl.infra.DataLoadOption;
 import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.Station;
@@ -210,7 +211,7 @@ public class SRTEAlgorithm extends Thread{
 
     public void extractData() throws Exception
     {
-        section.loadData(this.period,false);
+        section.loadData(this.period,DataLoadOption.setEvaluationMode());
         saveData();
     }
 

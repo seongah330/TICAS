@@ -73,7 +73,7 @@ public class VSLStationStateFullSearch extends VSLStationState{
     private void adjustStream(double m, NavigableMap<Double, VSLStationState> upstream) {
         //Find VSS between Current and Upstream Station that acc is less than 0
         VSLStationState current = this;
-        System.out.println("current : "+current.getID()+"("+current.acceleration+","+current.bottleneck+","+current.p_bottleneck);
+//        System.out.println("current : "+current.getID()+"("+current.acceleration+","+current.bottleneck+","+current.p_bottleneck);
         if(!findVSS(m,upstream)){
             return;
         }
@@ -125,7 +125,7 @@ public class VSLStationStateFullSearch extends VSLStationState{
             }
             
             if(sp.bottleneck || sp.p_bottleneck){
-                System.out.println("-----Find VSS : "+sp.getID());
+//                System.out.println("-----Find VSS : "+sp.getID());
                 isVSS = true;
             }
             

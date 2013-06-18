@@ -593,7 +593,7 @@ public class SRTEDataExtractorPanel extends javax.swing.JPanel {
         ticasOption.setSelectedSectionIndex(this.cbxSections.getSelectedIndex());
         
         // selected interval
-        ticasOption.setSelectedIntervalIndex(this.cbxInterval.getSelectedIndex());
+//        ticasOption.setSelectedIntervalIndex(this.cbxInterval.getSelectedIndex());
         
         // url settings
         ticasOption.setTrafficConfigUrl(InfraConstants.TRAFFIC_CONFIG_URL);

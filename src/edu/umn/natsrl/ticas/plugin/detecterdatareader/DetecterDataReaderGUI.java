@@ -86,7 +86,7 @@ public class DetecterDataReaderGUI extends javax.swing.JPanel {
         
         for(Period p : peroids){
             System.out.println(detector.getLabel() + " ");
-            detector.loadData(p, false);
+            detector.loadData(p, null);
             String day = String.format("%02d",p.start_date);
             
 //            System.out.println("test : " + detector.isAuxiliary() + ", " + detector.isAbandoned() + ", " + detector.isMissing() + ", " + detector.getCategory());

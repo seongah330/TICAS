@@ -92,7 +92,7 @@ public class DataReaderGUI extends javax.swing.JPanel {
         
         int ci=1;
         for(Period p : periods) {
-            station.loadData(p, false);
+            station.loadData(p, null);
             String day = String.format("%02d", p.start_date);
             if(!likeOneDay) {
                 if(readDensity) {

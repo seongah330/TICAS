@@ -309,7 +309,7 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
     }
     
     private void calculateControlThreshold__TTMODE_NOLIMIT_backup(double m, NavigableMap<Double, VSLStationState> upstream) {
-        System.out.println("Calculate THREsHOLD - NEW");
+//        System.out.println("Calculate THREsHOLD - NEW");
         double cm = m;
         double cu = getAggregateRollingSpeed(); //
         boolean cbottleneck = this.bottleneck;

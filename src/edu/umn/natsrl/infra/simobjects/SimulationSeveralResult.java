@@ -17,8 +17,11 @@
  */
 package edu.umn.natsrl.infra.simobjects;
 
+import edu.umn.natsrl.evaluation.Interval;
+import edu.umn.natsrl.infra.DataLoadOption;
 import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
+import edu.umn.natsrl.ticas.Simulation.SimulationConfig;
 import edu.umn.natsrl.ticas.SimulationResult;
 import java.io.File;
 import java.util.ArrayList;
@@ -80,16 +83,16 @@ public class SimulationSeveralResult {
         String name = getName();
         String desc = getDesc();
         if(!checkName(name)) return;
-
+        int RunningInterval = SimulationConfig.RunningInterval;
         try {
             System.out.println("SAVE : period=" + simPeriod);
             System.out.println("SAVE : section="+simSection.getRoutes());
-            simSection.loadData(simPeriod, true);
+            simSection.loadData(simPeriod, DataLoadOption.setSimulationMode(Interval.get(RunningInterval)));
         } catch(Exception ex) {
             ex.printStackTrace();
         }
         
-        SimulationResult sr = new SimulationResult(name, desc, simSection, simPeriod,true,getKey(simRandom.getName(),simRandom.getSimulationKey()));
+        SimulationResult sr = new SimulationResult(name, desc, simSection, simPeriod,RunningInterval,true,getKey(simRandom.getName(),simRandom.getSimulationKey()));
         
         try {
             sr.save();

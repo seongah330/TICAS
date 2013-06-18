@@ -23,6 +23,7 @@ package edu.umn.natsrl.evaluation;
  */
 public enum Interval {
     
+    I10SEC(10, "10 second"),
     I30SEC(30, "30 second"),
     I1MIN(60, "1 min"),
     I2MIN(120, "2 min"),
@@ -34,6 +35,23 @@ public enum Interval {
     I20MIN(1200, "20 min"),
     I30MIN(1800, "30 min"),
     I1HOUR(3600, "1 hour");
+
+        public static int getMinInterval() {
+                int cstep = Integer.MAX_VALUE;
+                for(Interval in : Interval.values()){
+                        cstep = Math.min(cstep, in.second);
+                }
+                return cstep;
+        }
+        
+        public static int getMinTMCInterval(){
+                return Interval.I30SEC.second;
+        }
+        
+        public static int getMinSimulationInterval(){
+                return getMinInterval();
+//                return Interval.I30SEC.second;
+        }
     
     // interval in second
     public final int second;
@@ -60,5 +78,9 @@ public enum Interval {
     public String toString()
     {
         return this.description;
+    }
+    
+    public int getSecond(){
+            return second;
     }
 }

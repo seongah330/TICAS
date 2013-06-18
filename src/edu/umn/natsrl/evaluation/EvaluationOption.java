@@ -76,6 +76,7 @@ public class EvaluationOption implements Serializable {
     
     private transient IDetectorChecker detectorChecker;
     private boolean simulationMode = false;
+    private Interval simInterval;
 
     public EvaluationOption() {
         
@@ -248,6 +249,17 @@ public class EvaluationOption implements Serializable {
 
     public void setSimulationMode(boolean simulationMode) {
         this.simulationMode = simulationMode;
+    }
+    
+    public void setSimulationInterval(Interval sitv){
+            simInterval = sitv;
+    }
+    
+    public Interval getSimulationInterval(){
+            if(simInterval == null)
+                    return Interval.get(Interval.getMinTMCInterval());
+            else
+                    return simInterval;
     }
 
     public SectionInfo getSectionInfo() {

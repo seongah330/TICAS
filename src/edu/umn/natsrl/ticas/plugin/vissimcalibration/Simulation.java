@@ -17,6 +17,7 @@
  */
 package edu.umn.natsrl.ticas.plugin.vissimcalibration;
 
+import edu.umn.natsrl.ticas.Simulation.SimulationConfig;
 import edu.umn.natsrl.util.FileHelper;
 import edu.umn.natsrl.vissimcom.ITravelTimeListener;
 import edu.umn.natsrl.vissimcom.VISSIMController;
@@ -49,7 +50,7 @@ public class Simulation extends Thread implements ITravelTimeListener {
     }
     
     public void run() {
-        vc.initialize(casefile, seed,VISSIMVersion.VISSIM540x64);
+        vc.initialize(casefile, seed,VISSIMVersion.VISSIM540x64,SimulationConfig.RunningInterval);
         this.signalListener.signalEnd(0);
         //vc.addTrafficListener(this);   
         

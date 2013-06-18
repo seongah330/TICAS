@@ -20,11 +20,13 @@ package edu.umn.natsrl.ticas.plugin.simulation.VSL;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLStationState;
 import edu.umn.natsrl.chart.TICASChart;
 import edu.umn.natsrl.chart.TICASChartXY;
+import edu.umn.natsrl.evaluation.Interval;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.DMSImpl;
 import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.infra.simobjects.SimDMS;
 import edu.umn.natsrl.ticas.Simulation.Simulation;
+import edu.umn.natsrl.ticas.Simulation.SimulationConfig;
 import edu.umn.natsrl.ticas.Simulation.SimulationImpl;
 import edu.umn.natsrl.ticas.Simulation.StationState;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLAlgorithm;
@@ -60,8 +62,8 @@ public class VSLSim extends Simulation implements SimulationImpl{
     
     VSLVersion vslversion;
     
-    public VSLSim(String caseFile, int seed, Section section, VISSIMVersion v, VSLVersion _vv){
-        super(caseFile,seed,section,v);
+    public VSLSim(String caseFile, int seed, Section section, VISSIMVersion v, VSLVersion _vv, int rinterval){
+        super(caseFile,seed,section,v,rinterval);
         
         vslversion = _vv;
         SimInit();
@@ -69,6 +71,7 @@ public class VSLSim extends Simulation implements SimulationImpl{
     
     @Override
     public void SimInit() {
+//        this.DebugInterval = this.runInterval;
         /*
          * Set VSLStationState
          * set Up, down VSLStation
@@ -127,7 +130,7 @@ public class VSLSim extends Simulation implements SimulationImpl{
             //for Station debuging
             for (int i = 0; i < VSLStationStates.size(); i++) {
                 VSLStationState s = VSLStationStates.get(i);
-                System.out.println(s.getID() + " : T_Q="+String.format("%.1f",s.getFlow())
+                System.out.println(s.getID() + " : T_Q="+String.format("%.1f",s.getTotalFlow(0, this.getDebugIntervalIndex()))
                         + " A_Q="+String.format("%.1f",s.getAverageFlow(0, this.getDebugIntervalIndex()))
                         + " k=" +String.format("%.1f", s.getAverageDensity(0,getDebugIntervalIndex()))
                         + " u=" + String.format("%.1f", s.getAverageSpeed(0, getDebugIntervalIndex()))

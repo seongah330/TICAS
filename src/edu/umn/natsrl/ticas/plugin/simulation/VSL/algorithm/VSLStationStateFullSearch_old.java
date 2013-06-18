@@ -77,7 +77,7 @@ public class VSLStationStateFullSearch_old extends VSLStationState{
         VSLStationState maxStation = null;
         VSLStationState current = this;
         
-        System.out.println("current : "+current.getID()+"("+current.acceleration+","+current.bottleneck+","+current.p_bottleneck);
+//        System.out.println("current : "+current.getID()+"("+current.acceleration+","+current.bottleneck+","+current.p_bottleneck);
         if(!current.bottleneck && !current.p_bottleneck){
             return;
         }
@@ -98,7 +98,7 @@ public class VSLStationStateFullSearch_old extends VSLStationState{
         while(upstream != null){
             Double ap = upstream.acceleration;
             Double a = maxStation.acceleration;
-            System.out.println("fUp-max : "+maxStation.getID()+"("+maxStation.acceleration+","+maxStation.bottleneck+","+maxStation.p_bottleneck+"), com : "+upstream.getID()+"("+upstream.acceleration+")");
+//            System.out.println("fUp-max : "+maxStation.getID()+"("+maxStation.acceleration+","+maxStation.bottleneck+","+maxStation.p_bottleneck+"), com : "+upstream.getID()+"("+upstream.acceleration+")");
             if(ap == null || ap > 0){
                 break;
             }
@@ -128,7 +128,7 @@ public class VSLStationStateFullSearch_old extends VSLStationState{
         }
         
         while(downstream != null){
-            System.out.println("fDn-max : "+maxStation.getID()+"("+maxStation.acceleration+"), com : "+downstream.getID()+"("+downstream.acceleration+")");
+//            System.out.println("fDn-max : "+maxStation.getID()+"("+maxStation.acceleration+"), com : "+downstream.getID()+"("+downstream.acceleration+")");
             Double ap = downstream.acceleration;
             Double a = maxStation.acceleration;
             

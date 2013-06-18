@@ -56,7 +56,6 @@ import edu.umn.natsrl.map.TMCProvider;
 import edu.umn.natsrl.ticas.Simulation.SimulationUtil;
 import edu.umn.natsrl.ticas.error.ErrorMessage;
 import edu.umn.natsrl.ticas.error.StringErrorStream;
-import edu.umn.natsrl.ticas.plugin.VideoChecker.VideoChecker;
 import edu.umn.natsrl.ticas.plugin.datareader.DataReader;
 import edu.umn.natsrl.ticas.plugin.detecterdatareader.DetecterDataReader;
 import edu.umn.natsrl.ticas.plugin.fixedmetering.FixedMeteringSimulation;
@@ -66,6 +65,7 @@ import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLSimulation;
 import edu.umn.natsrl.ticas.plugin.simulation.basicmetering.BasicMetering;
 import edu.umn.natsrl.ticas.plugin.srte.TICASPluginSRTE;
 import edu.umn.natsrl.ticas.plugin.srte.TestFrame;
+import edu.umn.natsrl.ticas.plugin.srtedataextractor.SRTEDataExtractor;
 import edu.umn.natsrl.ticas.plugin.vissimcalibration2.VissimCalibration2;
 import edu.umn.natsrl.ticas.plugin.traveltimeIndexer.TTIndexterPlugin;
 import edu.umn.natsrl.ticas.plugin.vissimtoexcel.VISSIMtoExcel;
@@ -190,6 +190,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
     private double initLatitude = 44.974878;
     private double initLongitude = -93.233414;    
     private MapHelper mapHelper;
+    private boolean isSimresultLoaded = false;
     
     public TICAS2FrameLab(TMO tmo) {
 
@@ -241,9 +242,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         this.natsrlCalendar.setDateChecker(dc);
 
         // interval
-        for (Interval i : Interval.values()) {
-            this.cbxInterval.addItem(i);
-        }
+        setInterval(Interval.getMinTMCInterval());
 
         // output direction
         for (OutputDirection d : OutputDirection.values()) {
@@ -373,8 +372,15 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
 //        if(selectedSectionIndex < this.cbxSections.getItemCount()-1) this.cbxSections.setSelectedIndex(selectedSectionIndex);
         
         // selected interval index
-        int selectedIntervalIndex = ticasOption.getSelectedIntervalIndex();
-        if(selectedIntervalIndex < this.cbxInterval.getItemCount()-1) this.cbxInterval.setSelectedIndex(selectedIntervalIndex);        
+        int selectedIntervalSeconds = ticasOption.getSelectedIntervalSeconds();
+        for(int i = 0 ; i<cbxInterval.getItemCount();i++){
+                Interval in = (Interval)cbxInterval.getItemAt(i);
+                if(in.getSecond() == selectedIntervalSeconds){
+                        cbxInterval.setSelectedIndex(i);
+                        break;
+                }
+        }
+//        if(selectedIntervalSeconds < this.cbxInterval.getItemCount()-1) this.cbxInterval.setSelectedIndex(selectedIntervalIndex);        
         
         InfraConstants.TRAFFIC_DATA_URL = ticasOption.getTrafficDataUrl();
         InfraConstants.TRAFFIC_CONFIG_URL = ticasOption.getTrafficConfigUrl();
@@ -442,16 +448,16 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         PluginInfo simFixedMetering = new PluginInfo("Fixed Metering Simulation", PluginType.TOOL, FixedMeteringSimulation.class);       
         addSimulationPlugins(simFixedMetering);
         
-        PluginInfo simBasicMetering = new PluginInfo("Local Responsible Metering Simulation", PluginType.TOOL, BasicMetering.class);       
-        addSimulationPlugins(simBasicMetering);
+//        PluginInfo simBasicMetering = new PluginInfo("Local Responsible Metering Simulation", PluginType.TOOL, BasicMetering.class);       
+//        addSimulationPlugins(simBasicMetering);
         
-        if(addMeteringPlugin) {
-            PluginInfo meteringPlugin = new PluginInfo("K_Adaptive Metering Simulation", PluginType.SIMULATION, MeteringSimulation.class);
-            addSimulationPlugins(meteringPlugin);            
-        }        
+//        if(addMeteringPlugin) {
+//            PluginInfo meteringPlugin = new PluginInfo("K_Adaptive Metering Simulation", PluginType.SIMULATION, MeteringSimulation.class);
+//            addSimulationPlugins(meteringPlugin);            
+//        }        
         
-        PluginInfo vslPlugin = new PluginInfo("VSL Simulation/Emulation", PluginType.SIMULATION, VSLSimulation.class);
-        addSimulationPlugins(vslPlugin);
+//        PluginInfo vslPlugin = new PluginInfo("VSL Simulation/Emulation", PluginType.SIMULATION, VSLSimulation.class);
+//        addSimulationPlugins(vslPlugin);
         
         PluginInfo irisPlugin = new PluginInfo("IRIS Simulation/Emulation", PluginType.SIMULATION, IRISSimulation.class);
         addSimulationPlugins(irisPlugin);
@@ -483,6 +489,9 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         
         PluginInfo DdataReader = new PluginInfo("Detector Data Reader", PluginType.TOOL, DetecterDataReader.class);       
         addTools(DdataReader);        
+        
+        PluginInfo SRTEdataExtractor = new PluginInfo("SRTE Data Extractor", PluginType.TOOL, SRTEDataExtractor.class);       
+        addTools(SRTEdataExtractor);
         
 //        PluginInfo VSSIMDatatoExcel = new PluginInfo("VISSIM Data to Excel", PluginType.TOOL, VISSIMtoExcel.class);       
 //        addTools(VSSIMDatatoExcel);        
@@ -582,7 +591,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             return;
         }
         
-        simPeriod.interval = ((Interval)this.cbxInterval.getSelectedItem()).second;        
+        simPeriod.interval = ((Interval)this.cbxInterval.getSelectedItem()).getSecond();        
         
         
 //        try {
@@ -607,6 +616,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         
         
         opt.setSimulationMode(true);
+        opt.setSimulationInterval(this.selectedSimulationResult.getRunningInterval());
         
         if (selectedOption == null) {
             JOptionPane.showMessageDialog(null, "Check options");
@@ -843,7 +853,10 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             new Timer().schedule(new TimerTask(){
                 @Override
                 public void run() {
-                    loadSimulationResults();
+                        isSimresultLoaded = false;
+                        loadSimulationResults();
+                        isSimresultLoaded = true;
+                    setSimulationInterval(true);
                 }
             },5);
             this.cbxSimulationForCalibration.setEnabled(true);
@@ -861,6 +874,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
             this.cbxEndMin.setEnabled(true);
             this.cbxDuration.setEnabled(true);
             MainVisibleCheck(true);
+            setSimulationInterval(selected);
         }
     }
 
@@ -904,6 +918,32 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         this.cbxEndMin.setEnabled(timecheck);
         this.cbxDuration.setEnabled(timecheck);
 }
+
+        private void setSimulationInterval(boolean isSimulationData) {
+                SimulationResult sr = (SimulationResult)this.cbxsimulationresult.getSelectedItem();
+                if(sr == null || !isSimulationData){
+                        setInterval(Interval.getMinTMCInterval());
+                        System.out.println("set default");
+                }else{
+                        System.out.println("set simulation interval");
+                        setInterval(sr.getRunningSeconds());
+                }
+                
+                
+                
+        }
+
+        private void setInterval(int runningInterval) {
+                if(this.cbxInterval.getItemCount() > 0){
+                        cbxInterval.removeAllItems();
+                }
+                
+                for (Interval i : Interval.values()) {
+                        if(i.second >= runningInterval)
+                                this.cbxInterval.addItem(i);
+                }
+                
+        }
 
     /**
      * Task class to execute all selected evaluations
@@ -1144,7 +1184,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         Calendar[] selectedDates = this.natsrlCalendar.getSelectedDates();
         Calendar c1, c2;
         Period period;
-        int interval = ((Interval) this.cbxInterval.getSelectedItem()).second;
+        int interval = ((Interval) this.cbxInterval.getSelectedItem()).getSecond();
         int start_hour = Integer.parseInt(this.cbxStartHour.getSelectedItem().toString());
         int start_min = Integer.parseInt(this.cbxStartMin.getSelectedItem().toString());
         int end_hour = Integer.parseInt(this.cbxEndHour.getSelectedItem().toString());
@@ -1186,7 +1226,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         ticasOption.setSelectedSectionIndex(this.cbxSections.getSelectedIndex());
         
         // selected interval
-        ticasOption.setSelectedIntervalIndex(this.cbxInterval.getSelectedIndex());
+        ticasOption.setSelectedIntervalSeconds(((Interval)this.cbxInterval.getSelectedItem()).getSecond());
         
         try {
             opt.setCongestionThresholdSpeed(Integer.parseInt(this.tbxCongestionThresholdSpeed.getText()));
@@ -1239,6 +1279,11 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         if (!simulationMode && opts.getPeriods().length == 0) {
             JOptionPane.showMessageDialog(this, "Select date");
             return false;
+        }
+        Interval in = (Interval)cbxInterval.getSelectedItem();
+        if (!simulationMode && in.getSecond() < Interval.getMinTMCInterval()){
+                JOptionPane.showMessageDialog(null, "Interval of real traffic data must be over the 30 sec");
+                return false;
         }
 
         // check second tab : evaluation metrics
@@ -2124,6 +2169,11 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Simulation/Emulation & Simulation Output Extraction", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 10), java.awt.Color.black)); // NOI18N
 
                 cbxsimulationresult.setPreferredSize(new java.awt.Dimension(400, 20));
+                cbxsimulationresult.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                cbxsimulationresultActionPerformed(evt);
+                        }
+                });
 
                 jLabel28.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
                 jLabel28.setText("Simulation Output Files");
@@ -2143,6 +2193,11 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 });
 
                 cbxPlugins.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+                cbxPlugins.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                cbxPluginsActionPerformed(evt);
+                        }
+                });
 
                 btnRunSimulationPlugin.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
                 btnRunSimulationPlugin.setText("Run");
@@ -2572,6 +2627,16 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 // TODO add your handling code here:
         }//GEN-LAST:event_chkRWISActionPerformed
 
+        private void cbxsimulationresultActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxsimulationresultActionPerformed
+                // TODO add your handling code here:
+                if(isSimresultLoaded)
+                        setSimulationInterval(true);
+        }//GEN-LAST:event_cbxsimulationresultActionPerformed
+
+        private void cbxPluginsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxPluginsActionPerformed
+                // TODO add your handling code here:
+        }//GEN-LAST:event_cbxPluginsActionPerformed
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JCheckBox CbxFixmissingstationdata;
         private javax.swing.JCheckBox CbxmissingstationdataZero;
@@ -2660,10 +2725,8 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         private javax.swing.JPanel jPanel10;
         private javax.swing.JPanel jPanel11;
         private javax.swing.JPanel jPanel2;
-        private javax.swing.JPanel jPanel3;
         private javax.swing.JPanel jPanel4;
         private javax.swing.JPanel jPanel5;
-        private javax.swing.JPanel jPanel6;
         private javax.swing.JPanel jPanel8;
         private javax.swing.JTabbedPane jTabbedPane2;
         private org.jdesktop.swingx.JXMapKit jmKit;

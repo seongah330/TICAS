@@ -385,7 +385,7 @@ public class TT extends Evaluation {
     /**
      * Adjust result to make required data
      */
-    private EvaluationResult preAdjustResult(EvaluationResult res) {
+     private EvaluationResult preAdjustResult(EvaluationResult res) {
 
         // remove confidence information from result
         this.removeConfidenceFromResult(res);

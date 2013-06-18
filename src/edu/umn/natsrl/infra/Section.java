@@ -18,6 +18,7 @@
 
 package edu.umn.natsrl.infra;
 
+import edu.umn.natsrl.evaluation.EvaluationOption;
 import edu.umn.natsrl.infra.section.SectionInfo;
 import edu.umn.natsrl.infra.infraobjects.Corridor;
 import edu.umn.natsrl.infra.infraobjects.DMSImpl;
@@ -171,8 +172,7 @@ public class Section implements Serializable {
         for(int i=1; i<list.size(); i++)
         {
             RNode rn = list.get(i);
-
-            if(rn.isAvailableStation()) {                
+            if(rn.isAvailableStation()) {
                 // casting rnode to station
                 Station s = (Station)rn;
                 prevStation.setDownstreamStation(this.name, s);
@@ -220,14 +220,12 @@ public class Section implements Serializable {
                 
             // rn is Exit to other corridor    
             } else if(rn.isExit()){
-                
                 // if n(i) is not station, n(i) must be exit
                 // therefore n(i+1) is entrance
                 RNode entrance = list.get(i+1);
                 
                 // distance between exit and entrance
                 distanceExitAndEntrance = TMO.getDistanceInFeet(rn, entrance);                
-                
                 // already read n(i+1), so increase i
                 i++;
             }
@@ -654,22 +652,22 @@ public class Section implements Serializable {
      * Loads traffic data for all stations in section
      */
     public void loadData(Period period) throws OutOfMemoryError {
-        loadData(period, false);
+        loadData(period, null);
     }    
     
     /**
      * Loads traffic data for all stations in section
      */
-    public void loadData(Period period, boolean simmode) throws OutOfMemoryError {
-        loadData(period,simmode,null);
+    public void loadData(Period period, DataLoadOption dopt) throws OutOfMemoryError {
+        loadData(period,dopt,null);
     }
     
-    public void loadData(Period period, boolean simmode, SimObjects sobj) throws OutOfMemoryError{
+    public void loadData(Period period, DataLoadOption dopt, SimObjects sobj) throws OutOfMemoryError{
         for(RNode s : this.getRNodesWithExitEntrance()) {
             if(sobj == null)
-                s.loadData(period, simmode);
+                s.loadData(period, dopt);
             else
-                s.loadData(period, simmode,sobj);
+                s.loadData(period, dopt,sobj);
         }
     }
     
@@ -861,14 +859,26 @@ public class Section implements Serializable {
         this.dms.add(pdms);
     }
 
+        /**
+         * set RWIS Sites
+         */
         private void setSite() {
                 RWISSite = getNearSite();
         }
         
+        /**
+         * get RWIS Site by Id
+         * @param siteid 
+         * @return 
+         */
         private Site getSiteById(int siteid) {
                 return RWIS.getInstance().getInfra().getSite(siteid);
         }
 
+        /**
+         * get Near Site from this Section
+         * @return 
+         */
         private Site getNearSite() {
                 Site minsite = null;
                 int minDistance = Integer.MAX_VALUE;
@@ -888,11 +898,19 @@ public class Section implements Serializable {
                 
                 return minsite;
         }
-
+        
+        /**
+         * get Site
+         * @return 
+         */
         public Site getSite() {
                 return RWISSite;
         }
 
+        /**
+         * set Site
+         * @param csite 
+         */
         public void setSite(Site csite) {
                 RWISSite = csite;
         }

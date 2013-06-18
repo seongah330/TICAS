@@ -1580,7 +1580,7 @@ public class VSLSimulationGUI extends javax.swing.JPanel implements Simulation.I
             startTime = new Date();
             Section s = (Section)this.cbxSections.getSelectedItem();
             VISSIMVersion version = (VISSIMVersion)this.cbxvissimVersion.getSelectedItem();
-            simulation = new VSLSim(SimulationConfig.CASE_FILE,SimulationConfig.RANDOM_SEED,s,version,vv);
+            simulation = new VSLSim(SimulationConfig.CASE_FILE,SimulationConfig.RANDOM_SEED,s,version,vv,SimulationConfig.RunningInterval);
             simulation.setSignalListener(this);
             simulation.setChartPanel(this.PanelChart);
             simulation.start();

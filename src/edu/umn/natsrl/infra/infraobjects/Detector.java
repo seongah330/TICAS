@@ -18,6 +18,8 @@
 
 package edu.umn.natsrl.infra.infraobjects;
 
+import edu.umn.natsrl.evaluation.Interval;
+import edu.umn.natsrl.infra.DataLoadOption;
 import edu.umn.natsrl.infra.DetectorDataReader;
 import edu.umn.natsrl.infra.InfraConstants;
 import edu.umn.natsrl.infra.InfraObject;
@@ -50,6 +52,7 @@ public class Detector extends InfraObject implements Comparable {
     private int detector_id;
     private LaneType laneType = LaneType.NONE;
     transient private Period period;
+    transient private int MinInterval;
     private RNode r_node;
     private String cachePath = InfraConstants.CACHE_DETDATA_DIR;
     private double confidence = -1;
@@ -103,27 +106,30 @@ public class Detector extends InfraObject implements Comparable {
      * Read traffic data from cache or remote data
      * @param p
      */
-    public void loadData(Period p, boolean simmode) throws OutOfMemoryError {
-        loadData(p,simmode,null);
+    public void loadData(Period p, DataLoadOption dopt) throws OutOfMemoryError {
+        loadData(p,dopt,null);
     }
-    public void loadData(Period p, boolean simmode,SimObjects sobj) throws OutOfMemoryError {
+    public void loadData(Period p, DataLoadOption dopt,SimObjects sobj) throws OutOfMemoryError {
         this.clear();
         
         this.period = p;
-        
-        if(simmode) {
+        if(dopt != null && dopt.isSimulationMode()) {
+            MinInterval = dopt.getSimulationInterval().getSecond();
+            System.err.println("Simulation Interval : "+MinInterval);
             if(sobj == null)
                 this.fillSimulationData();
             else
                 this.fillSimulationData(sobj);
             return;
         }                
-                
+        MinInterval = Interval.getMinTMCInterval(); //fix me
 //        if(this.loadCache()) return;
                 
         this.confidence = -1;
-
-        if (p.interval % 30 != 0) {
+        if (p.interval < Interval.getMinTMCInterval()){
+                JOptionPane.showMessageDialog(null, "Interval of real traffic data must be over the 30 sec");
+        }
+        if (p.interval % Interval.getMinTMCInterval() != 0) {
             JOptionPane.showMessageDialog(null, "Interval must be the multiples of 30");
         }
         
@@ -240,14 +246,15 @@ public class Detector extends InfraObject implements Comparable {
         if(data == null){
             return null;
         }
-        int interval = this.period.interval / 30;
+        int interval = this.period.interval / MinInterval;
+//        System.err.println(this.id + " - adjustInterval : "+interval + ", dsize : "+data.size());
         Vector<Double> aData = new Vector<Double>();
         
         for (int i = 0; i < data.size(); i += interval) {
             double sum = 0.0;
             double validCount = 0;
-
-            for (int j = i; j < i + interval; j++) {
+            int nextItv = (i+interval) > data.size() ? data.size() : (i+interval);
+            for (int j = i; j < nextItv; j++) {
                 double v = data.get(j);
                 if (v > 0) {
                     sum += v;
@@ -316,9 +323,8 @@ public class Detector extends InfraObject implements Comparable {
          
         
         
-        int samples = period.getTimeline().length * (period.interval / 30);        
-//        System.out.println(this.id + ".fillSimulationData() : size=" + d.getSpeed().size() + ", times=" + samples);
-        
+        int samples = period.getTimeline().length * (period.interval / this.MinInterval);        
+//        System.err.println(this.id + ".fillSimulationData() : size=" + d.getSpeed().size() + ", times=" + samples);
         if(d.getSpeed().size() == 0) {
             Double[] dummy = new Double[samples];
             Arrays.fill(dummy, -1D);
@@ -343,7 +349,8 @@ public class Detector extends InfraObject implements Comparable {
 //        addData(density, d.getDensity(), samples);
 //        addData(volume, d.getVolume(), samples);
 //        addData(scan, d.getScan(), samples);
-        
+        System.err.println(this.id+ ", "+d.getSpeed().size()+ ", "+d.getFlow().size()+ ", "+d.getOccupancy().size()
+                + ", "+d.getDensity().size()+ ", "+d.getVolume().size()+ ", "+d.getScan().size());
         addData(speed, d.getSpeed());
         addData(flow, d.getFlow());
         addData(occupancy, d.getOccupancy());

@@ -30,8 +30,8 @@ import edu.umn.natsrl.vissimcom.VISSIMVersion;
 public class irisSim extends VSLSim{
     Metering metering;
     
-    public irisSim(String caseFile, int seed, Section section, VISSIMVersion v, VSLVersion _vv){
-        super(caseFile,seed,section,v,_vv);
+    public irisSim(String caseFile, int seed, Section section, VISSIMVersion v, VSLVersion _vv, int Intv){
+        super(caseFile,seed,section,v,_vv,Intv);
         metering = new Metering(section,meters,detectors);
     }
     

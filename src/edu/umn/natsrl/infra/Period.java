@@ -18,6 +18,7 @@
 
 package edu.umn.natsrl.infra;
 
+import edu.umn.natsrl.evaluation.Interval;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -34,7 +35,7 @@ public class Period implements Serializable {
     public Date endDate;
     public int start_year, start_month, start_date, start_hour, start_min;
     public int end_year, end_month, end_date, end_hour, end_min;
-    public int interval = 30;   // 30s data
+    public int interval = Interval.getMinTMCInterval();   // 30s data
 
     public Period(Date startDate, Date endDate, int interval) {
         this.setTimes(startDate, endDate);

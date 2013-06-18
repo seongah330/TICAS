@@ -18,6 +18,7 @@
 package edu.umn.natsrl.ticas.plugin.srte;
 
 import edu.umn.natsrl.evaluation.Interval;
+import edu.umn.natsrl.infra.DataLoadOption;
 import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.Station;
@@ -95,7 +96,7 @@ public class SRTEPatternSearch {
 //        period.setInterval(Interval.I15MIN.second);
 
         // load data
-        section.loadData(period, false);
+        section.loadData(period, DataLoadOption.setEvaluationMode());
 
         // station list
         Station[] stations = section.getStations();
@@ -456,7 +457,7 @@ public class SRTEPatternSearch {
     public void start(Section section, Period period) throws OutOfMemoryError, Exception {
         Logger log = new Logger("pattern_" + period.getPeriodString() + "_" + section.getName(), "csv");
         period.setInterval(Interval.I15MIN.second);
-        section.loadData(period, false);
+        section.loadData(period, DataLoadOption.setEvaluationMode());
 
         Station[] stations = section.getStations();
         int dataLength = stations[0].getDensity().length;
@@ -500,7 +501,7 @@ public class SRTEPatternSearch {
     public void start_by_occupancy(Section section, Period period) throws OutOfMemoryError, Exception {
         Logger log = new Logger("pattern_by_occupancy_" + period.getPeriodString() + "_" + section.getName(), "csv");
         period.setInterval(Interval.I15MIN.second);
-        section.loadData(period, false);
+        section.loadData(period, DataLoadOption.setEvaluationMode());
 
         Station[] stations = section.getStations();
         int dataLength = stations[0].getDensity().length;
@@ -544,7 +545,7 @@ public class SRTEPatternSearch {
     public void start(Station station, Period period) throws OutOfMemoryError, Exception {
         Logger log = new Logger("pattern_" + period.getPeriodString() + "_" + station.getStationId(), "csv");
         period.setInterval(Interval.I15MIN.second);
-        station.loadData(period, false);
+        station.loadData(period, DataLoadOption.setEvaluationMode());
         double[] speed = station.getSpeed();
         double[] density = station.getDensity();
         double[] flow = station.getAverageLaneFlow();
@@ -562,7 +563,7 @@ public class SRTEPatternSearch {
     public void start_by_occupancy(Station station, Period period) throws OutOfMemoryError, Exception {
         Logger log = new Logger("pattern_by_occupancy_" + period.getPeriodString() + "_" + station.getStationId(), "csv");
         period.setInterval(Interval.I15MIN.second);
-        station.loadData(period, false);
+        station.loadData(period, DataLoadOption.setEvaluationMode());
         double[] speed = station.getSpeed();
         double[] occupancy = station.getOccupancy();
         double[] flow = station.getAverageLaneFlow();

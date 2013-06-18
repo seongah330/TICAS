@@ -18,6 +18,7 @@
 
 package edu.umn.natsrl.infra.infraobjects;
 
+import edu.umn.natsrl.evaluation.EvaluationOption;
 import edu.umn.natsrl.infra.*;
 import edu.umn.natsrl.infra.interfaces.IDetectorChecker;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
@@ -103,22 +104,19 @@ public class RNode extends InfraObject {
         return null;
     }
 
-    public void loadData(Period period, boolean simmode) throws OutOfMemoryError
+    public void loadData(Period period, DataLoadOption dopt) throws OutOfMemoryError
     {
-        loadData(period,simmode,null);
+        loadData(period,dopt,null);
     }
     
-    public void loadData(Period period, boolean simmode, SimObjects sobj) throws OutOfMemoryError
+    public void loadData(Period period, DataLoadOption dopt, SimObjects sobj) throws OutOfMemoryError
     {
-        if(period.interval % 30 != 0) {
-            JOptionPane.showMessageDialog(null, "Interval must be the multiples of 30");
-        }
         for(Detector d : this.detectors.values())
         {
             if(sobj == null)
-                d.loadData(period, simmode);
+                d.loadData(period, dopt);
             else
-                d.loadData(period, simmode,sobj);
+                d.loadData(period, dopt,sobj);
         }
     }
     

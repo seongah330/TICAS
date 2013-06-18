@@ -277,7 +277,7 @@ public class VSLStationState extends StationState{
         double sp = this.getAggregateRollingSpeed();
         if(sp > 0 && sp < lim){
             int acc = -getControlThreshold();
-            System.out.println(acc);
+//            System.out.println(acc);
             return (lim * lim - sp * sp) / (2 * acc);
         }else{
             return 0;

@@ -17,6 +17,7 @@
  */
 package edu.umn.natsrl.ticas.plugin.simulation.IRIS;
 
+import edu.umn.natsrl.evaluation.Interval;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.ticas.Simulation.Simulation;
 import edu.umn.natsrl.ticas.plugin.metering.MeteringSim;
@@ -39,13 +40,14 @@ public enum SimulationOption {
         name = _name;
     }
     
-    public Simulation getSimulationOption(String caseFile, int seed, Section section, VISSIMVersion v, VSLVersion _vv){
+    public Simulation getSimulationOption(String caseFile, int seed, Section section, VISSIMVersion v, VSLVersion _vv,
+            Interval SimIntv){
         if(isVSLMETERING()){
-            return new irisSim(caseFile,seed,section,v,_vv);
+            return new irisSim(caseFile,seed,section,v,_vv,SimIntv.getSecond());
         }else if(isVSLMODE()){
-            return new VSLSim(caseFile,seed,section,v,_vv);
+            return new VSLSim(caseFile,seed,section,v,_vv,SimIntv.getSecond());
         }else if(isMETERING()){
-            return new MeteringSim(caseFile,seed,section,v);
+            return new MeteringSim(caseFile,seed,section,v,SimIntv.getSecond());
         }else
             return null;
     }

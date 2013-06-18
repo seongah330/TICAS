@@ -18,6 +18,7 @@
 
 package edu.umn.natsrl.ticas.Simulation;
 
+import edu.umn.natsrl.evaluation.Interval;
 import edu.umn.natsrl.util.PropertiesWrapper;
 import edu.umn.natsrl.util.ticasConfig;
 
@@ -38,6 +39,8 @@ public class SimulationConfig extends ticasConfig{
     public static int MAX_RATE = 1714;    // 3600/2.1 (red = 0.1s, green + yellow = 2s)
     public static int MAX_RED_TIME = 13;  // max red time = 13 second    
     public static float MIN_RED_TIME = 0.1f;  // minimum red time = 0.1 second
+    
+    public static int RunningInterval = Interval.getMinSimulationInterval();
     
     public static int getInterval(){
         switch(logtimeinterval){
@@ -84,7 +87,8 @@ public class SimulationConfig extends ticasConfig{
     
     public static void saveConfig() {
         prop.put("CASE_FILE", CASE_FILE);        
-        prop.put("RANDOM_SEED", RANDOM_SEED);   
+        prop.put("RANDOM_SEED", RANDOM_SEED);
+        prop.put("SINTV", RunningInterval);
         saveConfig(configFile);
     }
     
@@ -95,6 +99,10 @@ public class SimulationConfig extends ticasConfig{
             prop = p;
             CASE_FILE = prop.get("CASE_FILE");
             RANDOM_SEED = prop.getInteger("RANDOM_SEED");
+            if(prop.getInteger("SINTV") != 0)
+                RunningInterval = prop.getInteger("SINTV");
+            else
+                RunningInterval = Interval.getMinTMCInterval();
         }
     }
 

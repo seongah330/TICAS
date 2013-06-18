@@ -61,7 +61,7 @@ public class VSLConfig extends ticasConfig{
     public static double VSL_MIN_CHANGE = 5.0;
     public static int FTM = 5280;   // 1 mile = 5280 feets
     
-    public static int Interval = 30;
+    public static int Interval = edu.umn.natsrl.evaluation.Interval.I30SEC.getSecond();
     
     //VSS Identification
     public static BottleneckSpeed bottleneckSpeedType = BottleneckSpeed.BASEDBOTTLENECKSPEED;

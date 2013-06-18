@@ -39,8 +39,8 @@ public class RWIS {
         }
         
         public void setup(){
-                if(checkDB()){
-//                        JOptionPane.showMessageDialog(null, "Fail : Not Connected to RWIS");
+                if(!checkDB()){
+                        JOptionPane.showMessageDialog(null, "Fail : Not Connected to RWIS");
                         return;
                 }
                 infra = new SiteInfra();

@@ -29,8 +29,8 @@ import edu.umn.natsrl.vissimcom.VISSIMVersion;
 public class MeteringSim extends edu.umn.natsrl.ticas.Simulation.Simulation implements SimulationImpl{
     Metering metering;
     
-    public MeteringSim(String caseFile, int seed, Section section, VISSIMVersion v){
-        super(caseFile,seed,section,v);
+    public MeteringSim(String caseFile, int seed, Section section, VISSIMVersion v,int Intv){
+        super(caseFile,seed,section,v,Intv);
         
         SimInit();
     }

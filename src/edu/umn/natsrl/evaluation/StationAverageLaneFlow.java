@@ -50,7 +50,7 @@ public class StationAverageLaneFlow extends Evaluation {
             if(printDebug && idx < periods.length) System.out.println("      - " + periods[idx++].getPeriodString());                        
             if(stationSpeed.get(i).isStatistic()) continue;
             
-            this.opts.getSection().loadData(periods[periodIdx++], this.simulationMode);            
+            this.opts.getSection().loadData(periods[periodIdx++], this.dataLoadOption);            
             
             EvaluationResult res = EvaluationResult.copy(stationSpeed.get(i));
             EvaluationResult dRes = EvaluationResult.copy(stationDensity.get(i));

@@ -48,6 +48,6 @@ public enum VSLSTAType {
             return new VSLSTAOption1(s);
     }
     
-    boolean isOption1(){return this==OPTION1;}
-    boolean isOption2(){return this==OPTION2;}
+    public boolean isOption1(){return this==OPTION1;}
+    public boolean isOption2(){return this==OPTION2;}
 }

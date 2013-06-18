@@ -18,10 +18,13 @@
 
 package edu.umn.natsrl.ticas;
 
+import edu.umn.natsrl.evaluation.Interval;
+import edu.umn.natsrl.infra.DataLoadOption;
 import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.simobjects.RandomSeed;
 import edu.umn.natsrl.infra.simobjects.SimulationSeveralResult;
+import edu.umn.natsrl.ticas.Simulation.SimulationConfig;
 import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLResults;
 import java.awt.Frame;
@@ -55,20 +58,21 @@ public class SimulationResultSaveDialog extends javax.swing.JDialog {
         fname = this.tbxSectionName.getText();
         desc = this.tbxSectionDesc.getText();
         if(!checkName(fname)) return;
-
+        int RunningInterval = SimulationConfig.RunningInterval;
+        
         try {
             System.out.println("SAVE : period=" + period);
             System.out.println("SAVE : section="+section.getRoutes());
-            section.loadData(period, true);
+            section.loadData(period, DataLoadOption.setSimulationMode(Interval.get(RunningInterval)));
         } catch(Exception ex) {
             ex.printStackTrace();
         }
         
         SimulationResult sr = null;
         if(this.SimRandom.hasSimulationKey())
-            sr = new SimulationResult(fname, desc, section, period,false,SimulationSeveralResult.getKey(this.SimRandom.getName(), this.SimRandom.getSimulationKey()),this.SimRandom.getLength());
+            sr = new SimulationResult(fname, desc, section, period,RunningInterval,false,SimulationSeveralResult.getKey(this.SimRandom.getName(), this.SimRandom.getSimulationKey()),this.SimRandom.getLength());
         else
-            sr = new SimulationResult(fname, desc, section, period);
+            sr = new SimulationResult(fname, desc, section, period,RunningInterval);
         
         try {
             sr.save();

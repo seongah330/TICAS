@@ -17,6 +17,7 @@
  */
 package edu.umn.natsrl.evaluation;
 
+import edu.umn.natsrl.infra.DataLoadOption;
 import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.Corridor;
@@ -71,7 +72,7 @@ public class MRF extends Evaluation {
             if(printDebug) System.out.println("      - " + period.getPeriodString());
             
             // data load from all detectors in the section
-            section.loadData(period, this.simulationMode);                 
+            section.loadData(period, DataLoadOption.setSimulationMode(opts.getSimulationInterval()));                 
             
             // variable to save results
             EvaluationResult res = new EvaluationResult();
@@ -104,7 +105,7 @@ public class MRF extends Evaluation {
                     continue;
                 }
                 
-                rn.loadData(period, this.simulationMode);
+                rn.loadData(period, DataLoadOption.setSimulationMode(opts.getSimulationInterval()));
                 
                 // get data from rnode
                 double[] data = this.getTrafficData(rn);

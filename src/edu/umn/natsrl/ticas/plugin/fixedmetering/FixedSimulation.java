@@ -69,9 +69,12 @@ public class FixedSimulation extends Thread implements IStepListener, ITravelTim
     
     private VISSIMVersion version;
     
+    private int SimInterval;
+    
     private boolean isStop = false;
-    public FixedSimulation(String caseFile, int seed, Section section, VISSIMVersion v){
+    public FixedSimulation(String caseFile, int seed, Section section, VISSIMVersion v, int SimIntv){
         try{
+            SimInterval = SimIntv;
             this.caseFile = caseFile;
             this.seed = seed;
             this.section = section;
@@ -90,7 +93,7 @@ public class FixedSimulation extends Thread implements IStepListener, ITravelTim
         isStop = false;
         System.out.print("Starting VISSIM Simulator......");
         vc = new VISSIMController();
-        ComError ce = ComError.getErrorbyID(vc.initialize(caseFile,seed,version));
+        ComError ce = ComError.getErrorbyID(vc.initialize(caseFile,seed,version,SimInterval));
         if(!ce.isCorrect()){
             this.signalListener.signalEnd(ce.getErrorType());
             this.vc.stop();
@@ -116,7 +119,7 @@ public class FixedSimulation extends Thread implements IStepListener, ITravelTim
         sectionHelper = new MeteringSectionHelper(section, meters, detectors);
         ArrayList<StationState> stationStates = sectionHelper.getStationStates();
         int simcount=0; //30sec interval
-        int runInterval = 30;
+        int runInterval = SimInterval;
         while(true){
             if(isStop)
                 break;

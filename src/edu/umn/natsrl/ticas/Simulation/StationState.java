@@ -113,8 +113,8 @@ public class StationState extends State {
 
            if(k > 0) {
                sum += k;
-               validCount++;
            }
+           validCount++;
        }
        if(validCount == 0 || sum < 0) return 0;
 
@@ -141,8 +141,8 @@ public class StationState extends State {
            double u = simstation.getData(dc, TrafficType.SPEED, prevStep+i);
            if(u > 0) {
                sum += u;
-               validCount++;
            }
+           validCount++;
        }
        if(validCount == 0 || sum < 0) return 0;
        return sum/validCount;                        
@@ -173,8 +173,8 @@ public class StationState extends State {
            double q = this.RollingSpeed.get(idx);
            if(q > 0) {
                sum += q;
-               validCount++;
            }
+           validCount++;
        }
        if(validCount == 0 || sum < 0) return 0;
        return sum/validCount;   
@@ -187,8 +187,8 @@ public class StationState extends State {
            double q = simstation.getData(dc, TrafficType.AVERAGEFLOW, prevStep+i);
            if(q > 0) {
                sum += q;
-               validCount++;
            }
+           validCount++;
        }
        if(validCount == 0 || sum < 0) return 0;
        return sum/validCount;   
@@ -285,8 +285,8 @@ public class StationState extends State {
            double v = simstation.getData(dc, TrafficType.VOLUME, prevStep+i);
            if(v > 0) {
                sum += v;
-               validCount++;
            }
+           validCount++;
        }
        return sum;
    }
@@ -303,10 +303,11 @@ public class StationState extends State {
            double q = simstation.getData(dc, TrafficType.FLOW, prevStep+i);
            if(q > 0) {
                sum += q;
-               validCount++;
            }
+           validCount++;
+
        }
-       return sum;
+       return sum / validCount;
    }
    /**
     * @return 

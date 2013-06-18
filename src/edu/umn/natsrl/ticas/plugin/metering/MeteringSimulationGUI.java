@@ -28,6 +28,7 @@ import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.TMO;
 import edu.umn.natsrl.infra.section.SectionManager;
 import edu.umn.natsrl.sfim.SectionInfoDialog;
+import edu.umn.natsrl.ticas.Simulation.SimulationConfig;
 import edu.umn.natsrl.ticas.Simulation.SimulationUtil;
 import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import edu.umn.natsrl.ticas.plugin.metering.Simulation.ISimEndSignal;
@@ -134,7 +135,7 @@ public class MeteringSimulationGUI extends javax.swing.JPanel implements ISimEnd
             
             Section section = (Section)this.cbxSections.getSelectedItem();
             boolean noMetering = this.chkNoMetering.isSelected();
-            sim = new Simulation(MeteringConfig.CASE_FILE, MeteringConfig.RANDOM_SEED, section, noMetering, (VISSIMVersion)this.cbxVissimVersion.getSelectedItem());
+            sim = new Simulation(MeteringConfig.CASE_FILE, MeteringConfig.RANDOM_SEED, section, noMetering, (VISSIMVersion)this.cbxVissimVersion.getSelectedItem(),SimulationConfig.RunningInterval);
             sim.setSignalListener(this);
             sim.start();
             

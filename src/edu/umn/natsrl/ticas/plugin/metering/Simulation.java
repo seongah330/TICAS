@@ -72,10 +72,12 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     private int samples = 0;    
     private boolean noMetering = true;
     private VISSIMVersion version;
+    private int SimInterval;
     
     private boolean isStop = false;
-    public Simulation(String caseFile, int seed, Section section, boolean noMetering, VISSIMVersion v) {
+    public Simulation(String caseFile, int seed, Section section, boolean noMetering, VISSIMVersion v, int SimIntv) {
         try {
+            SimInterval = SimIntv;
             this.caseFile = caseFile;
             this.seed = seed;
             this.section = section;
@@ -96,7 +98,7 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         isStop = false;
         vc = new VISSIMController();
         
-        ComError ce = ComError.getErrorbyID(vc.initialize(caseFile,seed,version));
+        ComError ce = ComError.getErrorbyID(vc.initialize(caseFile,seed,version,SimInterval));
         if(!ce.isCorrect()){
             this.signalListener.signalEnd(ce.getErrorType());
             this.vc.stop();
@@ -123,7 +125,7 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
             if(isStop)
                 break;
             
-            vc.run(30);
+            vc.run(SimInterval);
             
             if(!noMetering){
                 metering.run(samples, vc.getCurrentTime());

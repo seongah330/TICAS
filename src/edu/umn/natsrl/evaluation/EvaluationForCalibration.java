@@ -17,6 +17,7 @@
  */
 package edu.umn.natsrl.evaluation;
 
+import edu.umn.natsrl.infra.DataLoadOption;
 import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.Station;
@@ -228,7 +229,7 @@ public class EvaluationForCalibration extends TimerTask {
         }
         
         //real data load
-        SectionD.loadData(option.getPeriods()[0],false);
+        SectionD.loadData(option.getPeriods()[0],DataLoadOption.setEvaluationMode());
         
         for(StationState s : SectionH.getStationStates()){
             StationStateReal.add(new CStation(s.getRNode().getTotalFlow(),s.getRNode().getSpeed(),CalibrationPrintType.Values));
@@ -240,7 +241,7 @@ public class EvaluationForCalibration extends TimerTask {
     }
     
     private void ReadSimData(SimObjects sobj){
-        SectionD.loadData(option.getPeriods()[0],true,sobj);
+        SectionD.loadData(option.getPeriods()[0],DataLoadOption.setSimulationMode(option.getSimulationInterval()),sobj);
         ArrayList<CStation> realstation = new ArrayList<CStation>();
         
 //        try{
