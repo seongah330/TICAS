@@ -72,7 +72,7 @@ public class MRF extends Evaluation {
             if(printDebug) System.out.println("      - " + period.getPeriodString());
             
             // data load from all detectors in the section
-            section.loadData(period, DataLoadOption.setSimulationMode(opts.getSimulationInterval()));                 
+            section.loadData(period, DataLoadOption.setEvaluationMode());                 
             
             // variable to save results
             EvaluationResult res = new EvaluationResult();
@@ -105,7 +105,7 @@ public class MRF extends Evaluation {
                     continue;
                 }
                 
-                rn.loadData(period, DataLoadOption.setSimulationMode(opts.getSimulationInterval()));
+                rn.loadData(period, DataLoadOption.setEvaluationMode());
                 
                 // get data from rnode
                 double[] data = this.getTrafficData(rn);

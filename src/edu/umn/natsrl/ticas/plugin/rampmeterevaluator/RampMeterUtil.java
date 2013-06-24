@@ -28,11 +28,11 @@ import java.util.Date;
 public class RampMeterUtil {
     public static String getTime(Period p, int count,int Interval){
         int tgap = 0;
-        tgap = Interval/60;
+        tgap = Interval;
         
         Calendar c = Calendar.getInstance();
         c.set(p.start_year, p.start_month-1, p.start_date, p.start_hour, p.start_min);
-        for(int i=0; i<=count; i++) c.add(Calendar.MINUTE, tgap);
+        for(int i=0; i<=count; i++) c.add(Calendar.SECOND, tgap);
 
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int min = c.get(Calendar.MINUTE);
@@ -42,11 +42,11 @@ public class RampMeterUtil {
     
     public static Date getDateTime(Period p, int count,int Interval){
         int tgap = 0;
-        tgap = Interval/60;
+        tgap = Interval;
         
         Calendar c = Calendar.getInstance();
         c.set(p.start_year, p.start_month-1, p.start_date, p.start_hour, p.start_min);
-        for(int i=0; i<=count; i++) c.add(Calendar.MINUTE, tgap);
+        for(int i=0; i<=count; i++) c.add(Calendar.SECOND, tgap);
 
         int hour = c.get(Calendar.HOUR_OF_DAY);
         int min = c.get(Calendar.MINUTE);

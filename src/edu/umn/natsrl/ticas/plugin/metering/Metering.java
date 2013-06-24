@@ -864,7 +864,8 @@ public class Metering {
                 EntranceState es = sectionHelper.getEntranceStates().get(i);
                 if(es.hasMeter())
                     System.err.println(es.meter.getId() + " : " + "Queue Demand="+es.getDemandVolume()+"("+es.getDemandVolume_ex()+")"
-                            +", Passage="+es.getMergingVolume()+",Queue="+es.queueLength()+", Rate="+es.meter.getReleaseRate()+", occ="+es.getMaxOccupancy());
+                            +", Passage="+es.getMergingVolume()+",Queue="+es.queueLength()+", Rate="+es.meter.getReleaseRate()
+                            +"("+es.getRate()+"), occ="+es.getMaxOccupancy());
             }
     }
 

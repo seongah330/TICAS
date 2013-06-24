@@ -70,7 +70,7 @@ public class MeteringSectionHelper {
     };
         
     /** Number of seconds for one time step */
-    static private final int STEP_SECONDS = 30;
+    static private final int STEP_SECONDS = 10;
         
     /** Number fo time steps to check before start metering */
     static private final int START_STEPS = steps(90);
