@@ -42,9 +42,32 @@ public class SV extends Evaluation {
         Vector<EvaluationResult> stationSpeed = Evaluation.getResult(StationSpeed.class, this.opts);
         
         // variable to store SV
-        EvaluationResult svResult = new EvaluationResult();
-        svResult.setName("Speed Variations");
-
+//        EvaluationResult svResult = new EvaluationResult();
+//        svResult.setName("Speed Variations");
+        EvaluationResult[] eresult = new EvaluationResult[5];
+        for(int i = 0; i<eresult.length;i++){
+                eresult[i] = new EvaluationResult();
+                String sname = "";
+                switch(i){
+                        case 0 :
+                                sname = "average";
+                                break;
+                        case 1 :
+                                sname = "variance";
+                                break;
+                        case 2 :
+                                sname = "max";
+                                break;
+                        case 3 :
+                                sname = "min";
+                                break;
+                        case 4 :
+                                sname = "diff";
+                                break;
+                }
+                eresult[i].setName(sname);
+        }
+        
         Period[] periods = this.opts.getPeriods();
         int idx = 0;
         
@@ -62,19 +85,21 @@ public class SV extends Evaluation {
             preAdjustResult(res);
 
             // add timeline
-            if(svResult.getColumnSize() == 0) 
-                svResult.addColumn(res.getColumn(0));            
+            if(eresult[0].getColumnSize() == 0){ 
+                    for(int i=0;i<eresult.length;i++)
+                        eresult[i].addColumn(res.getColumn(0));
+            }
             
             // calculate SV
-            calculateSV(res, svResult);
+            calculateSV(res, eresult);
             
         }                
         
-        makeAverageRow(svResult);
-        
-        // add result to result list
-        this.results.add(svResult);                               
-
+        for(int i=0;i<eresult.length;i++){
+                makeAverageRow(eresult[i]);
+                // add result to result list
+                this.results.add(eresult[i]);                               
+        }
     }
     
     /**
@@ -88,7 +113,7 @@ public class SV extends Evaluation {
      * 
      * @param res Speed variation evaluation result
      */
-    protected EvaluationResult calculateSV(EvaluationResult res, EvaluationResult svr)
+    protected EvaluationResult[] calculateSV(EvaluationResult res, EvaluationResult[] svr)
     {       
         // count value for data and station
         int dataCount = res.getRowSize(0);
@@ -139,11 +164,11 @@ public class SV extends Evaluation {
         }
         
         // add column to result
-        svr.addColumn(average);
-        svr.addColumn(variance);
-        svr.addColumn(max);
-        svr.addColumn(min);
-        svr.addColumn(diff);
+        svr[0].addColumn(average);
+        svr[1].addColumn(variance);
+        svr[2].addColumn(max);
+        svr[3].addColumn(min);
+        svr[4].addColumn(diff);
         
         return svr;
     }
