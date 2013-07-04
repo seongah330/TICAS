@@ -142,14 +142,23 @@ public class MRF extends Evaluation {
             {
                 double entranceTotal = 0.0f;
                 double exitTotal = 0.0f;
+                boolean isFirstStation = true;
+                double lStation = 0.0f;
                 for(int c=startCol; c<res.getColumnSize(); c++)
                 {
+                    if(rnodes[c-startCol].isStation() && isFirstStation){
+                            entranceTotal += Double.parseDouble(res.get(c, r).toString());
+                            isFirstStation = false;
+                    }
                     if(rnodes[c-startCol].isEntrance()) entranceTotal += Double.parseDouble(res.get(c, r).toString());
                     if(rnodes[c-startCol].isExit()) exitTotal += Double.parseDouble(res.get(c, r).toString());
+                    if(rnodes[c-startCol].isStation()) lStation = Double.parseDouble(res.get(c, r).toString());
+
                 }
                 if(entranceTotal < 1) entranceTotal = -1;
                 if(exitTotal < 1) exitTotal = -1;
                 entranceTotalCol.add(entranceTotal);
+                exitTotal += lStation;
                 exitTotalCol.add(exitTotal);
             }
             
