@@ -556,6 +556,7 @@ public class Infra implements Serializable {
      * @return station object
      */
     public Station getStation(String station_id) {
+        station_id = station_id.toUpperCase();
         Collection<Station> stations = this.getInfraObjects(InfraType.STATION);
         Iterator<Station> itr = stations.iterator();
         while (itr.hasNext()) {
