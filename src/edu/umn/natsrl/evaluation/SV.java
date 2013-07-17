@@ -50,10 +50,10 @@ public class SV extends Evaluation {
                 String sname = "";
                 switch(i){
                         case 0 :
-                                sname = "average";
+                                sname = "variance";
                                 break;
                         case 1 :
-                                sname = "variance";
+                                sname = "average";
                                 break;
                         case 2 :
                                 sname = "max";
@@ -127,8 +127,8 @@ public class SV extends Evaluation {
         ArrayList diff = new ArrayList();
         
         // add label
-        average.add(res.getName() + "_average");
         variance.add(res.getName() + "_variance");
+        average.add(res.getName() + "_average");
         max.add(res.getName() + "_max");
         min.add(res.getName() + "_min");
         diff.add(res.getName() + "_difference");
@@ -164,8 +164,8 @@ public class SV extends Evaluation {
         }
         
         // add column to result
-        svr[0].addColumn(average);
-        svr[1].addColumn(variance);
+        svr[0].addColumn(variance);
+        svr[1].addColumn(average);
         svr[2].addColumn(max);
         svr[3].addColumn(min);
         svr[4].addColumn(diff);
