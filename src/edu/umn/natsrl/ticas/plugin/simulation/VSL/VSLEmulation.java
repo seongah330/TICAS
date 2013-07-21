@@ -24,6 +24,7 @@ import edu.umn.natsrl.infra.infraobjects.DMSImpl;
 import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.ticas.Simulation.Emulation;
 import edu.umn.natsrl.ticas.Simulation.EmulationImpl;
+import edu.umn.natsrl.ticas.Simulation.SimulationGroup;
 import edu.umn.natsrl.ticas.Simulation.StationState;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLAlgorithm;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLStationStateNew;
@@ -99,7 +100,7 @@ public class VSLEmulation extends Emulation implements EmulationImpl{
     public void ExecuteAfterRun() {
         super.ExecuteAfterRun();
         for(VSLStationState cs : VSLStationStates){
-            cs.updateState();
+            cs.updateState(SimulationGroup.VSL);
         }
         
         vsl.Process();
@@ -202,26 +203,26 @@ public class VSLEmulation extends Emulation implements EmulationImpl{
             }
         }
         
-        System.out.println();
-        System.out.println("StationState List");
-        for(VSLStationState s : this.VSLStationStates){
-            System.out.println(s.getID() + " : "+s.getdistanceToDownstreamStationState());
-        }
-        System.out.println("RealStation List");
-        if(VSLStationStates.isEmpty())
-            return;
-        Station rstation = VSLStationStates.get(0).getStation();
-        while(true){
-            System.out.print(rstation.getStationId() + " : ");
-            Station down = rstation.getDownStation(this.section.getName());
-            if(down == null){
-                System.out.println("null");
-                break;
-            }
-            else{
-                System.out.println(down.getDistanceToUpstreamStation(this.section.getName()));
-                rstation = down;
-            }
-        }
+//        System.out.println();
+//        System.out.println("StationState List");
+//        for(VSLStationState s : this.VSLStationStates){
+//            System.out.println(s.getID() + " : "+s.getdistanceToDownstreamStationState());
+//        }
+//        System.out.println("RealStation List");
+//        if(VSLStationStates.isEmpty())
+//            return;
+//        Station rstation = VSLStationStates.get(0).getStation();
+//        while(true){
+//            System.out.print(rstation.getStationId() + " : ");
+//            Station down = rstation.getDownStation(this.section.getName());
+//            if(down == null){
+//                System.out.println("null");
+//                break;
+//            }
+//            else{
+//                System.out.println(down.getDistanceToUpstreamStation(this.section.getName()));
+//                rstation = down;
+//            }
+//        }
     }
 }

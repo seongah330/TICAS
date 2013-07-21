@@ -19,6 +19,7 @@ package edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm;
 
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.DMSImpl;
+import edu.umn.natsrl.ticas.Simulation.SimulationGroup;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLConfig;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +82,7 @@ public class VSLSTAOption2 implements VSLSTAImpl{
     }
 
     private boolean checkStationSpeedLimit(VSLStationState cstation) {
-        if(cstation.getAggregateRollingSpeed() >= cstation.getSpeedLimit())
+        if(cstation.getAggregateRollingSpeed(SimulationGroup.VSL) >= cstation.getSpeedLimit())
             return true;
         else
             return false;

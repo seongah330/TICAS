@@ -28,12 +28,9 @@ import edu.umn.natsrl.ticas.Simulation.StationState;
  */
 public class VSLStationStateFullSearch_old extends VSLStationState{
     int cnt = 1;
-    public VSLStationStateFullSearch_old(Station _station, Section _section, SimObjects simObjects){
-        super(_station, _section, simObjects);
-    }
-    
+
     public VSLStationStateFullSearch_old(StationState s) {
-        super(s.getStation(),s.getSection(),s.getSimObject());
+        super(s.getStation(),s.getSection(),s.getSimObject(),s.getSimulationInterval());
         setUpstreamStationState(s.getUpstreamStationState());
         setDownStreamStationState(s.getDownStreamStationState());
     }
@@ -52,7 +49,7 @@ public class VSLStationStateFullSearch_old extends VSLStationState{
         }
         
         if(upstream != null){
-            acceleration = calculateAcceleration(upstream, Pdistance);
+            acceleration = calculateAcceleration(simGroup,upstream, Pdistance);
         
             //check the bottleneck thresholds
             checkThresholds();

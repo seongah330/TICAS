@@ -17,6 +17,7 @@
  */
 package edu.umn.natsrl.ticas.Simulation;
 
+import edu.umn.natsrl.evaluation.Interval;
 import edu.umn.natsrl.infra.infraobjects.RNode;
 import edu.umn.natsrl.infra.simobjects.SimDetector;
 
@@ -29,17 +30,19 @@ import edu.umn.natsrl.infra.simobjects.SimDetector;
 */
 public class State {
 
-   StateType type;
-   String id;
-   int easting, northing;
-   State upstream;
-   State downstream;
-   RNode rnode;
-   double distanceToDownState = 0;
+   public StateType type;
+   public String id;
+   public int easting, northing;
+   public State upstream;
+   public State downstream;
+   public RNode rnode;
+   public double distanceToDownState = 0;
+   public StateInterval stateInterval = null;
+   public SimInterval simInterval = null;
    public State(){
 
    }
-   public State(String id, RNode rnode) {
+   public State(String id, RNode rnode, SimInterval simIntv) {
        this();
        this.id = id;
        this.rnode = rnode;
@@ -47,6 +50,10 @@ public class State {
            this.easting = rnode.getEasting();
            this.northing = rnode.getNorthing();
        }
+       
+       simInterval = simIntv;
+       if(simInterval != null)
+                stateInterval = simInterval.getState(rnode.getId());
    }
 
    public boolean hasDetector(SimDetector sd) {
@@ -83,4 +90,27 @@ public class State {
    public String getLabel(){
        return rnode.getLabel();
    }
-}
+   
+   public SimInterval getSimulationInterval(){
+           return this.simInterval;
+   }
+   
+   /**
+    * get State Interval
+    * @return 
+    */
+   public StateInterval getStateInterval(){
+           return this.stateInterval;
+   }
+   
+   public double getStateInterval(SimulationGroup sg){
+           return stateInterval.getIntervalByGID(sg);
+   }
+   
+   public double getSimulationRunningInterval(){
+           return stateInterval.getRunningInterval().second;
+   }
+   
+   public int getCurrentRunTime(){
+           return simInterval.getCurrentRunTime();
+   }}

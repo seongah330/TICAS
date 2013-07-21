@@ -20,6 +20,10 @@ package edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm;
 import edu.umn.natsrl.infra.Section;    
 import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
+import edu.umn.natsrl.ticas.Simulation.DensityRank;
+import edu.umn.natsrl.ticas.Simulation.SimInterval;
+import edu.umn.natsrl.ticas.Simulation.SimulationGroup;
+import edu.umn.natsrl.ticas.Simulation.StateInterval;
 import edu.umn.natsrl.ticas.Simulation.StationState;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLConfig;
 import edu.umn.natsrl.util.DistanceUtil;
@@ -47,8 +51,14 @@ public class VSLStationState extends StationState{
     public int VSLCONTROLTHRESHOLD = 0; //VSL Control Threshold
     public double VSLCONTROLDISTANCE = 0; // VSL Control Distance
     
+    protected SimulationGroup simGroup = SimulationGroup.VSL;
+    
     public VSLStationState(Station _station, Section _section, SimObjects simObjects){
         super(_station, _section, simObjects);
+    }
+    
+    public VSLStationState(Station _station, Section _section, SimObjects simObjects, SimInterval sitv){
+            super(_station,_section,simObjects,sitv);
     }
 
     public VSLStationState(StationState s) {
@@ -80,7 +90,7 @@ public class VSLStationState extends StationState{
             Pdistance += upstream.getdistanceToDownstreamStationState();
         }
         if(upstream != null){
-            acceleration = calculateAcceleration(upstream, Pdistance);
+            acceleration = calculateAcceleration(simGroup,upstream, Pdistance);
             
             //check the bottleneck thresholds
             checkThresholds();
@@ -147,7 +157,7 @@ public class VSLStationState extends StationState{
     /** Test if station speed is above the bottleneck id speed */
     protected boolean isAboveBottleneckSpeed() {
 //        System.out.println("AGGSpd : "+this.getAggregateRollingSpeed()+"VSL_BS_THRESHOLD : "+VSLConfig.VSL_BS_THRESHOLD);
-        return this.getAggregateRollingSpeed() > VSLConfig.VSL_BS_THRESHOLD;
+        return this.getAggregateRollingSpeed(simGroup) > VSLConfig.VSL_BS_THRESHOLD;
     }
 
     /** Set the bottleneck flag */
@@ -274,7 +284,7 @@ public class VSLStationState extends StationState{
     /** Get the upstream bottleneck distance */
     protected double getUpstreamDistance() {
         double lim = this.getStation().getSpeedLimit();
-        double sp = this.getAggregateRollingSpeed();
+        double sp = this.getAggregateRollingSpeed(simGroup);
         if(sp > 0 && sp < lim){
             int acc = -getControlThreshold();
 //            System.out.println(acc);

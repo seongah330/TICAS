@@ -19,6 +19,7 @@
 package edu.umn.natsrl.ticas.plugin.metering;
 
 import edu.umn.natsrl.util.PropertiesWrapper;
+import edu.umn.natsrl.evaluation.Interval;
 
 /**
  *
@@ -28,7 +29,7 @@ public class MeteringConfig {
     
     private static PropertiesWrapper prop = new PropertiesWrapper();
     private static String configFile = "metering.config";
-    
+    public static int MeteringInterval = Interval.I30SEC.second;
     public static double Kc = 40;
     public static double Kd_Rate = 0.8;
     public static double Kd = Kc*Kd_Rate;
@@ -93,6 +94,10 @@ public class MeteringConfig {
         return 3600 / (MIN_RED_TIME + 2);
     }
     
+    public static boolean isMeteringStep(int runtime){
+            return runtime != 0 && runtime % MeteringConfig.MeteringInterval == 0;
+    }
+    
     public static void saveConfig() {
         prop.put("Kc", Kc);
         prop.put("Kd", Kd);
@@ -111,6 +116,7 @@ public class MeteringConfig {
         prop.put("CASE_FILE", CASE_FILE);        
         prop.put("RANDOM_SEED", RANDOM_SEED);   
         prop.put("UseCoordination", UseCoordination);
+        prop.put("METER_INTERVAL", MeteringInterval);
         prop.save(configFile);
     }
     
@@ -135,6 +141,7 @@ public class MeteringConfig {
             CASE_FILE = prop.get("CASE_FILE");
             RANDOM_SEED = prop.getInteger("RANDOM_SEED");
             UseCoordination = prop.getBoolean("UseCoordination");
+            MeteringInterval = prop.getInteger("METER_INTERVAL");
         }
     }
 

@@ -17,6 +17,7 @@
  */
 package edu.umn.natsrl.ticas.Simulation;
 
+import edu.umn.natsrl.evaluation.Interval;
 import edu.umn.natsrl.infra.Period;
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.DMS;
@@ -52,16 +53,23 @@ public class Emulation extends Thread {
     
     private boolean isDebug_StationInfo = true;
     
+//    private SimulationGroup simGroup = SimulationGroup.DEFAULT;
+    
     public Emulation(Section _section, Period p){
         this.section = _section;
         period = p;
+//        simGroup = sg;
         initEmulation();
     }
     
     private void initEmulation() {
         detectors = loadSimDetectorFromSection();
         simDMSs = loadSimDMSFromSection();
-        sectionHelper = new SectionHelper(section,detectors,meters,simDMSs);
+        Interval stateitv = Interval.get(period.interval);
+        Interval runitv = Interval.get(period.interval);
+        SimInterval sinterval = new SimInterval(section,stateitv,runitv);
+//        sinterval.setSimulationGroup(simGroup);
+        sectionHelper = new SectionHelper(section,detectors,meters,simDMSs,sinterval);
     }
     
     @Override
@@ -97,6 +105,10 @@ public class Emulation extends Thread {
     
     public int getSample() {
         return samples;
+    }
+    
+    public int getInterval(){
+            return period.interval;
     }
 
     private ArrayList<SimDetector> loadSimDetectorFromSection() {
@@ -148,7 +160,7 @@ public class Emulation extends Thread {
             for(Detector d : r.getDetectors()){
                 if(d.getVolume() == null || (d.getVolume() != null && d.getVolume().length-1 < sample)){
                     System.out.println(r.getId()+", "+r.getLabel()+", "+r.getStationId()+", "+r.getInfraType().toString()+", "+d.getId());
-                    continue;
+//                    continue;
                 }
                 double v = d.getVolume()[sample];
                 double q = d.getFlow()[sample];
@@ -170,7 +182,7 @@ public class Emulation extends Thread {
             //for Station debuging
             for (int i = 0; i < stationStates.size(); i++) {
                 System.out.println(stationStates.get(i).getID() + " : T_Q="+String.format("%.1f",stationStates.get(i).getFlow())
-                        + " A_Q="+String.format("%.1f",stationStates.get(i).getAverageFlow(0, this.getDebugIntervalIndex()))
+                        + " A_Q="+String.format("%.1f",stationStates.get(i).getAverageLaneFlow(0, this.getDebugIntervalIndex()))
                         + " k=" +String.format("%.1f", stationStates.get(i).getAverageDensity(0,getDebugIntervalIndex()))
                         + " u=" + String.format("%.1f", stationStates.get(i).getAverageSpeed(0, getDebugIntervalIndex()))
                         + " v=" + stationStates.get(i).getTotalVolume(0, getDebugIntervalIndex()));
@@ -194,7 +206,7 @@ public class Emulation extends Thread {
         
         //Update Station
         for(StationState cs : stationStates){
-            cs.updateState();
+            cs.updateState(SimulationGroup.DEFAULT);
         }
     }
     

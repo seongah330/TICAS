@@ -18,7 +18,9 @@
 package edu.umn.natsrl.ticas.plugin.vissimcalibration2;
 
 import edu.umn.natsrl.infra.Section;
+import edu.umn.natsrl.ticas.Simulation.SimInterval;
 import edu.umn.natsrl.ticas.Simulation.Simulation;
+import edu.umn.natsrl.ticas.Simulation.SimulationGroup;
 import edu.umn.natsrl.ticas.Simulation.SimulationImpl;
 import edu.umn.natsrl.vissimcom.VISSIMVersion;
 
@@ -28,7 +30,7 @@ import edu.umn.natsrl.vissimcom.VISSIMVersion;
  */
 public class BasicSimulation extends Simulation implements SimulationImpl{
     
-    public BasicSimulation(String caseFile, int seed, Section section, VISSIMVersion v, int SimIntv) {
+    public BasicSimulation(String caseFile, int seed, Section section, VISSIMVersion v, SimInterval SimIntv) {
         super(caseFile,seed,section,v,SimIntv);
     }
 

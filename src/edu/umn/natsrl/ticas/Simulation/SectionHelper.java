@@ -64,6 +64,7 @@ public class SectionHelper {
     private ArrayList<SimMeter> meters;
     private ArrayList<SimDetector> detectors;
     private ArrayList<SimDMS> simDMSs;
+    private SimInterval SimulationInterval;
     
     public static IDetectorChecker dc = new IDetectorChecker() {
 
@@ -75,12 +76,13 @@ public class SectionHelper {
             return true;
         }
     };
-    
-    public SectionHelper(Section section, ArrayList<SimDetector> detectors, ArrayList<SimMeter> meters, ArrayList<SimDMS> simdms) {
+    public SectionHelper(Section section, ArrayList<SimDetector> detectors, ArrayList<SimMeter> meters, ArrayList<SimDMS> simdms,
+            SimInterval simInterval) {
         this.section = section;
         this.detectors = detectors; 
         this.meters = meters;
         simDMSs = simdms;
+        SimulationInterval = simInterval;
         init();
     }
 
@@ -143,12 +145,12 @@ public class SectionHelper {
      * @param downStation downstream station (not need to be next downstream of upStation)
      * @return average density (distance weight)
      */
-    public double getAverageDensity(StationState upStation, StationState downStation)
+    public double getAverageDensity(StationState upStation, StationState downStation, SimulationGroup sg)
     {
-        return getAverageDensity(upStation, downStation, 0);
+        return getAverageDensity(upStation, downStation, 0,sg);
     }
     
-    public double getAverageDensity(StationState upStation, StationState downStation, int prevStep)
+    public double getAverageDensity(StationState upStation, StationState downStation, int prevStep,SimulationGroup sg)
     {
         StationState cursor = upStation;
 
@@ -156,8 +158,8 @@ public class SectionHelper {
         double avgDensity = 0;
         while(true) {
             StationState dStation = cursor.getDownStreamStationState();
-            double upDensity = cursor.getAggregatedDensity(prevStep);
-            double downDensity = dStation.getAggregatedDensity(prevStep);
+            double upDensity = cursor.getIntervalAggregatedDensity(sg,prevStep);
+            double downDensity = dStation.getIntervalAggregatedDensity(sg,prevStep);
             double middleDensity = (upDensity + downDensity) / 2;
             double distance = TMO.getDistanceInMile(cursor.rnode, dStation.rnode);
             double distanceFactor = distance / 3;
@@ -202,18 +204,23 @@ public class SectionHelper {
             if (!states.isEmpty()) {
                 prev = states.get(states.size() - 1);
             }
-
+            
+            StateInterval sitv = null;
+            if(SimulationInterval != null)
+                    sitv = SimulationInterval.getState(rn.getId());
+            
             if (rn.isStation() && rn.isAvailableStation()) {
                 if (!isInMap((Station) rn)) {
                     errorStation.add((Station)rn);
                     continue;
                 }
-                StationState nss = new StationState((Station) rn, section,simObjects);
+                
+                StationState nss = new StationState((Station) rn, section,simObjects,SimulationInterval);
                 states.add(nss);
                 stationStates.add(nss);
             }
             if(rn.isEntrance()){
-                EntranceState en = new EntranceState((Entrance) rn, simObjects);
+                EntranceState en = new EntranceState((Entrance) rn, simObjects,SimulationInterval);
                 states.add(en);
                 entranceStates.add(en);
             }

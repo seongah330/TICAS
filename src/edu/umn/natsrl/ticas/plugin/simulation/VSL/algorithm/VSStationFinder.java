@@ -17,6 +17,7 @@
  */
 package edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm;
 
+import edu.umn.natsrl.ticas.Simulation.SimulationGroup;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLConfig;
 
 /**
@@ -63,6 +64,8 @@ public class VSStationFinder {
      */
     protected Double vss_mp;
     
+    protected SimulationGroup simGroup = SimulationGroup.VSL;
+    
     /**
      * for NEAR Station
      */
@@ -101,20 +104,20 @@ public class VSStationFinder {
             System.out.print("mu("+su.getID()+"):"+mu+", md("+sd.getID()+"):"+md+", ");
             System.out.print("ma-mu:"+Math.abs(ma-mu)+", ma-md:"+Math.abs(ma-md));
             if(Math.abs(ma-mu) <= Math.abs(ma-md)){
-                System.out.print(", S"+su.getID()+"-"+su.getAggregateRollingSpeed()+" : "+getSpeedLimit());
+                System.out.print(", S"+su.getID()+"-"+su.getAggregateRollingSpeed(simGroup)+" : "+getSpeedLimit());
                 return su;
             }
             else{
-                System.out.print(", S"+sd.getID()+"-"+sd.getAggregateRollingSpeed()+" : "+getSpeedLimit());
+                System.out.print(", S"+sd.getID()+"-"+sd.getAggregateRollingSpeed(simGroup)+" : "+getSpeedLimit());
                 return sd;
             }
         }else if(su != null){
             System.out.print("mu("+su.getID()+"):"+mu);
-            System.out.print(", S"+su.getID()+"-"+su.getAggregateRollingSpeed()+" : "+getSpeedLimit());
+            System.out.print(", S"+su.getID()+"-"+su.getAggregateRollingSpeed(simGroup)+" : "+getSpeedLimit());
             return su;
         }else if(sd != null){
             System.out.print("mu("+sd.getID()+"):"+md);
-            System.out.print(", S"+sd.getID()+"-"+sd.getAggregateRollingSpeed()+" : "+getSpeedLimit());
+            System.out.print(", S"+sd.getID()+"-"+sd.getAggregateRollingSpeed(simGroup)+" : "+getSpeedLimit());
             return sd;
         }else{
             return null;
@@ -149,7 +152,7 @@ public class VSStationFinder {
     /** Calculate the advisory speed */
     public Double calculateSpeedAdvisory() {
         if(vss != null && vss_mp != null) {
-            Double spd = vss.getAggregateRollingSpeed();
+            Double spd = vss.getAggregateRollingSpeed(simGroup);
             if(spd > 0){
                 return calculateSpeedAdvisory(spd, vss_mp - ma);
             }
@@ -190,8 +193,8 @@ public class VSStationFinder {
     /** Get the speed*/
     protected Double getSpeed(){
         if(su != null && sd != null){
-            double u0 = su.getAggregateRollingSpeed();
-            double u1 = sd.getAggregateRollingSpeed();
+            double u0 = su.getAggregateRollingSpeed(simGroup);
+            double u1 = sd.getAggregateRollingSpeed(simGroup);
             if(u0 > 0 && u1 > 0){
                 return Math.min(u0,u1);
             }
@@ -219,8 +222,8 @@ public class VSStationFinder {
         Double setSpeed = (double)s;
         
         if(su != null && sd != null){
-            Double uu = su.getAggregateRollingSpeed();
-            Double du = sd.getAggregateRollingSpeed();
+            Double uu = su.getAggregateRollingSpeed(simGroup);
+            Double du = sd.getAggregateRollingSpeed(simGroup);
             if(uu <= 0 || du <= 0)
                 return setSpeed;
             

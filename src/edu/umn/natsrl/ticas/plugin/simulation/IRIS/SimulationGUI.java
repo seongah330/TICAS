@@ -29,9 +29,12 @@ import edu.umn.natsrl.infra.simobjects.SimObjects;
 import edu.umn.natsrl.map.MapHelper;
 import edu.umn.natsrl.map.TMCProvider;
 import edu.umn.natsrl.ticas.Simulation.Emulation;
+import edu.umn.natsrl.ticas.Simulation.SimInterval;
 import edu.umn.natsrl.ticas.Simulation.Simulation;
 import edu.umn.natsrl.ticas.Simulation.SimulationConfig;
+import edu.umn.natsrl.ticas.Simulation.SimulationGroup;
 import edu.umn.natsrl.ticas.Simulation.SimulationUtil;
+import edu.umn.natsrl.ticas.Simulation.StateInterval;
 import edu.umn.natsrl.ticas.Simulation.StringOutputStream;
 import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import edu.umn.natsrl.ticas.plugin.metering.MeteringConfig;
@@ -60,6 +63,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
@@ -108,6 +112,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
     boolean isResultLoaded = false;
     
     VSLSTAType STAType;
+        private SimInterval simulationInterval;
     /**
      * Creates new form VSLSimulationGUI
      */
@@ -203,6 +208,15 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                 tbxVSLSTASPEED = new javax.swing.JTextField();
                 cbxAS = new javax.swing.JCheckBox();
                 cbxUpstream = new javax.swing.JCheckBox();
+                jPanel15 = new javax.swing.JPanel();
+                jLabel51 = new javax.swing.JLabel();
+                cbxVSLInterval = new javax.swing.JComboBox();
+                cbxVSLsetStation = new javax.swing.JCheckBox();
+                tbxVSLsetStationList = new javax.swing.JTextField();
+                jLabel4 = new javax.swing.JLabel();
+                jLabel53 = new javax.swing.JLabel();
+                tbxVSLsetInterval = new javax.swing.JTextField();
+                cbxVSL_SetAllStation = new javax.swing.JCheckBox();
                 jPanel13 = new javax.swing.JPanel();
                 jPanel14 = new javax.swing.JPanel();
                 jLabel8 = new javax.swing.JLabel();
@@ -242,6 +256,8 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                 jLabel46 = new javax.swing.JLabel();
                 tbxStopUpstreamCount = new javax.swing.JTextField();
                 jLabel47 = new javax.swing.JLabel();
+                jLabel52 = new javax.swing.JLabel();
+                cbxMETERInterval = new javax.swing.JComboBox();
                 jPanel2 = new javax.swing.JPanel();
                 chkShowVehicles = new javax.swing.JCheckBox();
                 jPanel6 = new javax.swing.JPanel();
@@ -276,6 +292,11 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
 
                 cbxSections.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
                 cbxSections.setPreferredSize(new java.awt.Dimension(200, 22));
+                cbxSections.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                cbxSectionsActionPerformed(evt);
+                        }
+                });
 
                 btnOpenSectionEditor.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
                 btnOpenSectionEditor.setText("Edit Route");
@@ -517,7 +538,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                                 .addComponent(pnDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnStartSimulation, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(77, Short.MAX_VALUE))
+                                .addContainerGap(69, Short.MAX_VALUE))
                 );
 
                 tabPanel.addTab("Simulation/Emulation", jPanel1);
@@ -800,7 +821,86 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                                         .addComponent(tbxVSLSTADISTANCE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(cbxUpstream)
-                                .addContainerGap(130, Short.MAX_VALUE))
+                                .addContainerGap(122, Short.MAX_VALUE))
+                );
+
+                jPanel15.setBorder(javax.swing.BorderFactory.createTitledBorder("Interval Setup"));
+
+                jLabel51.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
+                jLabel51.setText("Adjust VSL Interval for Simulation");
+
+                cbxVSLInterval.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+
+                cbxVSLsetStation.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+                cbxVSLsetStation.setText("Set seperate station");
+                cbxVSLsetStation.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                cbxVSLsetStationActionPerformed(evt);
+                        }
+                });
+
+                tbxVSLsetStationList.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+
+                jLabel4.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+                jLabel4.setText("Station List (ex. s89, s79)");
+
+                jLabel53.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+                jLabel53.setText("Set Interval(sec)");
+
+                tbxVSLsetInterval.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+                tbxVSLsetInterval.setText("10");
+
+                cbxVSL_SetAllStation.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+                cbxVSL_SetAllStation.setText("Set All Station");
+                cbxVSL_SetAllStation.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                cbxVSL_SetAllStationActionPerformed(evt);
+                        }
+                });
+
+                javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
+                jPanel15.setLayout(jPanel15Layout);
+                jPanel15Layout.setHorizontalGroup(
+                        jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel15Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanel15Layout.createSequentialGroup()
+                                                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(cbxVSLsetStation)
+                                                        .addComponent(jLabel51)
+                                                        .addComponent(cbxVSLInterval, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addGap(0, 168, Short.MAX_VALUE))
+                                        .addGroup(jPanel15Layout.createSequentialGroup()
+                                                .addGap(21, 21, 21)
+                                                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(jLabel53)
+                                                        .addComponent(tbxVSLsetInterval, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(tbxVSLsetStationList)
+                                                        .addComponent(jLabel4)
+                                                        .addComponent(cbxVSL_SetAllStation))))
+                                .addContainerGap())
+                );
+                jPanel15Layout.setVerticalGroup(
+                        jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel15Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel51)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbxVSLInterval, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cbxVSLsetStation)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel53)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tbxVSLsetInterval, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(cbxVSL_SetAllStation)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tbxVSLsetStationList, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(69, Short.MAX_VALUE))
                 );
 
                 javax.swing.GroupLayout jPanel12Layout = new javax.swing.GroupLayout(jPanel12);
@@ -810,13 +910,19 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                         .addGroup(jPanel12Layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 489, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(442, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
                 );
                 jPanel12Layout.setVerticalGroup(
                         jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel12Layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanel12Layout.createSequentialGroup()
+                                                .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 0, Short.MAX_VALUE))
+                                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                 .addContainerGap())
                 );
 
@@ -937,6 +1043,11 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                 jLabel47.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
                 jLabel47.setText("stations");
 
+                jLabel52.setFont(new java.awt.Font("Verdana", 1, 12)); // NOI18N
+                jLabel52.setText("Adjust METER Interval for Simulation");
+
+                cbxMETERInterval.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+
                 javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(jPanel14);
                 jPanel14.setLayout(jPanel14Layout);
                 jPanel14Layout.setHorizontalGroup(
@@ -991,6 +1102,12 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                                         .addComponent(jLabel43)
                                         .addComponent(jLabel45)
                                         .addComponent(jLabel47)))
+                        .addGroup(jPanel14Layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jLabel52)
+                                        .addComponent(cbxMETERInterval, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, Short.MAX_VALUE))
                 );
                 jPanel14Layout.setVerticalGroup(
                         jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1055,7 +1172,11 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                                         .addComponent(jLabel31)
                                         .addComponent(tbxMaxRedTime, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addComponent(jLabel32))
-                                .addContainerGap(20, Short.MAX_VALUE))
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel52)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(cbxMETERInterval, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(31, Short.MAX_VALUE))
                 );
 
                 javax.swing.GroupLayout jPanel13Layout = new javax.swing.GroupLayout(jPanel13);
@@ -1071,8 +1192,8 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                         jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel13Layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGap(269, 269, 269))
+                                .addComponent(jPanel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(192, Short.MAX_VALUE))
                 );
 
                 tabPanel.addTab("MeteringOption", jPanel13);
@@ -1127,7 +1248,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                         jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel7Layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 570, Short.MAX_VALUE)
+                                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 566, Short.MAX_VALUE)
                                 .addContainerGap())
                 );
 
@@ -1205,7 +1326,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                         .addGroup(jPanel9Layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(jPanel10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(233, Short.MAX_VALUE))
+                                .addContainerGap(229, Short.MAX_VALUE))
                 );
 
                 tabPanel.addTab("Simulation State", jPanel9);
@@ -1419,7 +1540,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                         layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(tabPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 688, Short.MAX_VALUE)
+                                .addComponent(tabPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 688, Short.MAX_VALUE)
                                 .addContainerGap())
                 );
         }// </editor-fold>//GEN-END:initComponents
@@ -1569,6 +1690,23 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                 setSTAType(VSLSTAType.OPTION2);
         }//GEN-LAST:event_cbxUpstreamActionPerformed
 
+        private void cbxSectionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxSectionsActionPerformed
+                // TODO add your handling code here:
+//                if(this.cbxSections.getItemCount() > 0){
+//                        LoadSimulationInterval();
+//                }
+        }//GEN-LAST:event_cbxSectionsActionPerformed
+
+        private void cbxVSLsetStationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxVSLsetStationActionPerformed
+                // TODO add your handling code here:
+                setVSLGUI(this.cbxVSLsetStation.isSelected());
+        }//GEN-LAST:event_cbxVSLsetStationActionPerformed
+
+        private void cbxVSL_SetAllStationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbxVSL_SetAllStationActionPerformed
+                // TODO add your handling code here:
+                this.tbxVSLsetStationList.setEnabled(!this.cbxVSL_SetAllStation.isSelected());
+        }//GEN-LAST:event_cbxVSL_SetAllStationActionPerformed
+
         // Variables declaration - do not modify//GEN-BEGIN:variables
         private javax.swing.JPanel PanelChart;
         private javax.swing.JPanel PanelChart_result;
@@ -1585,6 +1723,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         private javax.swing.JCheckBox cbxAccident;
         private javax.swing.JComboBox cbxEndHour;
         private javax.swing.JComboBox cbxEndMin;
+        private javax.swing.JComboBox cbxMETERInterval;
         private javax.swing.JComboBox cbxSavedResult;
         private javax.swing.JComboBox cbxSections;
         private javax.swing.JComboBox cbxSimulationCate;
@@ -1593,7 +1732,10 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         private javax.swing.JComboBox cbxStartHour;
         private javax.swing.JComboBox cbxStartMin;
         private javax.swing.JCheckBox cbxUpstream;
+        private javax.swing.JComboBox cbxVSLInterval;
         private javax.swing.JComboBox cbxVSLVersion;
+        private javax.swing.JCheckBox cbxVSL_SetAllStation;
+        private javax.swing.JCheckBox cbxVSLsetStation;
         private javax.swing.JComboBox cbxVSSDec;
         private javax.swing.JComboBox cbxVSSSpeed;
         private javax.swing.JComboBox cbx_result_station;
@@ -1633,6 +1775,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         private javax.swing.JLabel jLabel37;
         private javax.swing.JLabel jLabel38;
         private javax.swing.JLabel jLabel39;
+        private javax.swing.JLabel jLabel4;
         private javax.swing.JLabel jLabel40;
         private javax.swing.JLabel jLabel41;
         private javax.swing.JLabel jLabel42;
@@ -1645,6 +1788,9 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         private javax.swing.JLabel jLabel49;
         private javax.swing.JLabel jLabel5;
         private javax.swing.JLabel jLabel50;
+        private javax.swing.JLabel jLabel51;
+        private javax.swing.JLabel jLabel52;
+        private javax.swing.JLabel jLabel53;
         private javax.swing.JLabel jLabel6;
         private javax.swing.JLabel jLabel7;
         private javax.swing.JLabel jLabel8;
@@ -1655,6 +1801,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         private javax.swing.JPanel jPanel12;
         private javax.swing.JPanel jPanel13;
         private javax.swing.JPanel jPanel14;
+        private javax.swing.JPanel jPanel15;
         private javax.swing.JPanel jPanel2;
         private javax.swing.JPanel jPanel3;
         private javax.swing.JPanel jPanel4;
@@ -1696,6 +1843,8 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         private javax.swing.JTextField tbxVSLSTADISTANCE;
         private javax.swing.JTextField tbxVSLSTASPEED;
         private javax.swing.JTextField tbxVSLZoneLength;
+        private javax.swing.JTextField tbxVSLsetInterval;
+        private javax.swing.JTextField tbxVSLsetStationList;
         private javax.swing.JTextField tbxZesDecceleration;
         // End of variables declaration//GEN-END:variables
 
@@ -1704,6 +1853,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         SimulationMode smode = (SimulationMode)this.cbxSimulationMode.getSelectedItem();
         SimulationOption soption = (SimulationOption)this.cbxSimulationCate.getSelectedItem();
         int samples = 0;
+        int rinterval = 0;
         VSLResults vslresult = null;
         if(smode.isSimulationMode()){
             if(code == -1) {
@@ -1721,6 +1871,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
             }
 
             samples = simulation.getSamples();
+            rinterval = simulation.getRunningInterval();
             if(samples < 5) {
                 JOptionPane.showMessageDialog(simFrame, "Too short simulation");
                 simFrame.afterSimulation(null, null);
@@ -1734,9 +1885,11 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         }else if(smode.isEmulationMode()){
             samples = emulation.getSample();
             vslresult = emulation.getVSLResults();
+            rinterval = emulation.getInterval();
         }
         
-        int duration = samples * simulation.getRunningInterval();
+        
+        int duration = samples * rinterval;
 
         Calendar c = Calendar.getInstance();
         c.setTime(startTime);
@@ -1744,12 +1897,12 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         Date sTime = c.getTime();
         c.add(Calendar.SECOND, duration);
         Date eTime = c.getTime();
-        simFrame.afterSimulation((Section)this.cbxSections.getSelectedItem(), new Period(sTime, eTime, simulation.getRunningInterval()));
+        simFrame.afterSimulation((Section)this.cbxSections.getSelectedItem(), new Period(sTime, eTime, rinterval));
         
         if(!soption.isMETERING()){
-            SimulationUtil.SaveVSLSimulation((Section)this.cbxSections.getSelectedItem(),new Period(sTime, eTime, simulation.getRunningInterval()),simFrame,vslresult);
+            SimulationUtil.SaveVSLSimulation((Section)this.cbxSections.getSelectedItem(),new Period(sTime, eTime, rinterval),simFrame,vslresult);
         }else
-            SimulationUtil.SaveSimulation((Section)this.cbxSections.getSelectedItem(),new Period(sTime, eTime, simulation.getRunningInterval()),simFrame);
+            SimulationUtil.SaveSimulation((Section)this.cbxSections.getSelectedItem(),new Period(sTime, eTime, rinterval),simFrame);
         
         System.out.println("Restore output redirection ... ");
         loadVSLResults();
@@ -1808,6 +1961,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         for (Section s : this.sections) {
             this.cbxSections.addItem(s);
         }
+//        LoadSimulationInterval();
     }
 
     private void openSectionEditor() {
@@ -1836,11 +1990,14 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         }
         
         loadSimulationInterval();
+        loadVSLInterval();
+        loadMeteringInterval();
         loadVSLMode();
         loadSimulationMode();
         loadSimulationOption();
         loadVSLParameter();
         loadMeteringParameter();
+        setVSLGUI(false);
         setGUIEnable();
         initResult();
         initSTAType();
@@ -1866,6 +2023,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         MeteringConfig.setMaxWaitTimeF2F(Integer.parseInt(this.tbxMaxWaittingTimeF2F.getText()));
         MeteringConfig.setMaxWaitTime(Integer.parseInt(this.tbxMaxWaittingTime.getText()));
         MeteringConfig.MAX_RED_TIME = Integer.parseInt(this.tbxMaxRedTime.getText());
+        MeteringConfig.MeteringInterval = ((Interval)this.cbxMETERInterval.getSelectedItem()).second;
         MeteringConfig.saveConfig();
     }
     
@@ -1882,6 +2040,8 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         VSLConfig.VSL_ZONE_LENGTH_MILE = Double.parseDouble(this.tbxVSLZoneLength.getText());
         VSLConfig.coverDistance = Double.parseDouble(this.tbxVSLSTADISTANCE.getText());
         VSLConfig.coverageSpeed = Integer.parseInt(this.tbxVSLSTASPEED.getText());
+        VSLConfig.VSL_INTERVAL = ((Interval)this.cbxVSLInterval.getSelectedItem()).second;
+        VSLConfig.VSL_INTERVAL_STATIONLIST = this.tbxVSLsetStationList.getText();
         saveSpeedValueList();
         VSLConfig.save();
     }
@@ -1922,6 +2082,8 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         this.tbxVSLZoneLength.setText(String.valueOf(VSLConfig.VSL_ZONE_LENGTH_MILE));
         this.tbxVSLSTADISTANCE.setText(String.valueOf(VSLConfig.coverDistance));
         this.tbxVSLSTASPEED.setText(String.valueOf(VSLConfig.coverageSpeed));
+        this.cbxVSLInterval.setSelectedItem(Interval.get(VSLConfig.VSL_INTERVAL));
+        this.tbxVSLsetStationList.setText(VSLConfig.VSL_INTERVAL_STATIONLIST);
         this.setSTAType(VSLConfig.vslSTAtype);
         loadSpeedValueList();
     }
@@ -1942,6 +2104,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         this.tbxMaxRedTime.setText(df.format(MeteringConfig.MAX_RED_TIME));
         this.tbxMaxWaittingTime.setText(df.format(MeteringConfig.MAX_WAIT_TIME_MINUTE));
         this.tbxMaxWaittingTimeF2F.setText(df.format(MeteringConfig.MAX_WAIT_TIME_MINUTE_F2F));
+        this.cbxMETERInterval.setSelectedItem(Interval.get(MeteringConfig.MeteringInterval));
     }
 
     private void loadSpeedValueList() {
@@ -2015,9 +2178,11 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
             SimulationOption sopt = (SimulationOption)this.cbxSimulationCate.getSelectedItem();
             startTime = new Date();
             Section s = (Section)this.cbxSections.getSelectedItem();
+            LoadSimulationInterval();
             VISSIMVersion version = (VISSIMVersion)this.cbxvissimVersion.getSelectedItem();
-            Interval simIntv = (Interval)this.cbxSimulationInterval.getSelectedItem();
-            simulation = sopt.getSimulationOption(SimulationConfig.CASE_FILE,SimulationConfig.RANDOM_SEED,s,version,vv,simIntv);
+            Interval simRunningIntv = (Interval)this.cbxSimulationInterval.getSelectedItem();
+            this.simulationInterval.setSimulationRunningInterval(simRunningIntv);
+            simulation = sopt.getSimulationOption(SimulationConfig.CASE_FILE,SimulationConfig.RANDOM_SEED,s,version,vv,simulationInterval);
 //            simulation = new VSLSim(SimulationConfig.CASE_FILE,SimulationConfig.RANDOM_SEED,s,version,vv);
             simulation.setSignalListener(this);
             simulation.setChartPanel(this.PanelChart);
@@ -2065,11 +2230,12 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         ce.set(Calendar.MINUTE, Integer.parseInt(this.cbxEndMin.getSelectedItem().toString()));
         //barelane
         
-        Period p = new Period(cs.getTime(),ce.getTime(),VSLConfig.Interval);
+        Period p = new Period(cs.getTime(),ce.getTime(),VSLConfig.EmulInterval);
         
         startTime = new Date();
         emulation = new VSLEmulation(section,p,vv);
         emulation.setSignalListener(this);
+        SimulationConfig.RunningInterval = Interval.getMinTMCInterval();
         emulation.start();
         isStartSimulation(true);
     }
@@ -2102,6 +2268,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
             if(cbxSimulationCate.getItemCount() > 1)
                 this.cbxSimulationCate.setSelectedIndex(1);
             cbxSimulationCate.setEnabled(false);
+            
         }
     }
     
@@ -2197,7 +2364,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
     {
         Calendar c = Calendar.getInstance();
         c.setTime(StartDate);
-
+        
         for(int i=0;i<step;i++){
             c.add(Calendar.SECOND, interval);
         }
@@ -2411,6 +2578,20 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
 //            rows.addRow(data);
 //        }
     }
+    
+    private void loadVSLInterval(){
+            for(Interval i : Interval.values()){
+                    this.cbxVSLInterval.addItem(i);
+            }
+            this.cbxVSLInterval.setSelectedItem(Interval.get(VSLConfig.VSL_INTERVAL));
+    }
+    
+    private void loadMeteringInterval(){
+            for(Interval i : Interval.values()){
+                    this.cbxMETERInterval.addItem(i);
+            }
+            this.cbxMETERInterval.setSelectedItem(Interval.get(MeteringConfig.MeteringInterval));
+    }
 
         private void loadSimulationInterval() {
                 for(Interval i : Interval.values()){
@@ -2436,6 +2617,58 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                     this.cbxUpstream.setSelected(true);
                     this.tbxVSLSTADISTANCE.setEnabled(false);
                     this.tbxVSLSTASPEED.setEnabled(false);
+                }
+        }
+
+        /**
+         * Load Simulation Interval by Section
+         */
+        private void LoadSimulationInterval() {
+                Section s = (Section)this.cbxSections.getSelectedItem();
+                if(s == null)
+                        return;
+                SimInterval sitnv = new SimInterval(s);
+                simulationInterval = sitnv;
+//                simulationInterval.UpdateAllStates(SimulationGroup.VSL,Interval.I10SEC.second);
+                HashMap<String,StateInterval> st = simulationInterval.getStates();
+                int cnt = 0;
+                
+                if(!this.cbxVSLsetStation.isSelected())
+                        return;
+                
+                for(String key : st.keySet()){
+                        StateInterval si = st.get(key);
+                        System.out.println("RID : "+tmo.getInfra().getRNode(key).getLabel()+", "+tmo.getInfra().getRNode(key).getId()+", "+si.getIntervalByGID(SimulationGroup.VSL));
+                }
+                
+                //is each Station
+                if(!this.cbxVSL_SetAllStation.isSelected()){
+                        //VSL setUp
+                        String[] vslStation = this.tbxVSLsetStationList.getText().split(",");
+                        if(vslStation.length > 0 && this.tbxVSLsetInterval.getText() != null){
+                                for(String vs : vslStation){
+                                        String rnode = tmo.getInfra().getStation(vs).getId();
+                                        System.out.println(rnode);
+                                        StateInterval si = st.get(rnode);
+                                        si.updateInterval(SimulationGroup.VSL, Integer.parseInt(this.tbxVSLsetInterval.getText()));
+                                }
+                        }
+                }else{//all station
+                        for(String key : st.keySet()){
+                                StateInterval si = st.get(key);
+                                si.updateInterval(SimulationGroup.VSL, Integer.parseInt(this.tbxVSLsetInterval.getText()));
+                        }
+                }
+                
+                
+        }
+
+        private void setVSLGUI(boolean isSelected) {
+                this.tbxVSLsetStationList.setEnabled(isSelected);
+                this.tbxVSLsetInterval.setEnabled(isSelected);
+                this.cbxVSL_SetAllStation.setEnabled(isSelected);
+                if(this.cbxVSL_SetAllStation.isSelected() && !isSelected){
+                        this.cbxVSL_SetAllStation.setSelected(isSelected);
                 }
         }
 

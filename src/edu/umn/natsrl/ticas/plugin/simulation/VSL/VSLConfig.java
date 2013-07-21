@@ -17,6 +17,7 @@
  */
 package edu.umn.natsrl.ticas.plugin.simulation.VSL;
 
+import edu.umn.natsrl.evaluation.Interval;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.AccCheckThreshold;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.BottleneckSpeed;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.DensityAggregation;
@@ -61,7 +62,7 @@ public class VSLConfig extends ticasConfig{
     public static double VSL_MIN_CHANGE = 5.0;
     public static int FTM = 5280;   // 1 mile = 5280 feets
     
-    public static int Interval = edu.umn.natsrl.evaluation.Interval.I30SEC.getSecond();
+    public static int EmulInterval = edu.umn.natsrl.evaluation.Interval.I30SEC.getSecond();
     
     //VSS Identification
     public static BottleneckSpeed bottleneckSpeedType = BottleneckSpeed.BASEDBOTTLENECKSPEED;
@@ -75,6 +76,16 @@ public class VSLConfig extends ticasConfig{
     
     //VSL STA Type
     public static VSLSTAType vslSTAtype = VSLSTAType.OPTION2;
+    
+    //VSL Interval
+    public static int VSL_INTERVAL = Interval.I30SEC.second;
+    
+    //VSL interval stationlist
+    public static String VSL_INTERVAL_STATIONLIST = "";
+    
+    public static boolean isVSLStep(int runtime){
+            return runtime != 0 && runtime % VSL_INTERVAL == 0;
+    }
     
     public static void save(){
         prop.put("VSL_VDA", VSL_VSS_DECISION_ACCEL);
@@ -95,6 +106,8 @@ public class VSLConfig extends ticasConfig{
         prop.put("VSLZONEMILE", VSL_ZONE_LENGTH_MILE);
         prop.put("STA_COVERDISTANCE", coverDistance);
         prop.put("STA_COVERSPEED", coverageSpeed);
+        prop.put("VSL_INTERVAL",VSL_INTERVAL);
+        prop.put("VSL_INTERVAL_STATIONLIST", VSL_INTERVAL_STATIONLIST);
         saveConfig(configFile);
     }
     public static void load(){
@@ -119,6 +132,8 @@ public class VSLConfig extends ticasConfig{
             VSL_ZONE_LENGTH_MILE = p.getDouble("VSLZONEMILE");
             coverDistance = p.getDouble("STA_COVERDISTANCE");
             coverageSpeed = p.getInteger("STA_COVERSPEED");
+            VSL_INTERVAL = p.getInteger("VSL_INTERVAL");
+            VSL_INTERVAL_STATIONLIST = p.get("VSL_INTERVAL_STATIONLIST");
         }   
     }
 }

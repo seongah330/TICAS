@@ -33,6 +33,7 @@ import edu.umn.natsrl.infra.simobjects.RandomSeeds;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
 import edu.umn.natsrl.infra.simobjects.SimulationSeveralResult;
 import edu.umn.natsrl.sfim.SectionInfoDialog;
+import edu.umn.natsrl.ticas.Simulation.SimInterval;
 import edu.umn.natsrl.ticas.plugin.PluginFrame;
 import edu.umn.natsrl.ticas.Simulation.Simulation.ISimEndSignal;
 import edu.umn.natsrl.ticas.Simulation.SimulationConfig;
@@ -174,8 +175,11 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             
             Section section = (Section)this.cbxSections.getSelectedItem();
             Interval simIntv = (Interval)this.cbxSimulationInterval.getSelectedItem();
+            SimInterval sintv = new SimInterval(section, Interval.getDefaultSimulationInterval(), simIntv);
+//            Interval simRunningIntv = (Interval)this.cbxSimulationInterval.getSelectedItem();
+//            this.simulationInterval.setSimulationRunningInterval(simRunningIntv);
             sim = new BasicSimulation(SimulationConfig.CASE_FILE, SimulationConfig.RANDOM_SEED, section, (VISSIMVersion)this.cbxVissimVersion.getSelectedItem()
-                    ,simIntv.getSecond());
+                    ,sintv);
             sim.setDebugInterval(SimulationConfig.getInterval());
             sim.setSignalListener(this);
             sim.start();
@@ -206,7 +210,7 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             setVissimVisible(false);
             return;
         }
-        
+        int rinterval = 0;
         ComError ce = ComError.getErrorbyID(code);
         if(!ce.isCorrect()){
             JOptionPane.showMessageDialog(simFrame, ce.toString());
@@ -215,13 +219,14 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
         }
         
         int samples = sim.getSamples();
+        rinterval = sim.getRunningInterval();
         if(samples < 5) {
             JOptionPane.showMessageDialog(simFrame, "Too short simulation");
             simFrame.afterSimulation(null, null);
 //            this.simFrame.setVisible(false);            
         }
 
-        int duration = samples * 30;        
+        int duration = samples * rinterval;        
 
         Calendar c = Calendar.getInstance();
         c.setTime(startTime);
@@ -231,10 +236,10 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
         Date eTime = c.getTime();
         
         if(this.SimRandom.isSingle()){
-            simFrame.afterSimulation((Section)this.cbxSections.getSelectedItem(), new Period(sTime, eTime, 30));
+            simFrame.afterSimulation((Section)this.cbxSections.getSelectedItem(), new Period(sTime, eTime, rinterval));
         }else{
             System.out.println("Save Simulation File("+SimulationConfig.RANDOM_SEED+")");
-            SimulationSeveralResult ssr = new SimulationSeveralResult((Section)this.cbxSections.getSelectedItem(), new Period(sTime, eTime, 30));
+            SimulationSeveralResult ssr = new SimulationSeveralResult((Section)this.cbxSections.getSelectedItem(), new Period(sTime, eTime, rinterval));
             ssr.saveResult();
             System.out.println("------------------------------------------------------------------------");
             System.out.println("Random Seed - " + SimulationConfig.RANDOM_SEED + "Simulation Complete.");
@@ -246,13 +251,13 @@ public class VissimCalibration2GUI extends javax.swing.JPanel implements ISimEnd
             SimObjects.getInstance().reset();
             runSimulation();
         }else{
-            simFrame.afterSimulation((Section)this.cbxSections.getSelectedItem(), new Period(sTime, eTime, 30));
+            simFrame.afterSimulation((Section)this.cbxSections.getSelectedItem(), new Period(sTime, eTime, rinterval));
             System.out.println("Restore output redirection ... ");
             System.out.println("------------------------------------------------------------------------");
             System.out.println("Simulation Complete.");
             System.out.println("------------------------------------------------------------------------");
             this.restoreOutput();
-            SimulationUtil.SaveSimulation((Section)this.cbxSections.getSelectedItem(),new Period(sTime, eTime, 30),simFrame);
+            SimulationUtil.SaveSimulation((Section)this.cbxSections.getSelectedItem(),new Period(sTime, eTime, rinterval),simFrame);
         }
     }
     

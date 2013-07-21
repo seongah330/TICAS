@@ -41,11 +41,15 @@ public class EntranceState extends State {
    double lastDemand = 0;
    double lastVolumeOfRamp = 0;
 
-   public EntranceState(Entrance e, SimObjects _simObject) {
-       super(e.getId(), e);
+   public EntranceState(Entrance e, SimObjects _simObject, SimInterval sitv) {
+       super(e.getId(), e,sitv);
        this.entrance = e;
        type = StateType.ENTRANCE;
        simObjects = _simObject;
+   }
+   
+   public EntranceState(Entrance e, SimObjects _simObject) {
+           this(e,_simObject,null);
    }
 
    /**

@@ -31,12 +31,9 @@ import java.util.NavigableMap;
  */
 public class VSLStationStateFullSearch extends VSLStationState{
     int cnt = 1;
-    public VSLStationStateFullSearch(Station _station, Section _section, SimObjects simObjects){
-        super(_station, _section, simObjects);
-    }
     
     public VSLStationStateFullSearch(StationState s) {
-        super(s.getStation(),s.getSection(),s.getSimObject());
+        super(s.getStation(),s.getSection(),s.getSimObject(),s.getSimulationInterval());
         setUpstreamStationState(s.getUpstreamStationState());
         setDownStreamStationState(s.getDownStreamStationState());
     }
@@ -53,7 +50,7 @@ public class VSLStationStateFullSearch extends VSLStationState{
         if(mp != null){
             VSLStationState sp = upstream.get(mp);
             Double d = m - mp;
-            acceleration = calculateAcceleration(sp, d);
+            acceleration = calculateAcceleration(simGroup,sp, d);
             checkThresholds();
             
             if(isAboveBottleneckSpeed()){

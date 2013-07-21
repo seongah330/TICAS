@@ -47,7 +47,7 @@ public class StationAverageLaneFlow extends Evaluation {
         Station[] stations = this.opts.getSection().getStations(detectorChecker);
         for(int i=0; i<stationSpeed.size(); i++)
         {
-            if(printDebug && idx < periods.length) System.out.println("      - " + periods[idx++].getPeriodString());                        
+            if(printDebug && idx < periods.length) System.out.println("   - Load Station Average Lane Flow" + periods[idx++].getPeriodString());                        
             if(stationSpeed.get(i).isStatistic()) continue;
             
             this.opts.getSection().loadData(periods[periodIdx++], this.dataLoadOption);            

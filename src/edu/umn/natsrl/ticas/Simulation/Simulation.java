@@ -85,13 +85,16 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     private boolean isDebug_StationInfo = true;
     private boolean isDebug_EntranceInfo = true;
     protected int runInterval = Interval.I30SEC.getSecond();
-    protected int DebugInterval = 30;
+    protected SimInterval simulationInterval;
+    protected int DebugInterval = 10;
     //chart Option
     protected JPanel chartPanel = null;
     
-    public Simulation(String caseFile, int seed, Section section, VISSIMVersion v,int rinterval){
+    public Simulation(String caseFile, int seed, Section section, VISSIMVersion v,SimInterval sInterval){
         try{
-            runInterval = rinterval;
+            runInterval = sInterval.getSimulationRunningInterval().getSecond();
+            simulationInterval = sInterval;
+//            simulationInterval.setSimulationGroup(simGroup);
             this.caseFile = caseFile;
             this.seed = seed;
             this.section = section;
@@ -101,7 +104,7 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
             checkDetector(detectors);
             this.simDuration = VISSIMHelper.loadSimulationDuration(this.caseFile);
             simDMSs = loadDMSsFromCasefile(this.caseFile);
-            sectionHelper = new SectionHelper(section, detectors,meters,simDMSs);
+            sectionHelper = new SectionHelper(section, detectors,meters,simDMSs,sInterval);
             saveSimulationConfig();
 
         }catch(IOException ex){
@@ -120,10 +123,13 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         vc = new VISSIMController();
         ComError ce = ComError.getErrorbyID(vc.initialize(caseFile,seed,version,runInterval));
         if(!ce.isCorrect()){
-            this.signalListener.signalEnd(ce.getErrorType());
-            this.vc.stop();
-            this.vc.close();
+            SimulationStop(ce.getErrorType());
             return;
+        }
+        
+        if(!simulationInterval.isCorrect()){
+                SimulationStop(-1);
+                return;
         }
         
         System.out.println("Ok");
@@ -142,7 +148,7 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         samples = 0;
         long sTime = new Date().getTime();
         simcount=0; //30sec interval
-        
+        simulationInterval.setRunTime(simcount);
         
         /**
          * Running Initialize
@@ -155,20 +161,23 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
             
             ExecuteBeforeRun();
             vc.run(runInterval);
+            simcount+=runInterval;
+            simulationInterval.setRunTime(simcount);
+            samples++;
             ExecuteAfterRun();
             
-            simcount+=runInterval;
             if(isInterval(simcount)){
                 System.out.println("\nData Log (Total Sec : "+simcount+")");
                 DebugMassage();
             }
-            samples++;
+            
             if(samples >= totalSamples) {
 //                metering.writeLog();
                 break;
             }
+            
         }
-        
+        ExecuteEnd();
         int elapsedSeconds = (int) ( ( new Date().getTime() - sTime ) / 1000 );
         int h = elapsedSeconds / 3600;
         int m = ( elapsedSeconds % 3600 ) / 60;
@@ -203,6 +212,10 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
     protected void DebugMassage(){
         DisplayStationState();
         DisplayMeterState(entrancestates);
+    }
+    
+    protected void ExecuteEnd() {
+        
     }
     
     private void loadSignalGroupFromCasefile(String casefile) throws IOException{
@@ -350,10 +363,9 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
                 e.updateState();
             }
         }
-        
         //Update Station
         for(StationState cs : stationStates){
-            cs.updateState();
+            cs.updateState(SimulationGroup.DEFAULT);
         }
     }
 
@@ -374,10 +386,10 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
             //for Station debuging
             for (int i = 0; i < stationStates.size(); i++) {
                 System.out.println(stationStates.get(i).getID() + " : T_Q="+String.format("%.1f",stationStates.get(i).getFlow())
-                        + " A_Q="+String.format("%.1f",stationStates.get(i).getAverageFlow(0, this.getDebugIntervalIndex()))
-                        + " k=" +String.format("%.1f", stationStates.get(i).getAverageDensity(0,getDebugIntervalIndex()))
-                        + " u=" + String.format("%.1f", stationStates.get(i).getAverageSpeed(0, getDebugIntervalIndex()))
-                        + " v=" + stationStates.get(i).getTotalVolume(0, getDebugIntervalIndex()));
+                        + " A_Q="+String.format("%.1f",stationStates.get(i).getIntervalAverageLaneFlow(SimulationGroup.DEFAULT))
+                        + " k=" +String.format("%.1f", stationStates.get(i).getIntervalAggregatedDensity(SimulationGroup.DEFAULT, 1))
+                        + " u=" + String.format("%.1f", stationStates.get(i).getIntervalAggregatedSpeed(SimulationGroup.DEFAULT, 1))
+                        + " v=" + stationStates.get(i).getIntervalVolume(SimulationGroup.DEFAULT));
             }
         }
     }
@@ -431,6 +443,12 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
         private void saveSimulationConfig() {
                 SimulationConfig.RunningInterval = runInterval;
                 SimulationConfig.saveConfig();
+        }
+
+        private void SimulationStop(int errorType) {
+                this.signalListener.signalEnd(errorType);
+                this.vc.stop();     
+                this.vc.close();
         }
     
     public static interface ISimEndSignal {

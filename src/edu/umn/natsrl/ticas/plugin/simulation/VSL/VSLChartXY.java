@@ -20,6 +20,7 @@ package edu.umn.natsrl.ticas.plugin.simulation.VSL;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLStationState;
 import edu.umn.natsrl.chart.TICASChartXY;
 import edu.umn.natsrl.infra.infraobjects.DMSImpl;
+import edu.umn.natsrl.ticas.Simulation.SimulationGroup;
 import info.monitorenter.gui.chart.Chart2D;
 import info.monitorenter.gui.chart.traces.painters.TracePainterDisc;
 import info.monitorenter.gui.chart.traces.painters.TracePainterVerticalBar;
@@ -71,7 +72,7 @@ public class VSLChartXY extends TICASChartXY{
         int cnt = 0;
         for(Integer key : stations.keySet()){
             xdata[cnt] = key;
-            speeddata[cnt] = stations.get(key).getAggregateRollingSpeed();
+            speeddata[cnt] = stations.get(key).getAggregateRollingSpeed(SimulationGroup.VSL);
             
             cnt++;
         }

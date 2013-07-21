@@ -49,7 +49,7 @@ public abstract class AStationData extends Evaluation {
         for (Period period : this.opts.getPeriods()) 
         {            
             if(printDebug) 
-                System.out.println("      - " + period.getPeriodString());
+                System.out.println("      - LoadAStationData..." + period.getPeriodString());
             
             // data load from all detectors in the section
             section.loadData(period, this.dataLoadOption);                 

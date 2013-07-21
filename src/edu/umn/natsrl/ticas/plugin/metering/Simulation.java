@@ -28,6 +28,7 @@ import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.simobjects.SimDetector;
 import edu.umn.natsrl.infra.simobjects.SimMeter;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
+import edu.umn.natsrl.ticas.Simulation.SimulationGroup;
 import edu.umn.natsrl.ticas.plugin.metering.MeteringSectionHelper.StationState;
 import edu.umn.natsrl.util.FileHelper;
 import edu.umn.natsrl.vissimcom.ComError;
@@ -132,8 +133,8 @@ public class Simulation extends Thread implements IStepListener, ITravelTimeList
                 //for debuging
                 for (int i = 0; i < stationStates.size(); i++) {
                     System.out.println(stationStates.get(i).id + " : q="+stationStates.get(i).getFlow()
-                            + " k=" +String.format("%.1f", stationStates.get(i).getDensity())+"("+String.format("%.1f", stationStates.get(i).getAggregatedDensity())+")"
-                            + " u=" + String.format("%.1f", stationStates.get(i).getSpeed())+"("+String.format("%.1f", stationStates.get(i).getAggregatedSpeed())+")"
+                            + " k=" +String.format("%.1f", stationStates.get(i).getDensity())+"("+String.format("%.1f", stationStates.get(i).getIntervalAggregatedDensity(SimulationGroup.Meter))+")"
+                            + " u=" + String.format("%.1f", stationStates.get(i).getSpeed())+"("+String.format("%.1f", stationStates.get(i).getIntervalAggregatedSpeed(SimulationGroup.Meter))+")"
                             + " v=" + stationStates.get(i).getVolume());
                 }
 //                StringBuilder ulog = new StringBuilder();

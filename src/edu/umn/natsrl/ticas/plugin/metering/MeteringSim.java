@@ -18,6 +18,8 @@
 package edu.umn.natsrl.ticas.plugin.metering;
 
 import edu.umn.natsrl.infra.Section;
+import edu.umn.natsrl.ticas.Simulation.SimInterval;
+import edu.umn.natsrl.ticas.Simulation.SimulationGroup;
 import edu.umn.natsrl.ticas.Simulation.SimulationImpl;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLVersion;
 import edu.umn.natsrl.vissimcom.VISSIMVersion;
@@ -29,7 +31,7 @@ import edu.umn.natsrl.vissimcom.VISSIMVersion;
 public class MeteringSim extends edu.umn.natsrl.ticas.Simulation.Simulation implements SimulationImpl{
     Metering metering;
     
-    public MeteringSim(String caseFile, int seed, Section section, VISSIMVersion v,int Intv){
+    public MeteringSim(String caseFile, int seed, Section section, VISSIMVersion v,SimInterval Intv){
         super(caseFile,seed,section,v,Intv);
         
         SimInit();
@@ -48,18 +50,24 @@ public class MeteringSim extends edu.umn.natsrl.ticas.Simulation.Simulation impl
     @Override
     public void ExecuteAfterRun() {
         super.ExecuteAfterRun();
-        metering.run(samples, vc.getCurrentTime());
+        RunMetering();
     }
 
     @Override
     public void DebugMassage() {
         DisplayStationState();
-        metering.printEntrance();
+        if(MeteringConfig.isMeteringStep(simcount))
+                metering.printEntrance();
     }
 
     @Override
     public void SimInit() {
-        metering = new Metering(section,meters,detectors);
+        metering = new Metering(section,meters,detectors,simulationInterval);
     }
     
+        private void RunMetering() {
+                metering.updateEntranceStates();
+                if(MeteringConfig.isMeteringStep(simcount))
+                        metering.run(samples, vc.getCurrentTime());
+        }
 }

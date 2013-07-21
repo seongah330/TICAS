@@ -25,8 +25,10 @@ import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.DMSImpl;
 import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.infra.simobjects.SimDMS;
+import edu.umn.natsrl.ticas.Simulation.SimInterval;
 import edu.umn.natsrl.ticas.Simulation.Simulation;
 import edu.umn.natsrl.ticas.Simulation.SimulationConfig;
+import edu.umn.natsrl.ticas.Simulation.SimulationGroup;
 import edu.umn.natsrl.ticas.Simulation.SimulationImpl;
 import edu.umn.natsrl.ticas.Simulation.StationState;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLAlgorithm;
@@ -62,8 +64,8 @@ public class VSLSim extends Simulation implements SimulationImpl{
     
     VSLVersion vslversion;
     
-    public VSLSim(String caseFile, int seed, Section section, VISSIMVersion v, VSLVersion _vv, int rinterval){
-        super(caseFile,seed,section,v,rinterval);
+    public VSLSim(String caseFile, int seed, Section section, VISSIMVersion v, VSLVersion _vv, SimInterval sInterval){
+        super(caseFile,seed,section,v,sInterval);
         
         vslversion = _vv;
         SimInit();
@@ -115,30 +117,46 @@ public class VSLSim extends Simulation implements SimulationImpl{
     @Override
     public void ExecuteAfterRun() {
         super.ExecuteAfterRun();
-        
-        //Update Station
+//        Update Station
         for(VSLStationState cs : VSLStationStates){
-            cs.updateState();
+            cs.updateState(SimulationGroup.VSL);
         }
-        vsl.Process();
-        updateDMS();
+        
+        if(VSLConfig.isVSLStep(simcount)){
+                System.out.println("simcnt = "+simcount+" : startVSL");
+                vsl.Process();
+                updateDMS();
+        }
         updateResults();
     }
-
+    
     @Override
     public void DebugMassage() {
             //for Station debuging
             for (int i = 0; i < VSLStationStates.size(); i++) {
                 VSLStationState s = VSLStationStates.get(i);
-                System.out.println(s.getID() + " : T_Q="+String.format("%.1f",s.getTotalFlow(0, this.getDebugIntervalIndex()))
-                        + " A_Q="+String.format("%.1f",s.getAverageFlow(0, this.getDebugIntervalIndex()))
-                        + " k=" +String.format("%.1f", s.getAverageDensity(0,getDebugIntervalIndex()))
-                        + " u=" + String.format("%.1f", s.getAverageSpeed(0, getDebugIntervalIndex()))
+                System.out.println(s.getID() + " : TT_Q="+String.format("%.1f",s.getIntervalFlow(SimulationGroup.VSL))
+                        + " A_Q="+String.format("%.1f",s.getIntervalAverageLaneFlow(SimulationGroup.VSL))
+                        + " k=" +String.format("%.1f", s.getIntervalDensity(SimulationGroup.VSL))
+                        + " k_10 = "+String.format("%.1f", s.getDensity())
+                        + " k_iavg = "+String.format("%.1f", s.getIntervalAggregatedDensity(SimulationGroup.VSL))
+                        + " u=" + String.format("%.1f", s.getIntervalSpeed(SimulationGroup.VSL))//s.getAggregateRollingSpeed(SimulationGroup.VSL))
+                        + " agg="+s.getAggregateRollingSpeed(SimulationGroup.VSL)
+                        + " au="+s.getAverageRollingSpeed(SimulationGroup.VSL, 0,1) + ", "
+                        + s.getAverageRollingSpeed(SimulationGroup.VSL, 1,1) + ", "
+                        + s.getAverageRollingSpeed(SimulationGroup.VSL, 2,1)
+                        + s.getAverageRollingSpeed(SimulationGroup.VSL, 3,1)
+                        + s.getAverageRollingSpeed(SimulationGroup.VSL, 4,1)
+                        + " 10secU="+s.getAverageSpeed(0, 1) + ", "
+                        + s.getAverageSpeed(1, 1) + ", "
+                        + +s.getAverageSpeed(2, 1)
                         + " v=" + s.getTotalVolume(0, getDebugIntervalIndex())
-                        + " acc = "+s.calculateAcceleration());
+                        + " acc = "+s.calculateAcceleration(SimulationGroup.VSL)
+                        + " sitv = "+s.getStateInterval(SimulationGroup.VSL)
+                        + " crunT = "+s.getCurrentRunTime());
             }
             
-            System.err.println("clearlog");
+//            System.err.println("clearlog");
             for(VSLStationState cvs : VSLStationStates){
                 System.err.println(cvs.getID()+"("+cvs.getMilePoint()+")" + " : "+"bcount = "+cvs.n_bottleneck+" , bottleneck = " + cvs.bottleneck+", pbottle = "+ cvs.p_bottleneck);
             }
@@ -146,7 +164,7 @@ public class VSLSim extends Simulation implements SimulationImpl{
             System.err.println();
             System.err.println("DMS Information");
             for(DMSImpl d : section.getDMS()){
-                System.err.println(d.getId()+"("+d.getMilePoint(section.getName())+")" + " : "+d.isStarted()+", speedlimit : "+d.getSpeedLimit());
+                System.err.println(d.getId()+"("+d.getMilePoint(section.getName())+")" + " : "+d.isStarted()+", speedlimit : "+d.getSpeedLimit()+", sc="+simcount);
             }
             
             updateChart();
@@ -222,6 +240,11 @@ public class VSLSim extends Simulation implements SimulationImpl{
     }
 
     private void initDebug() {
+        System.out.println("Station Interval List");
+        for(VSLStationState vs : StationMap.values()){
+            System.out.print(vs.getID()+"("+vs.getLabel()+","+vs.getStation().getStationId()+")");
+            System.out.println(" : "+(vs.getStateInterval() != null ? true : false)+ ", "+vs.getStateInterval().getIntervalByGID(SimulationGroup.VSL));
+        }
 //        System.out.println();
 //        System.out.println("DMS-Station Distance compare");
 //        for(VSLStationState s : VSLStationStates){

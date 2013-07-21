@@ -22,10 +22,10 @@ package edu.umn.natsrl.vissimcom;
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
 public enum ComError {
-    CORRECT(0,"success","success"),
-    INCORRECTVERSION(1,"There is no VISSIM\nInstall the VISSIM or Select other VISSIM version","COMException: 80040154"),
-    INCORRECTFILE(2,"Select correct file","select correct file"),
-    Default(99,"","default");
+    CORRECT(990,"success","success"),
+    INCORRECTVERSION(991,"There is no VISSIM\nInstall the VISSIM or Select other VISSIM version","COMException: 80040154"),
+    INCORRECTFILE(992,"Select correct file","select correct file"),
+    Default(9999,"","default");
     
     private int etype;
     private String msg;

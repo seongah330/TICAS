@@ -25,6 +25,8 @@ import edu.umn.natsrl.infra.simobjects.SimDetector;
 import edu.umn.natsrl.infra.simobjects.SimMeter;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
 import edu.umn.natsrl.infra.simobjects.SimStation;
+import edu.umn.natsrl.ticas.Simulation.SimInterval;
+import edu.umn.natsrl.ticas.Simulation.SimulationGroup;
 import edu.umn.natsrl.ticas.plugin.metering.MeteringSectionHelper.EntranceState;
 import edu.umn.natsrl.ticas.plugin.metering.MeteringSectionHelper.StationState;
 import edu.umn.natsrl.util.Logger;
@@ -65,6 +67,8 @@ public class Metering {
     private int avgDensityTrend = 10;
     private int singleBottleneckCount = 0;
     
+    private final SimInterval SimulationInterval;
+    
     public static IDetectorChecker dc = new IDetectorChecker() {
 
         @Override
@@ -83,6 +87,7 @@ public class Metering {
     public void run(int dataCount, float simTime) {
 
         this.simTime = simTime;
+        System.out.println("sim Time : "+simTime);
         this.dataCount = dataCount;
 
         if (dataCount == 0) {
@@ -90,14 +95,14 @@ public class Metering {
         }
 
         System.out.println("[" + String.format("%3d", dataCount) + "]=======================================");
-
-        updateEntranceStates();
+        
+//        updateEntranceStates();
 
         if (dataCount < 6) {
             return;
         }
 
-        bottleneckFinder.findBottlenecks();
+        bottleneckFinder.findBottlenecks((int)this.simTime);
 
         calculateMeteringRates();
         
@@ -116,7 +121,7 @@ public class Metering {
     /**
      * Calculate demand and output for all entrances
      */
-    private void updateEntranceStates() {
+    public void updateEntranceStates() {
         ArrayList<EntranceState> entranceStates = sectionHelper.getEntranceStates();
         for (EntranceState e : entranceStates) {
             e.updateState();
@@ -221,7 +226,7 @@ public class Metering {
 
         double avgK = 0;
         StationState upStation = stations.get(0);
-        if(downstreamBS != null) avgK = sectionHelper.getAverageDensity(upStation, downstreamBS);
+        if(downstreamBS != null) avgK = sectionHelper.getAverageDensity(upStation, downstreamBS,SimulationGroup.Meter);
                                       
         corridorKHistory.add(avgK);
         int size = this.corridorKHistory.size();
@@ -254,7 +259,7 @@ public class Metering {
         List<StationState> stations = sectionHelper.getStationStates();
         StationState upStation = stations.get(0);
         StationState downStation = stations.get(stations.size()-1);
-        double avgK = sectionHelper.getAverageDensity(upStation, downStation);
+        double avgK = sectionHelper.getAverageDensity(upStation, downStation,SimulationGroup.Meter);
         
         corridorKHistory.add(avgK);
         int size = this.corridorKHistory.size();
@@ -448,9 +453,9 @@ public class Metering {
         // segment density (average density from upstream station to bottleneck)
         if(!es.hasBeenStoped) {
             // Start Condition 1 : segment density > Kthres_start
-            double segmentDensity = bs.getAggregatedDensity();
+            double segmentDensity = bs.getIntervalAggregatedDensity(SimulationGroup.Meter);
             if (us != null) {
-                segmentDensity = sectionHelper.getAverageDensity(us, bs);
+                segmentDensity = sectionHelper.getAverageDensity(us, bs,SimulationGroup.Meter);
             }            
             if (segmentDensity >= MeteringConfig.Kb) {
                 satisfyDensityCondition = true;
@@ -504,8 +509,8 @@ public class Metering {
         }
         
         for(int i=0; i<10; i++) {            
-            if (us != null) segmentDensity = sectionHelper.getAverageDensity(us, bs, i);
-            else segmentDensity = bs.getAggregatedDensity(i);
+            if (us != null) segmentDensity = sectionHelper.getAverageDensity(us, bs, i,SimulationGroup.Meter);
+            else segmentDensity = bs.getIntervalAggregatedDensity(SimulationGroup.Meter,i);
             
             // Start Condition 1 : segment density > Kthres_start
             if (segmentDensity < MeteringConfig.Kb) {
@@ -576,9 +581,9 @@ public class Metering {
         // p2's x = 0
         // p4's x = Kd
 
-        double Kt = bottleneck.getAggregatedDensity();
+        double Kt = bottleneck.getIntervalAggregatedDensity(SimulationGroup.Meter);
         if (upstream != null) {
-            Kt = sectionHelper.getAverageDensity(upstream, bottleneck);
+            Kt = sectionHelper.getAverageDensity(upstream, bottleneck,SimulationGroup.Meter);
         }
 
         entrance.saveSegmentDensityHistory(Kt);
@@ -671,13 +676,17 @@ public class Metering {
         }
     }
 
+    public Metering(Section section, ArrayList<SimMeter> meters, ArrayList<SimDetector> detectors) {
+            this(section,meters,detectors,null);
+    }
     /**
      * Constructor
      * @param section
      * @param meters
      * @param detectors 
      */
-    public Metering(Section section, ArrayList<SimMeter> meters, ArrayList<SimDetector> detectors) {
+    public Metering(Section section, ArrayList<SimMeter> meters, ArrayList<SimDetector> detectors,
+            SimInterval sitv) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd-HHmm");
         String time = format.format(new Date());
         meteringStartAndStopLog = new Logger("metering_log (" + time + ")", "csv");
@@ -687,9 +696,9 @@ public class Metering {
         bottleneckLog = new Logger("bottleneck_log (" + time + ")", "csv");
 //        waitTimeLog = new Logger("waittime_log (" + time + ")", "csv");
         rampDensityLog = new Logger("rampdensity_log (" + time + ")", "csv");
-
+        SimulationInterval = sitv;
         this.detectors = detectors;
-        sectionHelper = new MeteringSectionHelper(section, meters, detectors);
+        sectionHelper = new MeteringSectionHelper(section, meters, detectors,sitv);
         for (Station s : section.getStations()) {
             if (!isInMap(s)) {
                 continue;
@@ -801,8 +810,8 @@ public class Metering {
 
         for (int i = 0; i < stationStates.size(); i++) {
             StationState s = stationStates.get(i);
-            speedLog.print("," + s.getAggregatedSpeed());
-            densityLog.print("," + s.getAggregatedDensity());
+            speedLog.print("," + s.getIntervalAggregatedSpeed(SimulationGroup.Meter));
+            densityLog.print("," + s.getIntervalAggregatedDensity(SimulationGroup.Meter));
             if (s.isBottleneck) {
                 bottleneckLog.print("," + s.id);
             }
@@ -822,11 +831,11 @@ public class Metering {
             }
 
             // display
-//            System.out.println(
-//                    "  !! " + e.meter.getId()
-//                    + ", flow=" + String.format("%.2f", e.getMergingVolume()*120)
-//                    + ", demand=" + String.format("%.2f", e.getDemandVolume()*120)
-//                    + ", rate=" + String.format("%.2f", e.meter.getReleaseRate()));
+            System.out.println(
+                    "  !! " + e.meter.getId()
+                    + ", flow=" + String.format("%.2f", e.getMergingVolume()*120)
+                    + ", demand=" + String.format("%.2f", e.getDemandVolume()*120)
+                    + ", rate=" + String.format("%.2f", e.meter.getReleaseRate()));
 
             rateLog.print("," + e.meter.getReleaseRate());
 //            waitTimeLog.print("," + ( (e.maxWaitTimeIndex+1)/2));
@@ -857,6 +866,19 @@ public class Metering {
             ex.printStackTrace();
         }
     }
+    
+    public void DisplayStationState() {
+            //for Station debuging
+            ArrayList<StationState> stationStates = sectionHelper.getStationStates();
+            for (int i = 0; i < stationStates.size(); i++) {
+                System.out.println(stationStates.get(i).getID() 
+                        + " : T_Q="+String.format("%.1f",stationStates.get(i).getIntervalFlow(SimulationGroup.Meter))
+                        + " k=" +String.format("%.1f", stationStates.get(i).getIntervalAggregatedDensity(SimulationGroup.Meter))
+                        + " u=" + String.format("%.1f", stationStates.get(i).getIntervalSpeed(SimulationGroup.Meter))
+                        + " SI=" + String.format("%.1f", stationStates.get(i).getStateInterval(SimulationGroup.Meter))
+                        + " Cr=" + stationStates.get(i).getSimulationInterval().getCurrentRunTime());
+            }
+    }
 
     public void printEntrance() {
             System.err.println("=====Metering State======================");
@@ -868,6 +890,10 @@ public class Metering {
                             +"("+es.getRate()+"), occ="+es.getMaxOccupancy());
             }
     }
+
+        public SimInterval getSimulationInterval() {
+                return this.SimulationInterval;
+        }
 
 
 
@@ -888,166 +914,166 @@ public class Metering {
      * @param bs
      * @return 
      */
-    private String checkBSTrend(StationState bs) {
-        StringBuilder bsK = new StringBuilder();
-        bsK.append(",BSK(" + bs.id + ")");
-        boolean stopMetering = true;
-        for (int k = 0; k < MeteringConfig.stopBSTrend; k++) {
-            double cMovingAvgSpeed = bs.getMovingAverageSpeed(k, MeteringConfig.stopDuration);
-            double pMovingAvgSpeed = bs.getMovingAverageSpeed(k + 1, MeteringConfig.stopDuration);
-            bsK.append("," + cMovingAvgSpeed);
-            if (cMovingAvgSpeed >= pMovingAvgSpeed) {
-                stopMetering = false;
-            }
-        }
-        if (MeteringConfig.stopBSTrend > 0 && stopMetering) {
-            return bsK.toString();
-        } else {
-            return null;
-        }
-    }
+//    private String checkBSTrend(StationState bs) {
+//        StringBuilder bsK = new StringBuilder();
+//        bsK.append(",BSK(" + bs.id + ")");
+//        boolean stopMetering = true;
+//        for (int k = 0; k < MeteringConfig.stopBSTrend; k++) {
+//            double cMovingAvgSpeed = bs.getMovingAverageSpeed(k, MeteringConfig.stopDuration);
+//            double pMovingAvgSpeed = bs.getMovingAverageSpeed(k + 1, MeteringConfig.stopDuration);
+//            bsK.append("," + cMovingAvgSpeed);
+//            if (cMovingAvgSpeed >= pMovingAvgSpeed) {
+//                stopMetering = false;
+//            }
+//        }
+//        if (MeteringConfig.stopBSTrend > 0 && stopMetering) {
+//            return bsK.toString();
+//        } else {
+//            return null;
+//        }
+//    }
 
-    /**
-     * @deprecated 
-     */
-    private void stopMetering_backup() {
-
-        ArrayList<StationState> stationStates = sectionHelper.getStationStates();
-
-        int N = MeteringConfig.stopDuration;
-
-        // iterate from downstream to upstream
-        boolean hasBottleneck = false;
-        for (int i = stationStates.size() - 1; i >= 0; i--) {
-
-            StationState s = stationStates.get(i);
-            
-            // station is bottleneck
-            if (s.isBottleneck) {
-                hasBottleneck = true;
-                // set entrance's no-bottleneck count 0
-                for (EntranceState es : s.getAssociatedEntrances()) {
-                    es.resetNoBottleneckCount();
-                }
-                continue;
-            }
-            
-            // for all entrances
-            for (EntranceState es : s.getAssociatedEntrances()) 
-            {
-                // if meter isn't working, pass
-                if (!es.isMetering) {
-                    continue;
-                }
-                
-                // metering stop condition flag
-                boolean stopMetering = true;
-                
-                // if rate history is short, pass (do not stop)
-                if (es.countRateHistory() < N) {
-                    continue;
-                }
-
-                StringBuilder segK = new StringBuilder();
-                segK.append(",SK");
-                
-                // Stop Condition 1 : qj,t <= Rj,t for n times
-                //   - n : 10 (5min)
-                for (int k = 0; k < N; k++) {
-                    double q = es.getMergingVolume(k);
-                    double rate = es.getRate(k);
-                    if (q > rate) {
-                        stopMetering = false;
-                    }
-                    Double sk = es.getSegmentDensity(this.dataCount - k);
-                    segK.append("," + sk);
-                }
-
-                // if merging flow of ramp is high, pass
-                if (!stopMetering) continue;
-                
-
-
-                // Stop Condition 2 : 
-                //      if there's no bottleneck in downstream side of this meter                
-                if (!hasBottleneck) {
-                    es.addNoBottleneckCount();
-
-                    // if there's no bottleneck for a long time (N times)
-                    if (es.getNoBottleneckCount() >= N) {
-                        
-                        // find upstream station that not associated this entrance
-                        List<StationState> upstreamStations = new ArrayList<StationState>();
-                        if(MeteringConfig.stopUpstreamCount > 0) {
-                            for (int k = s.stationIdx - 1; k >= 0; k--) {
-                                StationState us = stationStates.get(k);
-                                boolean associatedStation = false;
-                                for (EntranceState tes : us.getAssociatedEntrances()) {
-                                    if (tes.equals(es)) {
-                                        associatedStation = true;
-                                    }
-                                }
-                                if (!associatedStation) {
-                                    upstreamStations.add(us);
-                                    if (upstreamStations.size() >= MeteringConfig.stopUpstreamCount) {
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        boolean hasUpstreamBS = false;
-                        for (StationState us : upstreamStations) {
-                            if (us.noBsCount < N) {
-                                hasUpstreamBS = true;
-                            }
-                        }
-
-                        if (!hasUpstreamBS) {
-                            System.out.println(this.dataCount + "(1) : " + es.meter.getId() + " is stoped!!");
-                            meteringStartAndStopLog.println(this.dataCount + "," + es.meter.getId() + ",stop,1" + segK.toString());
-                            es.stopMetering();
-                            continue;
-                        }
-                    }
-                    
-                    // end of checking about has-not-bottleneck case
-                    continue;
-                    
-                }
-                
-                // if has-bottleneck
-                es.resetNoBottleneckCount();
-
-                // Stop Condition 3 : segment density is low for n times
-                for (int k = 0; k < N; k++) {
-                    Double sk = es.getSegmentDensity(this.dataCount - k);
-                    if (sk > MeteringConfig.Kstop) {
-                        stopMetering = false;
-                        break;
-                    }
-                }
-
-                // Stop Condition 4 : bottleneck's density trend
-                if (stopMetering) {
-
-                    // check bottleneck's density trend for 'stopBSTrend' previous time steps
-                    String bsTrend = null;
-                    if(MeteringConfig.stopBSTrend > 0) bsTrend = checkBSTrend(es.getBottleneck());
-                    
-                    if (bsTrend != null) {
-                        System.out.println(this.dataCount + "(2) : " + es.meter.getId() + " is stoped!!");
-                        meteringStartAndStopLog.println(this.dataCount + "," + es.meter.getId() + ",stop,2" + segK.toString() + bsTrend);
-                        es.stopMetering();
-                    }
-                }
-
-            } // loop : entrances
-
-        } // loop : stations
-
-
-    }
+//    /**
+//     * @deprecated 
+//     */
+//    private void stopMetering_backup() {
+//
+//        ArrayList<StationState> stationStates = sectionHelper.getStationStates();
+//
+//        int N = MeteringConfig.stopDuration;
+//
+//        // iterate from downstream to upstream
+//        boolean hasBottleneck = false;
+//        for (int i = stationStates.size() - 1; i >= 0; i--) {
+//
+//            StationState s = stationStates.get(i);
+//            
+//            // station is bottleneck
+//            if (s.isBottleneck) {
+//                hasBottleneck = true;
+//                // set entrance's no-bottleneck count 0
+//                for (EntranceState es : s.getAssociatedEntrances()) {
+//                    es.resetNoBottleneckCount();
+//                }
+//                continue;
+//            }
+//            
+//            // for all entrances
+//            for (EntranceState es : s.getAssociatedEntrances()) 
+//            {
+//                // if meter isn't working, pass
+//                if (!es.isMetering) {
+//                    continue;
+//                }
+//                
+//                // metering stop condition flag
+//                boolean stopMetering = true;
+//                
+//                // if rate history is short, pass (do not stop)
+//                if (es.countRateHistory() < N) {
+//                    continue;
+//                }
+//
+//                StringBuilder segK = new StringBuilder();
+//                segK.append(",SK");
+//                
+//                // Stop Condition 1 : qj,t <= Rj,t for n times
+//                //   - n : 10 (5min)
+//                for (int k = 0; k < N; k++) {
+//                    double q = es.getMergingVolume(k);
+//                    double rate = es.getRate(k);
+//                    if (q > rate) {
+//                        stopMetering = false;
+//                    }
+//                    Double sk = es.getSegmentDensity(this.dataCount - k);
+//                    segK.append("," + sk);
+//                }
+//
+//                // if merging flow of ramp is high, pass
+//                if (!stopMetering) continue;
+//                
+//
+//
+//                // Stop Condition 2 : 
+//                //      if there's no bottleneck in downstream side of this meter                
+//                if (!hasBottleneck) {
+//                    es.addNoBottleneckCount();
+//
+//                    // if there's no bottleneck for a long time (N times)
+//                    if (es.getNoBottleneckCount() >= N) {
+//                        
+//                        // find upstream station that not associated this entrance
+//                        List<StationState> upstreamStations = new ArrayList<StationState>();
+//                        if(MeteringConfig.stopUpstreamCount > 0) {
+//                            for (int k = s.stationIdx - 1; k >= 0; k--) {
+//                                StationState us = stationStates.get(k);
+//                                boolean associatedStation = false;
+//                                for (EntranceState tes : us.getAssociatedEntrances()) {
+//                                    if (tes.equals(es)) {
+//                                        associatedStation = true;
+//                                    }
+//                                }
+//                                if (!associatedStation) {
+//                                    upstreamStations.add(us);
+//                                    if (upstreamStations.size() >= MeteringConfig.stopUpstreamCount) {
+//                                        break;
+//                                    }
+//                                }
+//                            }
+//                        }
+//
+//                        boolean hasUpstreamBS = false;
+//                        for (StationState us : upstreamStations) {
+//                            if (us.noBsCount < N) {
+//                                hasUpstreamBS = true;
+//                            }
+//                        }
+//
+//                        if (!hasUpstreamBS) {
+//                            System.out.println(this.dataCount + "(1) : " + es.meter.getId() + " is stoped!!");
+//                            meteringStartAndStopLog.println(this.dataCount + "," + es.meter.getId() + ",stop,1" + segK.toString());
+//                            es.stopMetering();
+//                            continue;
+//                        }
+//                    }
+//                    
+//                    // end of checking about has-not-bottleneck case
+//                    continue;
+//                    
+//                }
+//                
+//                // if has-bottleneck
+//                es.resetNoBottleneckCount();
+//
+//                // Stop Condition 3 : segment density is low for n times
+//                for (int k = 0; k < N; k++) {
+//                    Double sk = es.getSegmentDensity(this.dataCount - k);
+//                    if (sk > MeteringConfig.Kstop) {
+//                        stopMetering = false;
+//                        break;
+//                    }
+//                }
+//
+//                // Stop Condition 4 : bottleneck's density trend
+//                if (stopMetering) {
+//
+//                    // check bottleneck's density trend for 'stopBSTrend' previous time steps
+//                    String bsTrend = null;
+//                    if(MeteringConfig.stopBSTrend > 0) bsTrend = checkBSTrend(es.getBottleneck());
+//                    
+//                    if (bsTrend != null) {
+//                        System.out.println(this.dataCount + "(2) : " + es.meter.getId() + " is stoped!!");
+//                        meteringStartAndStopLog.println(this.dataCount + "," + es.meter.getId() + ",stop,2" + segK.toString() + bsTrend);
+//                        es.stopMetering();
+//                    }
+//                }
+//
+//            } // loop : entrances
+//
+//        } // loop : stations
+//
+//
+//    }
     
     
     
@@ -1070,7 +1096,7 @@ public class Metering {
         for (int i = stationStates.size() - 1; i >= 0; i--) {
             StationState station = stationStates.get(i);
             if (station.isBottleneck) {
-                sumKofBS += station.getAggregatedDensity();
+                sumKofBS += station.getIntervalAggregatedDensity(SimulationGroup.Meter);
                 bc++;
             }
         }

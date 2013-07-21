@@ -40,6 +40,11 @@ import edu.umn.natsrl.infra.simobjects.SimMeter.MeterType;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
 import edu.umn.natsrl.infra.simobjects.SimStation;
 import edu.umn.natsrl.infra.types.TrafficType;
+import edu.umn.natsrl.ticas.Simulation.SimInterval;
+import edu.umn.natsrl.ticas.Simulation.SimulationGroup;
+import edu.umn.natsrl.ticas.Simulation.State;
+import edu.umn.natsrl.ticas.Simulation.StateInterval;
+import edu.umn.natsrl.ticas.Simulation.StateType;
 import edu.umn.natsrl.util.Logger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -92,6 +97,8 @@ public class MeteringSectionHelper {
     public double PASSAGE_DEMAND_FACTOR = MeteringConfig.PASSAGE_DEMAND_FACTOR;
     public double MIN_RED_TIME = MeteringConfig.MIN_RED_TIME;  // minimum red time = 0.1 second
     
+    private SimInterval SimulationInterval;
+    
     static private int steps(int seconds) {
             float secs = seconds;
             return Math.round(secs / STEP_SECONDS);
@@ -142,9 +149,17 @@ public class MeteringSectionHelper {
     }
 
     public MeteringSectionHelper(Section section, ArrayList<SimMeter> meters, ArrayList<SimDetector> detectors) {
+            this(section,meters,detectors,null);
+    }
+    public MeteringSectionHelper(Section section, ArrayList<SimMeter> meters, ArrayList<SimDetector> detectors,
+            SimInterval simInterval) {
         this.section = section;
         this.meters = meters;
         this.detectors = detectors; 
+        if(simInterval == null){
+                SimulationInterval = new SimInterval(section);
+        }else
+                SimulationInterval = simInterval;
         init();
     }
 
@@ -185,23 +200,23 @@ public class MeteringSectionHelper {
      * @param downStation downstream station (not need to be next downstream of upStation)
      * @return average density (distance weight)
      */
-    public double getAverageDensity(StationState upStation, StationState downStation)
+    public double getAverageDensity(StationState upStation, StationState downStation,SimulationGroup sg)
     {
-        return getAverageDensity(upStation, downStation, 0);
+        return getAverageDensity(upStation, downStation, 0,sg);
     }
     
-    public double getAverageDensity(StationState upStation, StationState downStation, int prevStep)
+    public double getAverageDensity(StationState upStation, StationState downStation, int prevStep,SimulationGroup sg)
     {
         StationState cursor = upStation;
         if(cursor.equals(downStation))
-            return cursor.getAggregatedDensity(prevStep);
+            return cursor.getIntervalAggregatedDensity(sg,prevStep);
         
         double totalDistance = 0;
         double avgDensity = 0;
         while(true) {
             StationState dStation = this.getDownstreamStationState(cursor.idx);
-            double upDensity = cursor.getAggregatedDensity(prevStep);
-            double downDensity = dStation.getAggregatedDensity(prevStep);
+            double upDensity = cursor.getIntervalAggregatedDensity(sg,prevStep);
+            double downDensity = dStation.getIntervalAggregatedDensity(sg,prevStep);
             double middleDensity = (upDensity + downDensity) / 2;
             double distance = TMO.getDistanceInMile(cursor.rnode, dStation.rnode);
             double distanceFactor = distance / 3;
@@ -242,15 +257,19 @@ public class MeteringSectionHelper {
             if (!states.isEmpty()) {
                 prev = states.get(states.size() - 1);
             }
+            
+            StateInterval sitv = null;
+            if(SimulationInterval != null)
+                    sitv = SimulationInterval.getState(rn.getId());
 
             if (rn.isStation()) {
                 if (!isInMap((Station) rn)) {
                     continue;
                 }
-                states.add(new StationState((Station) rn));
+                states.add(new StationState((Station) rn,section,SimulationInterval));
             }
             if (rn.isEntrance()) {
-                states.add(new EntranceState((Entrance) rn));
+                states.add(new EntranceState((Entrance) rn,SimulationInterval));
             }
             if (rn.isExit()) {
                 states.add(new ExitState((Exit) rn));
@@ -301,28 +320,28 @@ public class MeteringSectionHelper {
         
         
         // DEBUG
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < states.size(); i++) {
-            State state = states.get(i);
-            sb.append("[" + String.format("%02d", state.idx) + "] ");
-            if (state.type.isStation()) {
-                StationState ss = (StationState)state;
-                sb.append(((Station) state.rnode).getStationId() + " -> ");
-                for(EntranceState es : ss.getAssociatedEntrances()) {
-                    if(es != null && es.meter != null) sb.append(es.meter.getId() + ", ");
-                }
-            }
-            if (state.type.isEntrance()) {
-                EntranceState e = (EntranceState) state;
-                if(e.meter != null) sb.append("Ent(" + e.meter.getId() + ")");
-                else sb.append("Ent(" + e.rnode.getLabel() + ")");
-            }
-            if (state.type.isExit()) {
-                sb.append("Ext(" + state.rnode.getLabel() + ")");
-            }
-            sb.append(" (distance to downstream = " + state.distanceToDownState + ")\n");
-        }
-        System.out.println(sb.toString());
+//        StringBuilder sb = new StringBuilder();
+//        for (int i = 0; i < states.size(); i++) {
+//            State state = states.get(i);
+//            sb.append("[" + String.format("%02d", state.idx) + "] ");
+//            if (state.type.isStation()) {
+//                StationState ss = (StationState)state;
+//                sb.append(((Station) state.rnode).getStationId() + " -> ");
+//                for(EntranceState es : ss.getAssociatedEntrances()) {
+//                    if(es != null && es.meter != null) sb.append(es.meter.getId() + ", ");
+//                }
+//            }
+//            if (state.type.isEntrance()) {
+//                EntranceState e = (EntranceState) state;
+//                if(e.meter != null) sb.append("Ent(" + e.meter.getId() + ")");
+//                else sb.append("Ent(" + e.rnode.getLabel() + ")");
+//            }
+//            if (state.type.isExit()) {
+//                sb.append("Ext(" + state.rnode.getLabel() + ")");
+//            }
+//            sb.append(" (distance to downstream = " + state.distanceToDownState + ")\n");
+//        }
+//        System.out.println(sb.toString());
     }
     
     /**
@@ -385,58 +404,58 @@ public class MeteringSectionHelper {
         return null;
     }
 
-    /**
-     * State class to organize for metering
-     */
-    public class State {
-
-        StateType type;
-        public String id;
-        int idx;
-        int easting, northing;
-        State upstream;
-        State downstream;
-        RNode rnode;
-        double distanceToDownState = 0;
-
-        public State(String id, RNode rnode) {
-            this.id = id;
-            this.rnode = rnode;
-            if(rnode != null) {
-                this.easting = rnode.getEasting();
-                this.northing = rnode.getNorthing();
-            }
-            this.idx = states.size();
-        }
-
-        public boolean hasDetector(SimDetector sd) {
-            if (sd == null) {
-                return false;
-            }
-            return this.rnode.hasDetector(sd.getId());
-        }
-
-        public boolean hasDetector(SimDetector[] sds) {
-            if (sds == null) {
-                return false;
-            }
-            for (SimDetector sd : sds) {
-                if (this.rnode.hasDetector(sd.getId())) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
+//    /**
+//     * State class to organize for metering
+//     */
+//    public class State {
+//
+//        StateType type;
+//        public String id;
+//        int idx;
+//        int easting, northing;
+//        State upstream;
+//        State downstream;
+//        RNode rnode;
+//        double distanceToDownState = 0;
+//
+//        public State(String id, RNode rnode) {
+//            this.id = id;
+//            this.rnode = rnode;
+//            if(rnode != null) {
+//                this.easting = rnode.getEasting();
+//                this.northing = rnode.getNorthing();
+//            }
+//            this.idx = states.size();
+//        }
+//
+//        public boolean hasDetector(SimDetector sd) {
+//            if (sd == null) {
+//                return false;
+//            }
+//            return this.rnode.hasDetector(sd.getId());
+//        }
+//
+//        public boolean hasDetector(SimDetector[] sds) {
+//            if (sds == null) {
+//                return false;
+//            }
+//            for (SimDetector sd : sds) {
+//                if (this.rnode.hasDetector(sd.getId())) {
+//                    return true;
+//                }
+//            }
+//            return false;
+//        }
+//    }
 
     /**
      * State class that represents entrance
      */
     public class EntranceState extends State {
-        Entrance entrance;
-        SimMeter meter;
-        StationState associatedStation;
-        DIR associatedStationDir;
+        public Entrance entrance;
+        public SimMeter meter;
+        public StationState associatedStation;
+        public DIR associatedStationDir;
         
         /** Queue denand history (vehicles / hour) */
         private final BoundedSampleHistory demandHist =
@@ -518,8 +537,8 @@ public class MeteringSectionHelper {
 
         
         
-        public EntranceState(Entrance e) {
-            super(e.getId(), e);
+        public EntranceState(Entrance e, SimInterval _sitv) {
+            super(e.getId(), e,_sitv);
             this.entrance = e;
             type = StateType.ENTRANCE;
             entranceStates.add(this);
@@ -1156,7 +1175,7 @@ public class MeteringSectionHelper {
         Exit exit;
         
         public ExitState(Exit e) {
-            super(e.getId(), e);
+            super(e.getId(), e,null);
             this.exit = e;
             type = StateType.EXIT;
             exitsStates.add(this);
@@ -1167,25 +1186,16 @@ public class MeteringSectionHelper {
     /**
      * State class that represents station
      */
-    public class StationState extends State {
+    public class StationState extends edu.umn.natsrl.ticas.Simulation.StationState {
 
-        SimStation station;
         //EntranceState associatedEntrance;
         DIR associatedDir;
         int stationIdx = 0;
-        double aggregatedDensity = 0;
-        double aggregatedSpeed = 0;
         
-        int MOVING_U_AVG_WINDOW = 2;
-        int MOVING_K_AVG_WINDOW = 2;
-        
-        int MAX_SPEED_ALPHA = 10;
-        int lastSpeedAggCount = 0;
         int noBsCount = 0;
         boolean isBottleneck = false;
         boolean isPrevBottleneck = false;
         boolean isConsecutiveBS = false;
-        double NEARBY_DISTANCE = 2000;  // 2000 feet
                 
         public IDetectorChecker dc = Metering.dc;
         ArrayList<EntranceState> associatedEntrances = new ArrayList<EntranceState>();
@@ -1195,12 +1205,11 @@ public class MeteringSectionHelper {
         int trendIndicator;
         int coordinateLimit = 1;
         private boolean isPrevPrimaryBottleneck = false;
-
+        int idx;
                 
-        public StationState(Station s) {            
-            super(s.getStationId(), s);
-            this.station = simObjects.getStation(s.getStationId());
-            type = StateType.STATION;
+        public StationState(Station s, Section _sec, SimInterval _sitv) {  
+            super(s, _sec,simObjects,_sitv);
+            idx = states.size();
             stationStates.add(this);
             this.stationIdx = stationStates.size()-1;
         }
@@ -1210,150 +1219,16 @@ public class MeteringSectionHelper {
          * @param lastSampleIndex
          * @return 
          */
-        public double getAcceleration() {
-            double u2 = this.getAggregatedSpeed();
+        public double getAcceleration(SimulationGroup sg) {
+            double u2 = this.getIntervalAggregatedSpeed(sg);
             StationState downStationState = getDownstreamStationState(idx);
             if (downStationState == null) {
                 return 0;
             }
-            double u1 = downStationState.getAggregatedSpeed();
+            double u1 = downStationState.getIntervalAggregatedSpeed(sg);
             return (u1 * u1 - u2 * u2) / (2 * TMO.getDistanceInMile(this.rnode, downStationState.rnode));
         }
         
-        /**
-         * Return aggregated density
-         * @return 
-         */
-        public double getAggregatedDensity() {
-            return getAggregatedDensity(0);
-        }        
-        
-        /**
-         * Returns aggregated density before given prevStep time step
-         * @return 
-         */
-        public double getAggregatedDensity(int prevStep) {
-            double sum = 0;
-            int validCount = 0;
-            for(int i=0; i<MOVING_K_AVG_WINDOW; i++) {
-                double k = station.getData(dc, TrafficType.DENSITY, prevStep+i);
-                //debug
-//                double k = station.getData(dc, TrafficType.DENSITY, prevStep+i);
-
-                if(k > 0) {
-                    sum += k;
-                    validCount++;
-                }
-            }
-            if(validCount == 0 || sum < 0) return 0;
-            
-            return sum/validCount;
-        }   
-        
-        public double getAggregatedSpeed() {
-            return getAggregatedSpeed(0);
-        }        
-
-        public double getAggregatedSpeed(int prevStep) {
-            return getMovingAverageSpeed(prevStep, MOVING_U_AVG_WINDOW);
-        }
-
-        public double getMovingAverageSpeed(int prevStep, int howManySteps)
-        {
-            double sum = 0;
-            int validCount = 0;
-            for(int i=0; i<howManySteps; i++) {
-                double u = station.getData(dc, TrafficType.SPEED, prevStep+i);
-                if(u > 0) {
-                    sum += u;
-                    validCount++;
-                }
-            }
-            if(validCount == 0 || sum < 0) return 0;
-            return sum/validCount;                        
-        }
-        
-        
-        /**
-         * Return aggregated speed
-         * @param lastSampleIndex
-         * @return 
-         */
-        public double getAggregatedSpeed2(int lastSampleIndex) {
-            double density = getAggregatedDensity();
-            double usum, u30s;
-            usum = u30s = station.getData(dc, TrafficType.SPEED);
-            int divide = 1;
-            int period = 1;
-
-            if (density < 10) {
-                this.lastSpeedAggCount = lastSampleIndex;
-                return getSpeedForLowK();
-
-            } else if (density < 15) {
-                period = 6;
-            } else if (density < 25) {
-                period = 4;
-            } else if (density < 40) {
-                period = 3;
-            } else if (density < 55) {
-                period = 4;
-            } else {
-                period = 6;
-            }
-
-            // trend check
-            if (density >= 15) {
-                double cU = u30s;
-                double pU = this.station.getData(dc, TrafficType.SPEED, 1);
-                double ppU = this.station.getData(dc, TrafficType.SPEED, 2);
-
-                // if it has trend (incrase or decrease trend)
-                if ((cU >= pU && pU >= ppU) || (cU <= pU && pU <= ppU)) {
-                    period = 2;
-                }
-            }
-
-            divide = 1;
-            int last = lastSampleIndex;
-            for (int i = 1; i < period; i++) {
-                if (lastSampleIndex - i < 0 || lastSampleIndex - i < this.lastSpeedAggCount) {
-                    break;
-                }
-                usum += this.station.getData(dc, TrafficType.SPEED, i);
-                last = lastSampleIndex - i;
-                divide++;
-            }
-
-            this.lastSpeedAggCount = last;
-
-            return checkMaxSpeed(usum / divide, station.getStation().getSpeedLimit());
-        }
-
-        private double checkMaxSpeed(double u, double speedLimit) {
-            int alpha = MAX_SPEED_ALPHA;
-
-            // max speed = speed limit
-            if (u > speedLimit) {
-                return speedLimit + alpha;
-            } else {
-                return u;
-            }
-        }
-
-        private int getSpeedForLowK() {
-            int speedLimit = this.rnode.getSpeedLimit();
-            if (this.downstream == null) {
-                return speedLimit;
-            }
-            RNode downNode = this.downstream.rnode;
-            if (downNode != null && downNode.getSpeedLimit() < speedLimit) {
-                return (downNode.getSpeedLimit() + speedLimit) / 2;
-            }
-
-            return speedLimit;
-        }
-
         /**
          * Associated Meter to Station
          *   - Iterate from upstream to downstream
@@ -1478,29 +1353,7 @@ public class MeteringSectionHelper {
             }        
             return list;
         }          
-        public double getVolume(){
-            return this.station.getData(dc,TrafficType.VOLUME);
-        }
-        public double getFlow(){
-            return this.station.getData(dc,TrafficType.FLOW);
-        }
-        /**
-         * @deprecated 
-         * @return 
-         */
-        public double getSpeed() {
-            return this.station.getData(dc, TrafficType.SPEED);
-        }
 
-        /**
-         * @deprecated 
-         * @return 
-         */
-        public double getDensity() {
-            return this.station.getData(dc, TrafficType.DENSITY);
-//            return this.station.getDataForDebug(dc, TrafficType.DENSITY);
-        }
-        
         public void afterMetering() {
             // initialize variables to control coordinate
             if(!this.isPrimaryBottleneck) {
@@ -1517,12 +1370,12 @@ public class MeteringSectionHelper {
             
         }
 
-        public void updatePrimaryState() {
+        public void updatePrimaryState(SimulationGroup sg) {
             if(!this.isPrevPrimaryBottleneck) {
                 this.trendIndicator = 0;
-            } else if(this.getAggregatedDensity() > this.getAggregatedDensity(1)) {
+            } else if(this.getIntervalAggregatedDensity(SimulationGroup.Meter) > this.getIntervalAggregatedDensity(sg,1)) {
                 this.trendIndicator++;
-            } else if(this.getAggregatedDensity() < this.getAggregatedDensity(1)) {
+            } else if(this.getIntervalAggregatedDensity(SimulationGroup.Meter) < this.getIntervalAggregatedDensity(sg,1)) {
                 this.trendIndicator--;
             }
             this.trendIndicator = Math.min(5, this.trendIndicator);
@@ -1530,4 +1383,293 @@ public class MeteringSectionHelper {
         }
                 
     }
+    
+    /**
+     * Backup
+     * State class that represents station
+     */
+//    public class StationState extends State {
+//
+//        SimStation station;
+//        //EntranceState associatedEntrance;
+//        DIR associatedDir;
+//        int stationIdx = 0;
+//        double aggregatedDensity = 0;
+//        double aggregatedSpeed = 0;
+//        
+//        int MOVING_U_AVG_WINDOW = 2;
+//        int MOVING_K_AVG_WINDOW = 2;
+//        
+//        int MAX_SPEED_ALPHA = 10;
+//        int lastSpeedAggCount = 0;
+//        int noBsCount = 0;
+//        boolean isBottleneck = false;
+//        boolean isPrevBottleneck = false;
+//        boolean isConsecutiveBS = false;
+//        double NEARBY_DISTANCE = 2000;  // 2000 feet
+//                
+//        public IDetectorChecker dc = Metering.dc;
+//        ArrayList<EntranceState> associatedEntrances = new ArrayList<EntranceState>();
+//        double Kc = MeteringConfig.Kc;
+//        boolean isPrimaryBottleneck = false;
+//        double coordinateKc = -1;
+//        int trendIndicator;
+//        int coordinateLimit = 1;
+//        private boolean isPrevPrimaryBottleneck = false;
+//        int idx;
+//                
+//        public StationState(Station s, StateInterval _sitv) {  
+//            super(s.getStationId(), s,_sitv);
+//            idx = states.size();
+//            this.station = simObjects.getStation(s.getStationId());
+//            type = StateType.STATION;
+//            stationStates.add(this);
+//            this.stationIdx = stationStates.size()-1;
+//        }
+//
+//        /**
+//         * Return acceleration from current station to down station
+//         * @param lastSampleIndex
+//         * @return 
+//         */
+//        public double getAcceleration() {
+//            double u2 = this.getAggregatedSpeed();
+//            StationState downStationState = getDownstreamStationState(idx);
+//            if (downStationState == null) {
+//                return 0;
+//            }
+//            double u1 = downStationState.getAggregatedSpeed();
+//            return (u1 * u1 - u2 * u2) / (2 * TMO.getDistanceInMile(this.rnode, downStationState.rnode));
+//        }
+//        
+//        /**
+//         * Return aggregated density
+//         * @return 
+//         */
+//        public double getAggregatedDensity() {
+//            return getAggregatedDensity(0);
+//        }        
+//        
+//        /**
+//         * Returns aggregated density before given prevStep time step
+//         * @return 
+//         */
+//        public double getAggregatedDensity(int prevStep) {
+//            double sum = 0;
+//            int validCount = 0;
+//            for(int i=0; i<MOVING_K_AVG_WINDOW; i++) {
+//                double k = station.getData(dc, TrafficType.DENSITY, prevStep+i);
+//                //debug
+////                double k = station.getData(dc, TrafficType.DENSITY, prevStep+i);
+//
+//                if(k > 0) {
+//                    sum += k;
+//                    validCount++;
+//                }
+//            }
+//            if(validCount == 0 || sum < 0) return 0;
+//            
+//            return sum/validCount;
+//        }   
+//        
+//        public double getAggregatedSpeed() {
+//            return getAggregatedSpeed(0);
+//        }        
+//
+//        public double getAggregatedSpeed(int prevStep) {
+//            return getMovingAverageSpeed(prevStep, MOVING_U_AVG_WINDOW);
+//        }
+//
+//        public double getMovingAverageSpeed(int prevStep, int howManySteps)
+//        {
+//            double sum = 0;
+//            int validCount = 0;
+//            for(int i=0; i<howManySteps; i++) {
+//                double u = station.getData(dc, TrafficType.SPEED, prevStep+i);
+//                if(u > 0) {
+//                    sum += u;
+//                    validCount++;
+//                }
+//            }
+//            if(validCount == 0 || sum < 0) return 0;
+//            return sum/validCount;                        
+//        }
+//        
+//        
+//        /**
+//         * Associated Meter to Station
+//         *   - Iterate from upstream to downstream
+//         *   - Upstream meter will be associated to the station 
+//         *     when distance(Upstream Meter, Station) less than 500 feet 
+//         *          or Meter is not associated to any station
+//         *   - Downstream meter will be associated to the station
+//         *     when distance(Downstream Meter, Station) less than 1 mile         
+//         */
+//        private void setAssociatedEntrances() {
+//           
+//            ArrayList<EntranceState> upstreamEntrances = this.getUpstreamEntrances();
+//            ArrayList<EntranceState> downstreamEntrances = this.getDownstreamEntrances();
+//            
+//            StationState us = null, ds = null;
+//            if(this.stationIdx > 0) us = stationStates.get(this.stationIdx-1);
+//            if(this.stationIdx < stationStates.size()-1) ds = stationStates.get(this.stationIdx+1);
+//                        
+//            if(us != null) {
+//                for(EntranceState es : upstreamEntrances) {                    
+//                    int d = this.getDistanceToUpstreamEntrance(es);                    
+//                    int ud = us.getDistanceToDownstreamEntrance(es) ;
+//                    
+//                    // very close(?) or not allocated with upstream station                    
+//                    //if( ( d < 800 && ud > 500) || es.associatedStation == null) {
+//                    if( ( d < 500 && d < ud) || es.associatedStation == null) {
+//                        if(es.associatedStation != null) {
+//                            es.associatedStation.associatedEntrances.remove(es);
+//                        }                        
+//                        associatedEntrances.add(es);
+//                        es.associatedStation = this;
+//                    }
+//                    
+//                    
+//                }
+//            }
+//            
+//            if(ds != null) {
+//                for(EntranceState es : downstreamEntrances) {
+//                    int d = this.getDistanceToDownstreamEntrance(es);
+//                    if(d < 5280) {
+//                        associatedEntrances.add(es);
+//                        es.associatedStation = this;
+//                    }
+//                }
+//            }
+//        }
+//        
+//        public ArrayList<EntranceState> getAssociatedEntrances() {
+//            return associatedEntrances;
+//        }
+//        
+//        public int getDistanceToUpstreamEntrance(EntranceState es) {
+//            if(this.idx <= 0) return -1;
+//            int distance = 0;
+//            State cursor = this;
+//            State s = null;
+//            
+//            boolean found = false;
+//            for(int i=this.idx-1; i>=0; i--) {
+//                s = states.get(i);
+//            
+//                distance += TMO.getDistanceInFeet(cursor.rnode, s.rnode);
+//                if(s.equals(es)) {
+//                    found = true;
+//                    break;
+//                }
+//                cursor = s;
+//            }
+//            if(found) return distance;
+//            else return -1;
+//        }
+//        
+//        public int getDistanceToDownstreamEntrance(EntranceState es) {
+//            if(this.idx >= states.size()-1) return -1;
+//            int distance = 0;
+//            State cursor = this;
+//            State s = null;
+//            
+//            boolean found = false;
+//            for(int i=this.idx+1; i<states.size(); i++) {
+//                s = states.get(i);
+//                distance += TMO.getDistanceInFeet(cursor.rnode, s.rnode);
+//                if(s.equals(es)) {
+//                    found = true;
+//                    break;
+//                }
+//                cursor = s;
+//            }
+//            if(found) return distance;
+//            else return -1;
+//        }        
+//
+//        /**
+//         * Return upstream entrances up to next upstream station
+//         * @return upstream entrance list
+//         */
+//        public ArrayList<EntranceState> getUpstreamEntrances() {
+//            ArrayList<EntranceState> list = new ArrayList<EntranceState>();
+//            if(this.idx <= 0) return list;
+//                 
+//            for(int i=this.idx-1; i>=0; i--) {
+//                State s = states.get(i);
+//                if(s.type.isStation()) break;
+//                if(s.type.isEntrance() && ((EntranceState)s).meter != null) list.add((EntranceState)s);
+//            }        
+//            return list;
+//        }    
+//        
+//        /**
+//         * Return downstream entrances up to next downstream station
+//         * @return downstream entrance list
+//         */        
+//        public ArrayList<EntranceState> getDownstreamEntrances() {
+//            ArrayList<EntranceState> list = new ArrayList<EntranceState>();
+//            if(this.idx >= states.size()-1) return list;
+//
+//            for(int i=this.idx+1; i<states.size(); i++) {
+//                State s = states.get(i);
+//                if(s.type.isStation()) break;
+//                if(s.type.isEntrance()&& ((EntranceState)s).meter != null) list.add((EntranceState)s);
+//            }        
+//            return list;
+//        }          
+//        public double getVolume(){
+//            return this.station.getData(dc,TrafficType.VOLUME);
+//        }
+//        public double getFlow(){
+//            return this.station.getData(dc,TrafficType.FLOW);
+//        }
+//        /**
+//         * @deprecated 
+//         * @return 
+//         */
+//        public double getSpeed() {
+//            return this.station.getData(dc, TrafficType.SPEED);
+//        }
+//
+//        /**
+//         * @deprecated 
+//         * @return 
+//         */
+//        public double getDensity() {
+//            return this.station.getData(dc, TrafficType.DENSITY);
+////            return this.station.getDataForDebug(dc, TrafficType.DENSITY);
+//        }
+//        
+//        public void afterMetering() {
+//            // initialize variables to control coordinate
+//            if(!this.isPrimaryBottleneck) {
+//                this.trendIndicator = 0;                
+//                this.coordinateLimit = 1;
+//            }
+//            this.coordinateKc = -1;
+//            this.isPrevPrimaryBottleneck = this.isPrimaryBottleneck;
+//            
+//            this.isPrevBottleneck = this.isBottleneck;
+//            this.isBottleneck = false;
+//            this.isPrimaryBottleneck = false;
+//            this.isConsecutiveBS = false;
+//            
+//        }
+//
+//        public void updatePrimaryState() {
+//            if(!this.isPrevPrimaryBottleneck) {
+//                this.trendIndicator = 0;
+//            } else if(this.getAggregatedDensity() > this.getAggregatedDensity(1)) {
+//                this.trendIndicator++;
+//            } else if(this.getAggregatedDensity() < this.getAggregatedDensity(1)) {
+//                this.trendIndicator--;
+//            }
+//            this.trendIndicator = Math.min(5, this.trendIndicator);
+//            this.trendIndicator = Math.max(-5, this.trendIndicator);
+//        }
+//                
+//    }
 }

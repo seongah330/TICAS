@@ -19,6 +19,7 @@ package edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm;
 
 import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.DMSImpl;
+import edu.umn.natsrl.ticas.Simulation.SimulationGroup;
 import edu.umn.natsrl.ticas.Simulation.StationState;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLConfig;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public class VSLAlgorithm{
     ArrayList<VSLStationState> stationstates;
     TreeMap<Double, VSLStationState> StationMap;
     Section section;
+    private SimulationGroup simGroup = SimulationGroup.VSL;
     
     /** Get the minimum speed to display for advisory */
     static private double getMinDisplay() {
@@ -77,7 +79,7 @@ public class VSLAlgorithm{
         final TreeMap<Double, VSLStationState> upstream = 
                 new TreeMap<Double, VSLStationState>();
         for(VSLStationState vs : StationMap.values()){
-            if(vs.getAggregateRollingSpeed() > 0){
+            if(vs.getAggregateRollingSpeed(simGroup) > 0){
                 upstream.put(vs.getMilePoint(), vs);
                 vs.calculateBottleneck(vs.getMilePoint(), upstream);
                 vs.calculateControlThreshold(vs.getMilePoint(),upstream);
@@ -92,7 +94,7 @@ public class VSLAlgorithm{
      */
     private void FindBottleneck_old() {
         for(VSLStationState vs : stationstates){
-            if(vs.getAggregateRollingSpeed() > 0){
+            if(vs.getAggregateRollingSpeed(simGroup) > 0){
                 vs.calculateBottleneck();
             }else{
                 vs.clearBottleneck();

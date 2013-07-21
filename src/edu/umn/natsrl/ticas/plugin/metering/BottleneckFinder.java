@@ -18,6 +18,7 @@
 
 package edu.umn.natsrl.ticas.plugin.metering;
 
+import edu.umn.natsrl.ticas.Simulation.SimulationGroup;
 import edu.umn.natsrl.ticas.plugin.metering.MeteringSectionHelper.StationState;
 import java.util.ArrayList;
 
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 public class BottleneckFinder {
 
     MeteringSectionHelper sectionHelper;
-
+    private int runTime = 0;
     /**
      * Constructor
      * @param sectionHelper 
@@ -40,25 +41,25 @@ public class BottleneckFinder {
     /**
      * Find bottlenecks
      */
-    public void findBottlenecks() {
-       
+    public void findBottlenecks(int _runTime) {
+        runTime = _runTime;
         ArrayList<StationState> stationStates = sectionHelper.getStationStates();
         for (int i = 0; i < stationStates.size(); i++) {
-            System.out.println(stationStates.get(i).id + " : k=" + stationStates.get(i).getAggregatedDensity());
+            System.out.println(stationStates.get(i).id + " : k=" + stationStates.get(i).getIntervalAggregatedDensity(SimulationGroup.Meter));
         }
 
         // find bottleneck candidates
         for (int i = 0; i < stationStates.size(); i++) {
             StationState s = stationStates.get(i);
             
-            if (s.getAggregatedDensity() < MeteringConfig.Kb) continue;
+            if (s.getIntervalAggregatedDensity(SimulationGroup.Meter) < MeteringConfig.Kb) continue;
             
             boolean increaseTrend = true;
             boolean highDensity = true;
             
             for(int j=0; j<MeteringConfig.BottleneckTrendCount; j++) {
-                double k = s.getAggregatedDensity(j);
-                double pk = s.getAggregatedDensity(j+1);
+                double k = s.getIntervalAggregatedDensity(SimulationGroup.Meter,j);
+                double pk = s.getIntervalAggregatedDensity(SimulationGroup.Meter,j+1);
                 if(k < pk) {
                     increaseTrend = false;
                 }
@@ -89,7 +90,7 @@ public class BottleneckFinder {
         // iterate from downstream to upstream
         for(int i=stationStates.size()-1; i>=0; i--) {
             StationState s = stationStates.get(i);
-            double k = s.getAggregatedDensity();
+            double k = s.getIntervalAggregatedDensity(SimulationGroup.Meter);
             
             if(!s.isBottleneck) continue;
            
@@ -99,13 +100,13 @@ public class BottleneckFinder {
                 if(!us.isBottleneck) continue;
                 // close bottleneck                
                 if(s.stationIdx - us.stationIdx < 3) {
-                    if(us.getAggregatedDensity() > k && us.getAcceleration() > MeteringConfig.Ab) {
+                    if(us.getIntervalAggregatedDensity(SimulationGroup.Meter) > k && us.getAcceleration(SimulationGroup.Meter) > MeteringConfig.Ab) {
                         // close but independent BS
                         break;
                     }
                     // close -> merge
                     us.isBottleneck = false;
-                } else if(us.getAcceleration() > MeteringConfig.Ab) {
+                } else if(us.getAcceleration(SimulationGroup.Meter) > MeteringConfig.Ab) {
                     // acceleration is heigh -> BS
                     break;
                 } else {
@@ -132,7 +133,7 @@ public class BottleneckFinder {
         // Find primary bottlenecks
         for(StationState s : stationStates) {
             if(!s.isBottleneck) continue;
-            if(s.getAggregatedDensity() > s.Kc) s.isPrimaryBottleneck = true;
+            if(s.getIntervalAggregatedDensity(SimulationGroup.Meter) > s.Kc) s.isPrimaryBottleneck = true;
         }
         
         // Coordinate bottlenecks
@@ -140,7 +141,7 @@ public class BottleneckFinder {
             StationState primaryBS = stationStates.get(i);
             if(!primaryBS.isPrimaryBottleneck) continue;
             
-            primaryBS.updatePrimaryState();            
+            primaryBS.updatePrimaryState(SimulationGroup.Meter);            
             double primaryK = getZoneDensity(primaryBS);            
             System.out.println("      Primary Bottleneck : " + primaryBS.id +" ------------- (TR="+primaryBS.trendIndicator+")");
             // coordinate up to 1 upstream bottleneck
@@ -172,7 +173,7 @@ public class BottleneckFinder {
      */
     private double getZoneDensity(StationState bottleneck)
     {
-        if(bottleneck.stationIdx == 0) return bottleneck.getAggregatedDensity();
+        if(bottleneck.stationIdx == 0) return bottleneck.getIntervalAggregatedDensity(SimulationGroup.Meter);
         
         ArrayList<StationState> stationStates = sectionHelper.getStationStates();
         StationState upstreamBound = null;
@@ -183,9 +184,9 @@ public class BottleneckFinder {
             upstreamBound = us;
         }
         
-        if(upstreamBound == null) return bottleneck.getAggregatedDensity();
+        if(upstreamBound == null) return bottleneck.getIntervalAggregatedDensity(SimulationGroup.Meter);
         
-        return sectionHelper.getAverageDensity(upstreamBound, bottleneck);
+        return sectionHelper.getAverageDensity(upstreamBound, bottleneck,SimulationGroup.Meter);
     }
     
 }

@@ -17,8 +17,10 @@
  */
 package edu.umn.natsrl.ticas.plugin.simulation.VSL;
 
+import edu.umn.natsrl.ticas.Simulation.SimulationGroup;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm.VSLStationState;
 import java.util.ArrayList;
+import sun.security.action.GetIntegerAction;
 
 /**
  *
@@ -36,7 +38,7 @@ public class VSLResultStation extends VSLResultInfra{
     private ArrayList<Boolean> cVSS = new ArrayList<Boolean>();
     private ArrayList<Boolean> pVSS = new ArrayList<Boolean>();
     private ArrayList<Integer> ControlThreshold = new ArrayList<Integer>();
-    
+    private SimulationGroup simGroup = SimulationGroup.VSL;
     
     public VSLResultStation(VSLStationState s) {
         super(s.getID(),s.getMilePoint());
@@ -53,7 +55,27 @@ public class VSLResultStation extends VSLResultInfra{
         if(s.getAcceleration() != null){
             acc = s.getAcceleration();
         }
-        addData(s.getFlow(),s.getAverageFlow(0, 1),s.getAverageDensity(0, 1),s.getAverageSpeed(0, 1),s.getAggregateRollingSpeed(),s.getTotalVolume(0, 1),acc
+        addData(s.getIntervalFlow(simGroup),s.getIntervalAverageLaneFlow(simGroup),
+                s.getIntervalDensity(simGroup),s.getIntervalSpeed(simGroup),
+                s.getAggregateRollingSpeed(simGroup),s.getIntervalVolume(simGroup),acc
+                ,s.n_bottleneck,s.bottleneck,s.p_bottleneck,s.getVSSControlThreshold());
+//        addData(s.getFlow(),s.getAverageLaneFlow(0, 1),s.getAverageDensity(0, 1),s.getAverageSpeed(0, 1),s.getAggregateRollingSpeed(),s.getTotalVolume(0, 1),acc
+//                ,s.n_bottleneck,s.bottleneck,s.p_bottleneck,s.getVSSControlThreshold());
+    }
+    
+    /**
+     * @deprecated 
+     * @param s
+     * @param runTime 
+     */
+    public void addData(VSLStationState s, int runTime) {
+        double acc = -1;
+        if(s.getAcceleration() != null){
+            acc = s.getAcceleration();
+        }
+        addData(s.getIntervalFlow(SimulationGroup.VSL),s.getIntervalAverageLaneFlow(SimulationGroup.VSL),
+                s.getIntervalDensity(SimulationGroup.VSL),s.getIntervalSpeed(SimulationGroup.VSL),
+                s.getAggregateRollingSpeed(simGroup),s.getIntervalVolume(SimulationGroup.VSL),acc
                 ,s.n_bottleneck,s.bottleneck,s.p_bottleneck,s.getVSSControlThreshold());
     }
     

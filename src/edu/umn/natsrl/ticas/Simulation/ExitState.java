@@ -28,7 +28,7 @@ public class ExitState extends State {
    Exit exit;
 
    public ExitState(Exit e) {
-       super(e.getId(), e);
+       super(e.getId(), e,null);
        this.exit = e;
        type = StateType.EXIT;
    }     

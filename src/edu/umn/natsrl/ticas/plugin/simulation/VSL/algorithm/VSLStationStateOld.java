@@ -27,12 +27,8 @@ import edu.umn.natsrl.ticas.Simulation.StationState;
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
 public class VSLStationStateOld extends VSLStationState{
-    public VSLStationStateOld(Station _station, Section _section, SimObjects simObjects){
-        super(_station, _section, simObjects);
-    }
-    
     public VSLStationStateOld(StationState s) {
-        super(s.getStation(),s.getSection(),s.getSimObject());
+        super(s.getStation(),s.getSection(),s.getSimObject(),s.getSimulationInterval());
         setUpstreamStationState(s.getUpstreamStationState());
         setDownStreamStationState(s.getDownStreamStationState());
     }

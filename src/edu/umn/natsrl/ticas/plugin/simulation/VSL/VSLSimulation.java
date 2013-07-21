@@ -33,7 +33,7 @@ public class VSLSimulation implements ITicasPlugin{
         frame.setSize(1024,768);
         Container container = frame.getContentPane();
         container.setLayout(new BorderLayout());
-        container.add(new VSLSimulationGUI(frame));
+//        container.add(new VSLSimulationGUI(frame));
     }
     
 }

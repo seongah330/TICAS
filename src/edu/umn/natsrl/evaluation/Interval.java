@@ -52,6 +52,10 @@ public enum Interval {
                 return getMinInterval();
 //                return Interval.I30SEC.second;
         }
+        
+        public static Interval getDefaultSimulationInterval(){
+                return Interval.I30SEC;
+        }
     
     // interval in second
     public final int second;

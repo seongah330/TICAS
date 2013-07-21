@@ -26,6 +26,7 @@ import edu.umn.natsrl.infra.simobjects.SimMeter;
 import edu.umn.natsrl.map.MapHelper;
 import edu.umn.natsrl.map.TMCProvider;
 import edu.umn.natsrl.ticas.Simulation.EntranceState;
+import edu.umn.natsrl.ticas.Simulation.SimInterval;
 import edu.umn.natsrl.ticas.Simulation.Simulation.ISimEndSignal;
 import edu.umn.natsrl.ticas.Simulation.SimulationConfig;
 import edu.umn.natsrl.ticas.Simulation.SimulationUtil;
@@ -685,7 +686,9 @@ public class BasicMeteringGUI extends javax.swing.JPanel implements ISimEndSigna
         
         Section s = (Section)this.cbxSections.getSelectedItem();
         VISSIMVersion v = (VISSIMVersion)this.cbxvissimVersion.getSelectedItem();
-        simulation = new BasicMeterSimulation(SimulationConfig.CASE_FILE,SimulationConfig.RANDOM_SEED,s,v);
+//        Interval simIntv = (Interval)this.cbxSimulationInterval.getSelectedItem();
+        SimInterval sitv = new SimInterval(s,Interval.getDefaultSimulationInterval(),Interval.getDefaultSimulationInterval());
+        simulation = new BasicMeterSimulation(SimulationConfig.CASE_FILE,SimulationConfig.RANDOM_SEED,s,v,sitv);
         if(!checkLoadState(simulation,s))
             return;
         BasicMeterGroup bg = BasicMeterGroup.load(SimulationConfig.CASE_FILE, simulation.sectionHelper);
