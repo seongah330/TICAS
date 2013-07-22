@@ -31,6 +31,9 @@ public class SRTESection {
     private String Label;
     private double speedLimit;
     private int TotalStation = 0;
+    private ArrayList<Station> station = new ArrayList<Station>();
+    private String startStation;
+    private String endStation;
     
     private double[] u = null;
     private double[] k = null;
@@ -85,6 +88,19 @@ public class SRTESection {
     public String getStationId(){
         return id;
     }
+    
+    private void updateState(Station _station) {
+        if(station.size() <= 0){
+            startStation = _station.getStationId();
+            endStation = _station.getStationId();
+        }else
+            endStation = _station.getStationId();
+        
+        if(endStation != null)
+                id = startStation+"-"+endStation;
+        
+        station.add(_station);
+    }
 
     public void AddData(Station station) {
         if(hasData(station.getSpeed())){
@@ -112,7 +128,7 @@ public class SRTESection {
         }
         
         TotalStation++;
-
+        updateState(station);
     }
     
     private double[] AddData(double[] origin, double[] addition) {
@@ -127,6 +143,30 @@ public class SRTESection {
         }
         return temp;
         
+    }
+    
+    public void SyncAverage() {
+        if(u == null || q == null || k == null)
+            return;
+        if(uavgCount > 0)
+            u = avgData(u,uavgCount);
+        if(qavgCount > 0)
+            q = avgData(q,qavgCount);
+        if(kavgCount > 0)
+            k = avgData(k,kavgCount);
+        
+        calcFilter();
+    }
+    
+    private double[] avgData(double[] data, int avgCount) {
+        double[] temp = new double[data.length];
+        if(avgCount == 0)
+            return data;
+        
+        for(int i=0;i<data.length;i++)
+            temp[i] = data[i] / avgCount;
+        
+        return temp;
     }
     
     /**

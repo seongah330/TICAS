@@ -136,7 +136,7 @@ public class SRTEAlgorithm extends Thread{
          * Average Section
          */
         SRTESection sectionwide = AverageSection(stations);
-        
+        System.out.println("Station count : "+stations.length);
         int cnt = 0;
         System.out.println("Group Name : "+sectionwide.id + " - avgCount : "+sectionwide.getAvgCount());
         sectionwide.printAllData();
@@ -156,8 +156,16 @@ public class SRTEAlgorithm extends Thread{
      * @return 
      */
     private SRTESection AverageSection(Station[] stations){
-            SRTESection newstation = new SRTESection(stations[0].getStationId(),stations[0],config);
-//            SRTEStation newstation = new SRTEStation(s.getStationId(),-1,s,config);
+            SRTESection newstation = null;
+            for(int i=0;i<stations.length;i++){
+                    if(i == 0){
+                        newstation = new SRTESection(stations[i].getStationId(),stations[i],config);
+                    }
+                    else{
+                            newstation.AddData(stations[i]);
+                    }
+            }
+            newstation.SyncAverage();
             return newstation;
     }
     public void extractData() throws Exception
