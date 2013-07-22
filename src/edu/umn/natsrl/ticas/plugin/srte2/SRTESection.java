@@ -364,24 +364,24 @@ public class SRTESection {
                 }
                 //Flow
                 q_smoothed = smoothing(q);
-                q_quant = quantization(q_smoothed);
+                q_quant = quantization(q);
                 
                 //Density
                 k_smoothed = smoothing(k);
-                k_quant = quantization(k_smoothed);
+                k_quant = quantization(k);
                 
                 //speed
                 data_smoothed = smoothing(u);
-                data_quant = quantization(data_smoothed);
+                data_quant = quantization(u);
                 
                 //average u
                 u_Avg_origin = SRTEUtil.CalculateSmoothedSpeed(q, k);
                 u_Avg_smoothed = SRTEUtil.CalculateSmoothedSpeed(q_smoothed, k_smoothed);
-                u_Avg_quant = quantization(u_Avg_smoothed);
+                u_Avg_quant = quantization(u_Avg_origin);
                 
                 //TravelTime
                 tt_smoothed = smoothing(tt);
-                tt_quant = quantization(tt_smoothed);
+                tt_quant = quantization(tt);
                 
         }
 
