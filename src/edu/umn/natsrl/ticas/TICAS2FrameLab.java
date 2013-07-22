@@ -56,6 +56,7 @@ import edu.umn.natsrl.map.TMCProvider;
 import edu.umn.natsrl.ticas.Simulation.SimulationUtil;
 import edu.umn.natsrl.ticas.error.ErrorMessage;
 import edu.umn.natsrl.ticas.error.StringErrorStream;
+import edu.umn.natsrl.ticas.plugin.IncidentViewr.IncidentViewerFrame;
 import edu.umn.natsrl.ticas.plugin.datareader.DataReader;
 import edu.umn.natsrl.ticas.plugin.detecterdatareader.DetecterDataReader;
 import edu.umn.natsrl.ticas.plugin.fixedmetering.FixedMeteringSimulation;
@@ -64,6 +65,7 @@ import edu.umn.natsrl.ticas.plugin.simulation.IRIS.IRISSimulation;
 import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLSimulation;
 import edu.umn.natsrl.ticas.plugin.simulation.basicmetering.BasicMetering;
 import edu.umn.natsrl.ticas.plugin.srte.TICASPluginSRTE;
+import edu.umn.natsrl.ticas.plugin.srte2.TICASPluginSRTE2;
 import edu.umn.natsrl.ticas.plugin.srte.TestFrame;
 import edu.umn.natsrl.ticas.plugin.srtedataextractor.SRTEDataExtractor;
 import edu.umn.natsrl.ticas.plugin.vissimcalibration2.VissimCalibration2;
@@ -493,6 +495,9 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         PluginInfo SRTEdataExtractor = new PluginInfo("SRTE Data Extractor", PluginType.TOOL, SRTEDataExtractor.class);       
         addTools(SRTEdataExtractor);
         
+        PluginInfo Incidentviwer = new PluginInfo("Incident Viewer", PluginType.TOOL, IncidentViewerFrame.class);       
+        addTools(Incidentviwer);
+        
 //        PluginInfo VSSIMDatatoExcel = new PluginInfo("VISSIM Data to Excel", PluginType.TOOL, VISSIMtoExcel.class);       
 //        addTools(VSSIMDatatoExcel);        
         
@@ -503,6 +508,9 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
         
         PluginInfo srte = new PluginInfo("SRTE", PluginType.TOOL, TICASPluginSRTE.class);       
         addSimulationPlugins(srte);
+        
+        PluginInfo srte2 = new PluginInfo("SRTE2", PluginType.TOOL, TICASPluginSRTE2.class);       
+        addSimulationPlugins(srte2);
     }
 
     /**
@@ -1481,8 +1489,6 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 CbxFixmissingstationdata = new EvaluationCheckBox("TICAS", OptionType.FIXING_MISSING_DATA);
                 jLabel19 = new javax.swing.JLabel();
                 jPanel1 = new javax.swing.JPanel();
-                natsrlCalendar = new edu.umn.natsrl.gadget.calendar.NATSRLCalendar();
-                jLabel10 = new javax.swing.JLabel();
                 jLabel17 = new javax.swing.JLabel();
                 cbxInterval = new javax.swing.JComboBox();
                 jLabel18 = new javax.swing.JLabel();
@@ -1504,6 +1510,8 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 cbxSimulationForCalibration = new javax.swing.JCheckBox();
                 cbxPlugins = new javax.swing.JComboBox();
                 btnRunSimulationPlugin = new javax.swing.JButton();
+                natsrlCalendar = new edu.umn.natsrl.gadget.calendar.NATSRLCalendar();
+                jLabel10 = new javax.swing.JLabel();
                 jPanel5 = new javax.swing.JPanel();
                 jTabbedPane2 = new javax.swing.JTabbedPane();
                 panContourSettingSpeed = new javax.swing.JPanel();
@@ -1803,7 +1811,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                                                 .addComponent(jLabel4)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addComponent(tbxCongestionThresholdSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addContainerGap(34, Short.MAX_VALUE))
+                                .addContainerGap(22, Short.MAX_VALUE))
                 );
                 jPanel4Layout.setVerticalGroup(
                         jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2027,9 +2035,6 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                                 .addContainerGap())
                 );
 
-                jLabel10.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
-                jLabel10.setText("Date and Time");
-
                 jLabel17.setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
                 jLabel17.setText("Time Interval");
 
@@ -2091,54 +2096,47 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                 jPanel1Layout.setHorizontalGroup(
                         jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel10)
-                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                                        .addComponent(jLabel3)
-                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                        .addComponent(jLabel5)
-                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                        .addComponent(cbxDuration, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                        .addComponent(jLabel6))
-                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                                                .addGap(21, 21, 21)
-                                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                                        .addComponent(jLabel18)
-                                                                        .addComponent(jLabel20))
-                                                                .addGap(18, 18, 18)
-                                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                                        .addComponent(cbxEndHour, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                                        .addComponent(cbxStartHour, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                                .addComponent(jLabel15)
-                                                                                .addGap(1, 1, 1)
-                                                                                .addComponent(cbxEndMin, 0, 1, Short.MAX_VALUE))
-                                                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                                                                .addGap(2, 2, 2)
-                                                                                .addComponent(jLabel14)
-                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                                .addComponent(cbxStartMin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                                                .addComponent(jLabel17)
-                                                                .addGap(18, 18, 18)
-                                                                .addComponent(cbxInterval, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addContainerGap()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                         .addGroup(jPanel1Layout.createSequentialGroup()
-                                                .addContainerGap()
-                                                .addComponent(natsrlCalendar, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                .addComponent(jLabel3)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabel5)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(cbxDuration, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jLabel6))
+                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                                        .addGap(21, 21, 21)
+                                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                .addComponent(jLabel18)
+                                                                .addComponent(jLabel20))
+                                                        .addGap(18, 18, 18)
+                                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                                .addComponent(cbxEndHour, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                                .addComponent(cbxStartHour, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                        .addComponent(jLabel15)
+                                                                        .addGap(1, 1, 1)
+                                                                        .addComponent(cbxEndMin, 0, 1, Short.MAX_VALUE))
+                                                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                                                        .addGap(2, 2, 2)
+                                                                        .addComponent(jLabel14)
+                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                        .addComponent(cbxStartMin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                                        .addComponent(jLabel17)
+                                                        .addGap(18, 18, 18)
+                                                        .addComponent(cbxInterval, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addContainerGap(30, Short.MAX_VALUE))
                 );
                 jPanel1Layout.setVerticalGroup(
                         jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel10)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(natsrlCalendar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addContainerGap()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                         .addComponent(jLabel17)
                                         .addComponent(cbxInterval, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -2166,7 +2164,7 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 );
 
-                jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Simulation/Emulation & Simulation Output Extraction", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 10), java.awt.Color.black)); // NOI18N
+                jPanel8.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Simulation/Emulation & Simulation Output Extraction", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Verdana", 1, 10))); // NOI18N
 
                 cbxsimulationresult.setPreferredSize(new java.awt.Dimension(400, 20));
                 cbxsimulationresult.addActionListener(new java.awt.event.ActionListener() {
@@ -2248,6 +2246,9 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                                 .addContainerGap())
                 );
 
+                jLabel10.setFont(new java.awt.Font("Verdana", 1, 10)); // NOI18N
+                jLabel10.setText("Date and Time");
+
                 javax.swing.GroupLayout tbDataPerformanceLayout = new javax.swing.GroupLayout(tbDataPerformance);
                 tbDataPerformance.setLayout(tbDataPerformanceLayout);
                 tbDataPerformanceLayout.setHorizontalGroup(
@@ -2258,8 +2259,13 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(tbDataPerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                         .addGroup(tbDataPerformanceLayout.createSequentialGroup()
-                                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(tbDataPerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(jLabel10)
+                                                        .addGroup(tbDataPerformanceLayout.createSequentialGroup()
+                                                                .addGap(7, 7, 7)
+                                                                .addComponent(natsrlCalendar, javax.swing.GroupLayout.PREFERRED_SIZE, 229, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addGap(18, 18, 18)
                                                 .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                         .addComponent(jPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -2274,9 +2280,14 @@ public class TICAS2FrameLab extends javax.swing.JFrame implements ITicasAfterSim
                                                 .addComponent(jPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                 .addContainerGap())
                                         .addGroup(tbDataPerformanceLayout.createSequentialGroup()
-                                                .addGroup(tbDataPerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(tbDataPerformanceLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                                         .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, 378, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, tbDataPerformanceLayout.createSequentialGroup()
+                                                                .addComponent(jLabel10)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(natsrlCalendar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
