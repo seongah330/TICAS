@@ -159,13 +159,13 @@ public class SRTEAlgorithm extends Thread{
             SRTESection newstation = null;
             for(int i=0;i<stations.length;i++){
                     if(i == 0){
-                        newstation = new SRTESection(stations[i].getStationId(),stations[i],config);
+                        newstation = new SRTESection(stations[i].getStationId(),stations[i],config,section);
                     }
                     else{
                             newstation.AddData(stations[i]);
                     }
             }
-            newstation.SyncAverage();
+            newstation.SyncSection();
             return newstation;
     }
     public void extractData() throws Exception

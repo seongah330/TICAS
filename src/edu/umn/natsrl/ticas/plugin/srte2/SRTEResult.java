@@ -61,6 +61,10 @@ public class SRTEResult {
     public double[] q_smoothed;
     public double[] q_quant;
     
+    public double[] tt_origin;
+    public double[] tt_smoothed;
+    public double[] tt_quant;
+    
     public int[] phases;
     public List<String> msgs = new ArrayList<String>();
     public double SpeedLimit;

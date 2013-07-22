@@ -17,8 +17,10 @@
  */
 package edu.umn.natsrl.ticas.plugin.srte2;
 
+import edu.umn.natsrl.infra.Section;
 import edu.umn.natsrl.infra.infraobjects.Station;
 import edu.umn.natsrl.ticas.plugin.srte2.SMOOTHING;
+import edu.umn.natsrl.util.DistanceUtil;
 import java.util.ArrayList;
 
 /**
@@ -52,6 +54,10 @@ public class SRTESection {
     private double[] q_smoothed;
     private double[] q_quant;
     
+    private double[] tt;
+    private double[] tt_smoothed;
+    private double[] tt_quant;
+    
     private int qavgCount = 0;
     private int kavgCount = 0;
     private int uavgCount = 0;
@@ -61,21 +67,23 @@ public class SRTESection {
     private SMOOTHING sfilter;
     
     private boolean hasData = true;
+    private Section section;
     
-    public SRTESection(String _id,SRTEConfig config){
+    public SRTESection(String _id,SRTEConfig config,Section _sec){
         id = _id;
         // config setting
         this.SMOOTHING_FILTERSIZE = config.getInt("SMOOTHING_FILTERSIZE");
         this.QUANTIZATION_THRESHOLD = config.getInt("QUANTIZATION_THRESHOLD");
         sfilter = SMOOTHING.getSmooth(config.getInt(SRTEConfig.SMOOTHINGOPTION));
+        section = _sec;
         calcFilter();
     }
-    public SRTESection(String _id, Station _station,SRTEConfig _config){
-        this(_id,_config);
+    public SRTESection(String _id, Station _station,SRTEConfig _config,Section _sec){
+        this(_id,_config,_sec);
         speedLimit = _station.getSpeedLimit();
         
         Label = id;
-
+        
         AddData(_station);
     }
     
@@ -145,7 +153,7 @@ public class SRTESection {
         
     }
     
-    public void SyncAverage() {
+    public void SyncSection() {
         if(u == null || q == null || k == null)
             return;
         if(uavgCount > 0)
@@ -155,6 +163,7 @@ public class SRTESection {
         if(kavgCount > 0)
             k = avgData(k,kavgCount);
         
+        calcTravelTime();
         calcFilter();
     }
     
@@ -192,7 +201,7 @@ public class SRTESection {
     
     public void printAllData(){
         for(int i=0;i<q.length;i++){
-            System.out.println("q:"+q[i]+" - k:"+k[i]+" - u:"+u[i]);
+            System.out.println("q:"+q[i]+" - k:"+k[i]+" - u:"+u[i]+" - TT:"+tt[i]+", TS:"+tt_smoothed[i]);
         }
     }
 
@@ -246,6 +255,18 @@ public class SRTESection {
     
     double[] getQuantAverageSpeed(){
             return this.u_Avg_quant;
+    }
+    
+    double[] getTravelTime(){
+            return tt;
+    }
+    
+    double[] getSmoothedTravelTime(){
+            return tt_smoothed;
+    }
+    
+    double[] getQuantTravelTime(){
+            return tt_quant;
     }
     
     int getTotalStation(){
@@ -357,6 +378,39 @@ public class SRTESection {
                 u_Avg_origin = SRTEUtil.CalculateSmoothedSpeed(q, k);
                 u_Avg_smoothed = SRTEUtil.CalculateSmoothedSpeed(q_smoothed, k_smoothed);
                 u_Avg_quant = quantization(u_Avg_smoothed);
+                
+                //TravelTime
+                tt_smoothed = smoothing(tt);
+                tt_quant = quantization(tt_smoothed);
+                
+        }
+
+        private void calcTravelTime() {
+                tt = new double[u.length];
+                double STT = 0;
+                int delayFeet = 0;
+                //set Speed
+                double[][] speedlist = new double[station.size()][];
+                for(int i=0;i<station.size();i++){
+                        speedlist[i] = station.get(i).getSpeed();
+                }
+                for(int i=0;i<u.length;i++){
+                        STT = 0;
+                        for(int z=0;z<station.size();z++){
+                                int feet = station.get(z).getDistanceToUpstreamStation(section.getName());
+                                double[] u = speedlist[z];
+                                if(feet != -1){
+                                        if(u[i] <= 0){
+                                                delayFeet += feet;
+                                        }else{
+                                                STT += DistanceUtil.getFeetToMile(feet+delayFeet) / u[i] * 60;
+                                                delayFeet = 0;
+                                        }
+                                }
+                        }
+                        tt[i] = STT;
+                        System.out.println("i["+i+"] : "+STT);
+                }
         }
 
     

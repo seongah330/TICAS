@@ -100,6 +100,11 @@ public class SRTEProcess {
         result.u_Avg_origin = selectedStation.getAverageSpeed();
         result.u_Avg_smoothed = selectedStation.getSmoothedAverageSpeed();
         result.u_Avg_quant = selectedStation.getQuantAverageSpeed();
+        
+        //TT
+        result.tt_origin = selectedStation.getTravelTime();
+        result.tt_smoothed = selectedStation.getSmoothedTravelTime();
+        result.tt_quant = selectedStation.getQuantTravelTime();
 
     }
     /**

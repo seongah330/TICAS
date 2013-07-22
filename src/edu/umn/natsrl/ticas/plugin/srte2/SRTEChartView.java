@@ -46,6 +46,9 @@ public class SRTEChartView extends javax.swing.JFrame {
 //    StringOutputStream debugWriter;
     
     enum DataType{
+        TT_Origin("TT_Origin"),
+        TT_Smooth("TT_Smooth"),
+        TT_Quant("TT_Quant"),
         Speed_Origin("speed"),
         Speed_Smooth("speed"),
         Speed_Quan("speed"),
@@ -577,6 +580,12 @@ public class SRTEChartView extends javax.swing.JFrame {
             data = currentStationResult.q_smoothed;
         }else if(dataType == DataType.Flow_Quan){
             data = currentStationResult.q_quant;
+        }else if(dataType == DataType.TT_Origin){
+                data = currentStationResult.tt_origin;
+        }else if(dataType == DataType.TT_Smooth){
+                data = currentStationResult.tt_smoothed;
+        }else if(dataType == DataType.TT_Quant){
+                data = currentStationResult.tt_quant;
         }
         
         if(dataType != DataType.QK && data == null)
