@@ -56,7 +56,7 @@ import edu.umn.natsrl.map.TMCProvider;
 import edu.umn.natsrl.ticas.Simulation.SimulationUtil;
 import edu.umn.natsrl.ticas.error.ErrorMessage;
 import edu.umn.natsrl.ticas.error.StringErrorStream;
-import edu.umn.natsrl.ticas.plugin.IncidentViewr.IncidentViewerFrame;
+import edu.umn.natsrl.ticas.plugin.IncidentViewer.IncidentViewerFrame;
 import edu.umn.natsrl.ticas.plugin.datareader.DataReader;
 import edu.umn.natsrl.ticas.plugin.detecterdatareader.DetecterDataReader;
 import edu.umn.natsrl.ticas.plugin.fixedmetering.FixedMeteringSimulation;
