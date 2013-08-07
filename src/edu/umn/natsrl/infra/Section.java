@@ -46,6 +46,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.JOptionPane;
@@ -127,7 +128,7 @@ public class Section implements Serializable {
             s.tmo = TMO.getInstance();
             s.infra = s.tmo.getInfra();
             s.rnode_ids = prop.getStringList(Section.K_SECTION_RNODES);
-            s.constructSection();
+            s.constructSection(false);
             s.organizeDMS();
 //            s.organizeStations_OLD();
             s.organizeStationsandDMSs();
@@ -156,7 +157,6 @@ public class Section implements Serializable {
         // first node must be station
         Station prevStation = (Station)section.get(0);
         prevStation.setStationFeetPoint(this.name,0);
-        
         //set if there is Frist DMS in front of FristStation, set First DMS feet Point
         if(prevStation.getUpstreamDMS(this.name) != null){
             DMSImpl firstDMS = prevStation.getUpstreamDMS(this.name);
@@ -793,9 +793,18 @@ public class Section implements Serializable {
         return filteredSection;
     }
 
-    public void constructSection() {
+    /**
+     * 
+     * @param isreverse 
+     */
+    public void constructSection(boolean isreverse) {
         this.section = new ArrayList<RNode>();
         this.infra = tmo.getInfra();
+        //temporary
+        if(isreverse){
+                //temporary
+                Collections.reverse(rnode_ids);
+        }
         for(String rnid : this.rnode_ids) {
             RNode n = infra.getRNode(rnid);
             if(n != null) {
@@ -806,7 +815,7 @@ public class Section implements Serializable {
 
     public void setRnodeIds(List<String> rnode_ids) {
         this.rnode_ids = rnode_ids;
-        this.constructSection();
+        this.constructSection(false);
         this.organizeStationsandDMSs();        
     }
 
@@ -826,7 +835,7 @@ public class Section implements Serializable {
 
             Section s = (Section) input.readObject();
             s.tmo = TMO.getInstance();
-            s.constructSection();
+            s.constructSection(false);
             s.organizeStationsandDMSs();
             return s;
         } catch (Exception e) {

@@ -72,10 +72,15 @@ public class WeatherData implements Serializable{
                 ResultSet res = wdb.Select("select * from "+TableName+" where siteid = "+Siteid
                         +" and dttm >= '"+getTimetoSQL(p.startDate)
                         +"' and dttm <= '"+getTimetoSQL(p.endDate)+"'");
+                //debug
+                System.err.println("select * from "+TableName+" where siteid = "+Siteid
+                        +" and dttm >= '"+getTimetoSQL(p.startDate)
+                        +"' and dttm <= '"+getTimetoSQL(p.endDate)+"'");
                 
                 if(p.startDate.getTime() - p.endDate.getTime() > 0)
                         return new RWISError(ErrorType.PERIOD_REWIND);
                 if(!res.next()){
+                        System.err.println("load error");
                         RWISError er = new RWISError(ErrorType.DATABASE_LOAD,TableName);
                         er.addError(ErrorType.DATABASE_NOT_DATE);
                         return er;

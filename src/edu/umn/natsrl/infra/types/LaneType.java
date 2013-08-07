@@ -162,10 +162,18 @@ public enum LaneType {
 		return this == VELOCITY;
 	}
 
+        public static LaneType getbyDesc(String dcode) {
+            for(LaneType lt: LaneType.values()) {
+                if(dcode.isEmpty()) return LaneType.MAINLINE;
+                if(lt.description.toLowerCase().equals(dcode.toLowerCase())) return lt;
+            }
+            return NONE;
+        }
+        
         public static LaneType get(String dcode) {
             for(LaneType lt: LaneType.values()) {
                 if(dcode.isEmpty()) return LaneType.MAINLINE;
-                if(lt.suffix.equals(dcode)) return lt;
+                if(lt.suffix.toLowerCase().equals(dcode.toLowerCase())) return lt;
             }
             return NONE;
         }

@@ -33,7 +33,7 @@ import javax.swing.JOptionPane;
  * @author Chongmyung Park
  */
 public class TICASVersion {
-    public static final String version = " 3.5";    
+    public static final String version = " 3.51";    
     public static final boolean ISINIT = true;
     public static final boolean ISOPTIONINIT = true;
     public static final boolean ISVSLSIMULATIONINIT = false;

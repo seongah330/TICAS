@@ -91,12 +91,14 @@ public class Detector extends InfraObject implements Comparable {
      * @param lanes 
      */
     public Detector(int id, String lb, String ab, String lanetype, int lanes){
+        System.out.println("1lType : "+laneType);
         laneType = LaneType.get(lanetype);
+        System.out.println("lType : "+laneType);
         this.id = String.valueOf(id);
         this.detector_id = id;
         this.infraType = InfraType.DETECTOR;
         dType = DetectorType.getDetectorType(this.id);
-        setProperty(InfraProperty.category,lanetype);
+        setProperty(InfraProperty.category,laneType.suffix);
         setProperty(InfraProperty.abandoned,ab);
         setProperty(InfraProperty.lane,lanes);
         setProperty("label",lb);
