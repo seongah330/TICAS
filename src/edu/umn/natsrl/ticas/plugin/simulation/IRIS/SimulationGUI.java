@@ -217,6 +217,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                 jLabel53 = new javax.swing.JLabel();
                 tbxVSLsetInterval = new javax.swing.JTextField();
                 cbxVSL_SetAllStation = new javax.swing.JCheckBox();
+                cbxVSL_AdjustInterval = new javax.swing.JCheckBox();
                 jPanel13 = new javax.swing.JPanel();
                 jPanel14 = new javax.swing.JPanel();
                 jLabel8 = new javax.swing.JLabel();
@@ -858,6 +859,10 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                         }
                 });
 
+                cbxVSL_AdjustInterval.setFont(new java.awt.Font("Verdana", 0, 12)); // NOI18N
+                cbxVSL_AdjustInterval.setSelected(true);
+                cbxVSL_AdjustInterval.setText("Adjust 10sec Interval");
+
                 javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
                 jPanel15.setLayout(jPanel15Layout);
                 jPanel15Layout.setHorizontalGroup(
@@ -865,20 +870,18 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                         .addGroup(jPanel15Layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel15Layout.createSequentialGroup()
-                                                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(cbxVSLsetStation)
-                                                        .addComponent(jLabel51)
-                                                        .addComponent(cbxVSLInterval, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                .addGap(0, 168, Short.MAX_VALUE))
+                                        .addComponent(cbxVSLsetStation)
+                                        .addComponent(jLabel51)
+                                        .addComponent(cbxVSLInterval, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGroup(jPanel15Layout.createSequentialGroup()
                                                 .addGap(21, 21, 21)
                                                 .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                         .addComponent(jLabel53)
                                                         .addComponent(tbxVSLsetInterval, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(tbxVSLsetStationList)
-                                                        .addComponent(jLabel4)
-                                                        .addComponent(cbxVSL_SetAllStation))))
+                                                        .addComponent(cbxVSL_SetAllStation)
+                                                        .addComponent(tbxVSLsetStationList, javax.swing.GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE)
+                                                        .addComponent(cbxVSL_AdjustInterval)
+                                                        .addComponent(jLabel4))))
                                 .addContainerGap())
                 );
                 jPanel15Layout.setVerticalGroup(
@@ -896,11 +899,13 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                                 .addComponent(tbxVSLsetInterval, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(cbxVSL_SetAllStation)
+                                .addGap(2, 2, 2)
+                                .addComponent(cbxVSL_AdjustInterval)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel4)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(tbxVSLsetStationList, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(69, Short.MAX_VALUE))
+                                .addContainerGap(44, Short.MAX_VALUE))
                 );
 
                 javax.swing.GroupLayout jPanel12Layout = new javax.swing.GroupLayout(jPanel12);
@@ -1734,6 +1739,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         private javax.swing.JCheckBox cbxUpstream;
         private javax.swing.JComboBox cbxVSLInterval;
         private javax.swing.JComboBox cbxVSLVersion;
+        private javax.swing.JCheckBox cbxVSL_AdjustInterval;
         private javax.swing.JCheckBox cbxVSL_SetAllStation;
         private javax.swing.JCheckBox cbxVSLsetStation;
         private javax.swing.JComboBox cbxVSSDec;
@@ -2042,6 +2048,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
         VSLConfig.coverageSpeed = Integer.parseInt(this.tbxVSLSTASPEED.getText());
         VSLConfig.VSL_INTERVAL = ((Interval)this.cbxVSLInterval.getSelectedItem()).second;
         VSLConfig.VSL_INTERVAL_STATIONLIST = this.tbxVSLsetStationList.getText();
+        VSLConfig.INTERVAL_ADJUST = this.cbxVSL_AdjustInterval.isSelected();
         saveSpeedValueList();
         VSLConfig.save();
     }
@@ -2667,6 +2674,7 @@ public class SimulationGUI extends javax.swing.JPanel implements Simulation.ISim
                 this.tbxVSLsetStationList.setEnabled(isSelected);
                 this.tbxVSLsetInterval.setEnabled(isSelected);
                 this.cbxVSL_SetAllStation.setEnabled(isSelected);
+                this.cbxVSL_AdjustInterval.setEnabled(isSelected);
                 if(this.cbxVSL_SetAllStation.isSelected() && !isSelected){
                         this.cbxVSL_SetAllStation.setSelected(isSelected);
                 }

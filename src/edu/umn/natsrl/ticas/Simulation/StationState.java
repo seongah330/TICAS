@@ -25,6 +25,7 @@ import edu.umn.natsrl.infra.interfaces.IDetectorChecker;
 import edu.umn.natsrl.infra.simobjects.SimObjects;
 import edu.umn.natsrl.infra.simobjects.SimStation;
 import edu.umn.natsrl.infra.types.TrafficType;
+import edu.umn.natsrl.ticas.plugin.simulation.VSL.VSLConfig;
 import edu.umn.natsrl.util.DistanceUtil;
 import java.util.Vector;
 
@@ -321,6 +322,8 @@ public class StationState extends State {
        if(isSpeedValid()){
            int n_samples = this.calculateRollingSamples();
            if(n_samples > 0){
+                   if(VSLConfig.INTERVAL_ADJUST)
+                        n_samples = n_samples * (30 / stateInterval.getIntervalByGID(sg));
                return getAverageRollingSpeed(sg,0,n_samples);
            }else{
                return this.getStation().getSpeedLimit();

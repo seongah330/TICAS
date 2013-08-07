@@ -23,7 +23,8 @@ package edu.umn.natsrl.ticas.plugin.simulation.VSL.algorithm;
  */
 public enum AccCheckThreshold {
     BASEDCHECKTHRESHOLD(0,"ai,t-2, ai,t-1, ai,t <= X"),
-    TRENDCHECKTHRESHOLD(1,"ai,t-2 >= ai,t-1 >= ai,t, ai,t <= X");
+    TRENDCHECKTHRESHOLD(1,"ai,t-2 >= ai,t-1 >= ai,t, ai,t <= X"),
+    NEWTREND(2,"(ai,t-3, ai,t-2, ai,t-1, ai,t) <= X, count=3");
     
     int sid;
     String name;
@@ -52,4 +53,5 @@ public enum AccCheckThreshold {
     
     boolean isBASEON(){return this == this.BASEDCHECKTHRESHOLD;}
     boolean isTRENDON(){return this == this.TRENDCHECKTHRESHOLD;}
+    boolean isNewTRENDON(){return this==this.NEWTREND;}
 }

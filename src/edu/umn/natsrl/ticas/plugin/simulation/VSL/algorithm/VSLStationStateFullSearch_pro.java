@@ -42,7 +42,7 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
 //    public double VSLCONTROLDISTANCE = 0;
 
     /** Acceleration Sample Count*/
-    protected int s_count = 3;
+    protected int s_count = 4;
     /** Acceleration History
      * Add Count of Acceleration Trending Upward */
     protected double[] AccelerationHistory = new double[s_count];
@@ -120,7 +120,13 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
             }
             else if(ac.isTRENDON())
                 checkTrendThresholds();
-            else
+            else if(ac.isNewTRENDON()){
+                    if(stateInterval.getIntervalByGID(simGroup) == 30)
+                        checkTrendThresholds();
+                    else
+                        checkNewTrendThresholds();
+            }
+            else 
                 checkBasedThresholds();
         }else
             checkStopThreshold();
@@ -163,7 +169,8 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
         
         Double bacc = Double.MAX_VALUE;
         int accsize = AccelerationHistory.length-1;
-        for(int i=0; i<=accsize;i++){
+        int minsize = accsize - 3;
+        for(int i=0; i<=accsize-minsize;i++){
             Double acc = AccelerationHistory[accsize-i];
             if(acc == null || acc >= 0 ||  acc >= bacc)
                 return false;
@@ -172,6 +179,34 @@ public class VSLStationStateFullSearch_pro extends VSLStationState{
         } 
         
         return acceleration < getStartThreshold();
+    }
+    
+    protected void checkNewTrendThresholds(){
+            if(isAccNewTrend()){
+                    n_bottleneck = 3;
+            }else{
+                    n_bottleneck = 0;
+            }
+    }
+    
+    protected boolean isAccNewTrend(){
+            if(!isAccHistoryValid()){
+                    return false;
+            }
+            System.out.print("acctest : "+this.getID()+", ");
+            int accsize = AccelerationHistory.length-1;
+            int cnt = 0;
+            for(int i=0;i<=accsize;i++){
+                    Double acc = AccelerationHistory[i];
+                    System.out.print(" -"+acc);
+                    if(acc < getStartThreshold())
+                            cnt ++;
+            }
+            System.out.println(" (cnt = "+cnt+")");
+            if(cnt > 2)
+                    return true;
+            else
+                    return false;
     }
     
     private void adjustStream(double m, NavigableMap<Double, VSLStationState> upstream) {

@@ -83,6 +83,9 @@ public class VSLConfig extends ticasConfig{
     //VSL interval stationlist
     public static String VSL_INTERVAL_STATIONLIST = "";
     
+    //adjust 10sec interval as like 30 sec
+    public static boolean INTERVAL_ADJUST = true;
+    
     public static boolean isVSLStep(int runtime){
             return runtime != 0 && runtime % VSL_INTERVAL == 0;
     }
