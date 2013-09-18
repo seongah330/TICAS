@@ -637,11 +637,13 @@ public class RNode extends InfraObject {
         
         TMO tmo = TMO.getInstance();
         for(Detector dd : adets){
+            System.out.println("Searching : "+dd.getId());
             String d = dd.getId();
             Detector det = tmo.getInfra().getDetector(d);
             if(det != null){
                 detectors.put(det.getId(),det);
                 det.setRNode(this);
+                System.out.println("updated detector : "+det.getId());
             }
         }
     }

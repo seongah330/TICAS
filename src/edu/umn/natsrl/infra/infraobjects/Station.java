@@ -63,6 +63,7 @@ public class Station extends RNode {
         this.id = id;
         this.sid = StationType.getStationIDbyType(stationId);
         sType = StationType.getStationType(stationId);
+        if(!sType.isOriginStation()) this.isWavetronicsStation = true;
         this.infraType = itype;
         setProperty(InfraProperty.station_id,stationId);
         setProperty(InfraProperty.label,label);

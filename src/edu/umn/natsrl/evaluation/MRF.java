@@ -115,7 +115,7 @@ public class MRF extends Evaluation {
                 
                 // add station name at first element
                 stationData.add(getTitle(rn));
-
+                System.out.println(getTitle(rn));
                 // for all time series traffic data
                 for (int row = 0; row < data.length; row++) 
                 {

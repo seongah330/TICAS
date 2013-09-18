@@ -17,14 +17,16 @@
  */
 package edu.umn.natsrl.infra.types;
 
+import edu.umn.natsrl.util.StringUtil;
+
 /**
  *
  * @author Soobin Jeon <j.soobin@gmail.com>
  */
 public enum DetectorType {
     ORIGINDETECTOR("",1),
-    TEMPDETECTOR("T",10000),
-    TEMPDETECTOR_DT("DT",100000);
+    TEMPDETECTOR_DT("DT",100000),
+    TEMPDETECTOR("T",10000);
     
     String sType;
     int plot;
@@ -45,7 +47,13 @@ public enum DetectorType {
         
         return ORIGINDETECTOR;
     }
-    
+    public static boolean isDetectorID(String _id){
+            if((_id.substring(0,1).equals(TEMPDETECTOR.sType) || _id.substring(0, 2).equals(TEMPDETECTOR_DT.sType))
+                    && (StringUtil.isNumber(_id.substring(2,_id.length())) || StringUtil.isNumber(_id.substring(1,_id.length()))))
+                    return true;
+            else
+                    return false;
+    }
     public static int getDetectorIDbyType(String _id){
         DetectorType type = DetectorType.getDetectorType(_id);
         if(type.isOriginDetector())

@@ -34,7 +34,7 @@ public enum StationType {
         plot = _plot;
     }
     
-    String getTypeName(){
+    public String getTypeName(){
         return sType;
     }
     

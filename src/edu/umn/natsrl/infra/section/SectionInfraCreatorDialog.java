@@ -22,8 +22,10 @@ import edu.umn.natsrl.infra.TMO;
 import edu.umn.natsrl.infra.infraobjects.Corridor;
 import edu.umn.natsrl.infra.infraobjects.Detector;
 import edu.umn.natsrl.infra.infraobjects.RNode;
+import edu.umn.natsrl.infra.types.DetectorType;
 import edu.umn.natsrl.infra.types.InfraType;
 import edu.umn.natsrl.infra.types.LaneType;
+import edu.umn.natsrl.infra.types.StationType;
 import edu.umn.natsrl.map.InfraPoint;
 import edu.umn.natsrl.util.StringUtil;
 import java.awt.event.ActionEvent;
@@ -583,7 +585,7 @@ public class SectionInfraCreatorDialog extends javax.swing.JDialog {
         String sid=null;
         if(itype.isStation()){
             id = createNewRNodeId(adjustIds(tbx_id.getText().trim()));
-            sid = createStationId(adjustIds(tbx_id.getText().trim()));
+            sid = createStationId((tbx_id.getText().trim()));
         }
         else
             id = createNewRNodeId(adjustIds(tbxRNode.getText().trim()));
@@ -608,7 +610,7 @@ public class SectionInfraCreatorDialog extends javax.swing.JDialog {
     }
     private void updateNode(RNode rNode) {
         if(rNode.isStation()){
-            rNode.setStationId(createStationId(adjustIds(tbx_id.getText().trim())));
+            rNode.setStationId(createStationId(tbx_id.getText().trim()));
         }
         else
             rNode.setId(createRNodeId(adjustIds(tbxRNode.getText().trim())));
@@ -631,7 +633,8 @@ public class SectionInfraCreatorDialog extends javax.swing.JDialog {
         return this.RND_NAME + sid;
     }
     private String createStationId(String sid){
-        return "S"+sid;
+            System.out.println("sname :"+StationType.getStationType(sid).getTypeName());
+        return StationType.getStationType(sid).getTypeName()+adjustIds(sid);
     }
     private String createRNodeId(String sid) {
         return "rnd_"+sid;
@@ -644,14 +647,18 @@ public class SectionInfraCreatorDialog extends javax.swing.JDialog {
         DefaultTableModel rows = (DefaultTableModel)tblDetectors.getModel();
         List<Detector> dets = new ArrayList<Detector>();
         for(int i=0;i<rows.getRowCount();i++){
-            int data = 0;
+            String data = "";
             try{
                 String s = tblDetectors.getValueAt(i, 1).toString();
                 if(!s.equals("") &&
                     rNode.getDetector(s) == null){
                     int num = Integer.parseInt(tblDetectors.getValueAt(i,0).toString());
-                    data = Integer.parseInt(s);
-                    String lanetype = tblDetectors.getValueAt(i, 2).toString();
+                    data = s;
+                    String lanetype;
+                    if(tblDetectors.getValueAt(i, 2) == null)
+                            lanetype = LaneType.MAINLINE.suffix;
+                    else
+                            lanetype = tblDetectors.getValueAt(i, 2).toString();
                     lanetype = LaneType.getbyDesc(lanetype).suffix;
 //                    System.out.println("D : "+data);
                     dets.add(new Detector(data,s,"f",lanetype,num));
@@ -672,9 +679,7 @@ public class SectionInfraCreatorDialog extends javax.swing.JDialog {
     }
     private boolean hasDetectorInTable(JTable tblDetectors){
         DefaultTableModel rows = (DefaultTableModel)tblDetectors.getModel();
-        List<Detector> dets = new ArrayList<Detector>();
         for(int i=0;i<rows.getRowCount();i++){
-            int data = 0;
             try{
                 String s = tblDetectors.getValueAt(i, 1).toString();
                 if(!s.equals("")){
@@ -821,9 +826,13 @@ public class SectionInfraCreatorDialog extends javax.swing.JDialog {
         
         String did = tm.getValueAt(row, col).toString();
         System.out.println("Data : "+did);
-        if(!StringUtil.isNumber(did)){
-            tm.setValueAt(adjustIds(did), row, col);
+        if(!StringUtil.isNumber(did) && !DetectorType.isDetectorID(did)){
+                JOptionPane.showMessageDialog(rootPane, "Detector ID is incorrect.. : "+did);            
+                tm.setValueAt("", row, col);
         }
+//        if(!StringUtil.isNumber(did)){
+//            tm.setValueAt(adjustIds(did), row, col);
+//        }
 //        tm.setValueAt(did, row, col);
     }
 
@@ -838,7 +847,7 @@ public class SectionInfraCreatorDialog extends javax.swing.JDialog {
     private boolean checkId() {
         InfraType itype = (InfraType)cbxType.getSelectedItem();
         String tid = adjustIds(tbxRNode.getText().trim());
-        String sid = adjustIds(tbx_id.getText().trim());
+        String sid = tbx_id.getText().trim();
         /**
          * Check null
          */
@@ -877,10 +886,10 @@ public class SectionInfraCreatorDialog extends javax.swing.JDialog {
             rn = tmo.getInfra().getStation(createStationId(sid));
 
             if(!isNewNode && rn != null && !rNode.getId().equals(rn.getId())){
-                JOptionPane.showMessageDialog(rootPane, "TICAS already have the same ID : "+sid);
+                JOptionPane.showMessageDialog(rootPane, "TICAS already have the same Station : "+sid);
                 return false;
             }else if(isNewNode && rn != null){
-                JOptionPane.showMessageDialog(rootPane, "TICAS already have the same ID : "+sid);
+                JOptionPane.showMessageDialog(rootPane, "TICAS already have the same Station : "+sid);
                 return false;
             }else
                 return true;
