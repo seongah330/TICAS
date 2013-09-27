@@ -562,30 +562,38 @@ public class SRTEChartView extends javax.swing.JFrame {
         if(currentStationResult == null || !currentStationResult.hasData)
             return;
         double[] data = null;
+        double[] normalu = null;
+        double[] normalTT = null;
         if(dataType == DataType.Speed_Origin){
-            data = currentStationResult.data_origin;
+            data = currentStationResult.getSnowData().data_origin;
+            normalu = currentStationResult.getNormalData().data_origin;
         }else if(dataType == DataType.Speed_Smooth){
-            data = currentStationResult.data_smoothed;
+            data = currentStationResult.getSnowData().data_smoothed;
+            normalu = currentStationResult.getNormalData().data_smoothed;
         }else if(dataType == DataType.Speed_Quan){
-            data = currentStationResult.data_quant;
+            data = currentStationResult.getSnowData().data_quant;
+            normalu = currentStationResult.getNormalData().data_quant;
         }else if(dataType == DataType.Density_Origin){
-            data = currentStationResult.k_origin;
+            data = currentStationResult.getSnowData().k_origin;
         }else if(dataType == DataType.Density_Smooth){
-            data = currentStationResult.k_smoothed;
+            data = currentStationResult.getSnowData().k_smoothed;
         }else if(dataType == DataType.Density_Quan){
-            data = currentStationResult.k_quant;
+            data = currentStationResult.getSnowData().k_quant;
         }else if(dataType == DataType.Flow_Origin){
-            data = currentStationResult.q_origin;
+            data = currentStationResult.getSnowData().q_origin;
         }else if(dataType == DataType.Flow_Smooth){
-            data = currentStationResult.q_smoothed;
+            data = currentStationResult.getSnowData().q_smoothed;
         }else if(dataType == DataType.Flow_Quan){
-            data = currentStationResult.q_quant;
+            data = currentStationResult.getSnowData().q_quant;
         }else if(dataType == DataType.TT_Origin){
-                data = currentStationResult.tt_origin;
+                data = currentStationResult.getSnowData().tt_origin;
+                normalTT = currentStationResult.getNormalData().tt_origin;
         }else if(dataType == DataType.TT_Smooth){
-                data = currentStationResult.tt_smoothed;
+                data = currentStationResult.getSnowData().tt_smoothed;
+                normalTT = currentStationResult.getNormalData().data_smoothed;
         }else if(dataType == DataType.TT_Quant){
-                data = currentStationResult.tt_quant;
+                data = currentStationResult.getSnowData().tt_quant;
+                normalTT = currentStationResult.getNormalData().tt_quant;
         }
         
         if(dataType != DataType.QK && data == null)
@@ -665,11 +673,11 @@ public class SRTEChartView extends javax.swing.JFrame {
         
         if(dataType == DataType.QK){
             SRTEChartXY xy = new SRTEChartXY();
-            xy.setXYGraph(currentStationResult.k_smoothed, currentStationResult.q_smoothed, dataType);
+            xy.setXYGraph(currentStationResult.getSnowData().k_smoothed, currentStationResult.getSnowData().q_smoothed, dataType);
             srtechart = xy;
         }else{
             SRTEChartLine c = new SRTEChartLine();
-            c.setSpeedData(point, timestep,bare,srtPoint,RCRPoint,KeyPoint,SL, data, dataType);
+            c.setSpeedData(point, timestep,bare,srtPoint,RCRPoint,KeyPoint,SL, data, dataType,normalu,normalTT);
             srtechart = c;
         }
         

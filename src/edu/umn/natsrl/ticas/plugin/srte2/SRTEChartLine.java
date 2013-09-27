@@ -53,7 +53,7 @@ public class SRTEChartLine extends SRTEChart implements ImplSRTEChart{
     
     public void setSpeedData(HashMap<Integer,Boolean> point, HashMap<Integer,Boolean> time, HashMap<Integer,Boolean> bare, 
             HashMap<Integer,Boolean> srt, HashMap<Integer,Boolean> RCRp, HashMap<Integer,Boolean> Keyp, HashMap<Integer,Boolean> SL,
-            double[] datas, DataType datatype){
+            double[] datas, DataType datatype, double[] normalu, double[] normalTT){
         double Maxdata = 0;
         for(double d : datas){
             if(Maxdata < d)
@@ -71,5 +71,12 @@ public class SRTEChartLine extends SRTEChart implements ImplSRTEChart{
         this.AddPointDataTrace(RCRp, datas, "RCR Points", true, new TracePainterVerticalBar(3, chart),Color.RED);
         this.AddPointDataTrace(Keyp, datas, "Key Points", true, new TracePainterVerticalBar(3, chart),Color.yellow);
         this.AddPointDataTrace(SL, datas, "Key Points", true, new TracePainterVerticalBar(3, chart),Color.orange);
+        
+        //print normal u data
+        if(normalu != null)
+                this.AddDataTrace(normalu, "Normal Day Speed");
+        
+        if(normalTT != null)
+                this.AddDataTrace(normalTT, "Normal Day TravelTime");
     }
 }
