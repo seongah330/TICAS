@@ -123,24 +123,29 @@ public class SRTEAlgorithm extends Thread{
      * @return 
      */
     private SRTEResultSection process(Section sec, Period p, SRTEConfig config, TimeEvent te) {
-        Station[] stations = sec.getStations();                
-        //read data
-        System.out.print("Loading Data....."+te.getSectionName()+".............");
-        long st = new Date().getTime();
-        sec.loadData(p);
-        
-        long et = new Date().getTime();
-        System.out.println(" (OK : " + (et-st) + "ms)");
-        
         /**
          * Average Section
          */
-        SRTESection sectionwide = AverageSection(stations);
-        System.out.println("Station count : "+stations.length);
+//        SRTESection sectionwide = AverageSection(stations);
+        System.out.println(p.getPeriodStringWithoutTime());
+        SRTESection sectionwide = getSectionData(sec.clone(),p.clone());
+        
+        //temporary normal day
+        Calendar cs = Calendar.getInstance();
+        Calendar ce = Calendar.getInstance();
+        cs.setTime(p.startDate);
+        ce.setTime(p.endDate);
+        cs.set(Calendar.MONTH, 7);
+        ce.set(Calendar.MONTH, 7);
+        Period np = new Period(cs.getTime(),ce.getTime(),TimeInterval);
+        System.out.println(np.getPeriodStringWithoutTime());
+        
+        SRTESection normalDay = getSectionData(sec.clone(),np);
+        
         int cnt = 0;
         System.out.println("Group Name : "+sectionwide.id + " - avgCount : "+sectionwide.getAvgCount());
         sectionwide.printAllData();
-        SRTEProcess proc = new SRTEProcess(sec, p,sectionwide,config,te);
+        SRTEProcess proc = new SRTEProcess(sec, p,sectionwide,normalDay,config,te);
         SRTEResult[] result = new SRTEResult[1];
         result[0] = proc.stateDecision();
         cnt++;
@@ -149,6 +154,27 @@ public class SRTEAlgorithm extends Thread{
         
         return rSection;
     }
+    
+    /**
+     * return Section Data
+     * @param sec
+     * @param p
+     * @return 
+     */
+        private SRTESection getSectionData(Section sec, Period p) {
+                Station[] stations = sec.getStations();                
+                //read data
+                System.out.print("Loading Data....."+sec.getName()+".............");
+                long st = new Date().getTime();
+                sec.loadData(p);
+
+                long et = new Date().getTime();
+                System.out.println(" (OK : " + (et-st) + "ms)");
+                
+                System.out.println("Station count : "+stations.length);
+                
+                return AverageSection(stations);
+        }
     
     /**
      * Average Section Data
@@ -578,47 +604,47 @@ public class SRTEAlgorithm extends Thread{
                 colIdx += 1;
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srst)));
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srst));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().srst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().srst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].data_smoothed,result[i].getcurrentPoint().srst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().q_smoothed,result[i].getcurrentPoint().srst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().k_smoothed,result[i].getcurrentPoint().srst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().data_smoothed,result[i].getcurrentPoint().srst)));
                 //lst
                 colIdx += 1;
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getPoint(result[i].getcurrentPoint().lst))));
                 sheet.addCell(new Number(colIdx++, idx+rows, getPoint(result[i].getcurrentPoint().lst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().lst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().lst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].data_smoothed,result[i].getcurrentPoint().lst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().q_smoothed,result[i].getcurrentPoint().lst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().k_smoothed,result[i].getcurrentPoint().lst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().data_smoothed,result[i].getcurrentPoint().lst)));
                 //rst
                 colIdx += 1;
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().rst)));
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().rst));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().rst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().rst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].data_smoothed,result[i].getcurrentPoint().rst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().q_smoothed,result[i].getcurrentPoint().rst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().k_smoothed,result[i].getcurrentPoint().rst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().data_smoothed,result[i].getcurrentPoint().rst)));
                 //RCR
                 colIdx += 1;
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().RCR)));
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().RCR));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().RCR)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().RCR)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].data_smoothed,result[i].getcurrentPoint().RCR)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().q_smoothed,result[i].getcurrentPoint().RCR)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().k_smoothed,result[i].getcurrentPoint().RCR)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().data_smoothed,result[i].getcurrentPoint().RCR)));
                 
                 //SRT1
                 colIdx += 1;
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().csrt)));
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().csrt));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].q_smoothed,result[i].getcurrentPoint().csrt)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].k_smoothed,result[i].getcurrentPoint().csrt)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].data_smoothed,result[i].getcurrentPoint().csrt)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().q_smoothed,result[i].getcurrentPoint().csrt)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().k_smoothed,result[i].getcurrentPoint().csrt)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().data_smoothed,result[i].getcurrentPoint().csrt)));
                 
                 /**
                 * Difference in speed
                 */
                 colIdx += 1;
-                sheet.addCell(new Number(colIdx++, idx+rows, Math.abs(getValue(result[i].data_smoothed,result[i].getBareLaneTimeStep()))));
-                sheet.addCell(new Number(colIdx++, idx+rows, Math.abs(getValue(result[i].data_smoothed,(int)SRSTP)-getValue(result[i].data_smoothed,(int)LSTP))));
-                sheet.addCell(new Number(colIdx++, idx+rows, Math.abs(getValue(result[i].data_smoothed,(int)SRSTP)-getValue(result[i].data_smoothed,(int)SRTP))));
-                sheet.addCell(new Number(colIdx++, idx+rows, Math.abs(getValue(result[i].data_smoothed,(int)SRTP)-getValue(result[i].data_smoothed,(int)RSTP))));
+                sheet.addCell(new Number(colIdx++, idx+rows, Math.abs(getValue(result[i].getSnowData().data_smoothed,result[i].getBareLaneTimeStep()))));
+                sheet.addCell(new Number(colIdx++, idx+rows, Math.abs(getValue(result[i].getSnowData().data_smoothed,(int)SRSTP)-getValue(result[i].getSnowData().data_smoothed,(int)LSTP))));
+                sheet.addCell(new Number(colIdx++, idx+rows, Math.abs(getValue(result[i].getSnowData().data_smoothed,(int)SRSTP)-getValue(result[i].getSnowData().data_smoothed,(int)SRTP))));
+                sheet.addCell(new Number(colIdx++, idx+rows, Math.abs(getValue(result[i].getSnowData().data_smoothed,(int)SRTP)-getValue(result[i].getSnowData().data_smoothed,(int)RSTP))));
 //                colIdx += 1;
 //                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
 //                    sheet.addCell(new Label(colIdx++, idx+rows, "0"));
@@ -681,24 +707,24 @@ public class SRTEAlgorithm extends Thread{
                 addData(sheet, colIdx++, "Times", result[i].period.getTimelineJustTime());
                 
                 colIdx++;
-                addData(sheet, colIdx++, "Q", result[i].q_origin);
-                addData(sheet, colIdx++, "SQ", result[i].q_smoothed);
-                addData(sheet, colIdx++, "QQ", result[i].q_quant);
+                addData(sheet, colIdx++, "Q", result[i].getSnowData().q_origin);
+                addData(sheet, colIdx++, "SQ", result[i].getSnowData().q_smoothed);
+                addData(sheet, colIdx++, "QQ", result[i].getSnowData().q_quant);
                 
                 colIdx++;
-                addData(sheet, colIdx++, "K", result[i].k_origin);
-                addData(sheet, colIdx++, "SK", result[i].k_smoothed);
-                addData(sheet, colIdx++, "QK", result[i].k_quant);
+                addData(sheet, colIdx++, "K", result[i].getSnowData().k_origin);
+                addData(sheet, colIdx++, "SK", result[i].getSnowData().k_smoothed);
+                addData(sheet, colIdx++, "QK", result[i].getSnowData().k_quant);
 //                
                 colIdx++;
-                addData(sheet, colIdx++, "U", result[i].data_origin);
-                addData(sheet, colIdx++, "SU", result[i].data_smoothed);
-                addData(sheet, colIdx++, "QU", result[i].data_quant);
+                addData(sheet, colIdx++, "U", result[i].getSnowData().data_origin);
+                addData(sheet, colIdx++, "SU", result[i].getSnowData().data_smoothed);
+                addData(sheet, colIdx++, "QU", result[i].getSnowData().data_quant);
 //                
                 colIdx++;
-                addData(sheet, colIdx++, "U(Avg)", result[i].u_Avg_origin);
-                addData(sheet, colIdx++, "SU(Avg)", result[i].u_Avg_smoothed);
-                addData(sheet, colIdx++, "QU(Avg)", result[i].u_Avg_quant);
+                addData(sheet, colIdx++, "U(Avg)", result[i].getSnowData().u_Avg_origin);
+                addData(sheet, colIdx++, "SU(Avg)", result[i].getSnowData().u_Avg_smoothed);
+                addData(sheet, colIdx++, "QU(Avg)", result[i].getSnowData().u_Avg_quant);
 //
 //                colIdx++;colIdx++;
 
@@ -788,19 +814,19 @@ public class SRTEAlgorithm extends Thread{
             colIdx = 0;
             sheet = workbook.createSheet("Data", sheet_count++);
             addData(sheet, colIdx++, "Times", this.period.getTimelineJustTime());
-            addData(sheet, colIdx++, "U", result.data_origin);
-            addData(sheet, colIdx++, "SU", result.data_smoothed);
-            addData(sheet, colIdx++, "QU", result.data_quant);
+            addData(sheet, colIdx++, "U", result.getSnowData().data_origin);
+            addData(sheet, colIdx++, "SU", result.getSnowData().data_smoothed);
+            addData(sheet, colIdx++, "QU", result.getSnowData().data_quant);
             addData(sheet, colIdx++, "Phases", result.phases);
             colIdx++;
-            addData(sheet, colIdx++, "K", result.k_origin);
-            addData(sheet, colIdx++, "SK", result.k_smoothed);
-            addData(sheet, colIdx++, "QK", result.k_quant);
+            addData(sheet, colIdx++, "K", result.getSnowData().k_origin);
+            addData(sheet, colIdx++, "SK", result.getSnowData().k_smoothed);
+            addData(sheet, colIdx++, "QK", result.getSnowData().k_quant);
             
             colIdx++;colIdx++;
             
             Station[] stations = this.section.getStations();
-            addData(sheet, colIdx++, "Avg", result.data_origin);
+            addData(sheet, colIdx++, "Avg", result.getSnowData().data_origin);
             for(int i=0;i<stations.length; i++)
             {
                 addData(sheet, colIdx++, "U-"+stations[i].toString(), stations[i].getSpeed());

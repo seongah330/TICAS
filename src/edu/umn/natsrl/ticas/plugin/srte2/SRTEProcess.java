@@ -54,18 +54,21 @@ public class SRTEProcess {
     private final Section section;
     private Period period;
     private SRTESection selectedStation;
+    //normal SRTESection -> fix me : Sectionss
+    private SRTESection normalStation;
 //    private SMOOTHING sfilter;
     private SRTEConfig config;
     
     //Check data for proccesing
     private boolean hasData = true;
 
-    public SRTEProcess(Section section, Period period,SRTESection station, SRTEConfig config,TimeEvent te) {
+    public SRTEProcess(Section section, Period period,SRTESection station,SRTESection normalStation, SRTEConfig config,TimeEvent te) {
         // config setting
 //        this.SMOOTHING_FILTERSIZE = config.getInt("SMOOTHING_FILTERSIZE");
 //        this.QUANTIZATION_THRESHOLD = config.getInt("QUANTIZATION_THRESHOLD");
 //        sfilter = SMOOTHING.getSmooth(config.getInt(SRTEConfig.SMOOTHINGOPTION));
         this.selectedStation = station;
+        this.normalStation = normalStation;
         this.section = section;
         this.period = period;
         timeevent = te;
@@ -81,31 +84,8 @@ public class SRTEProcess {
         result.setTime(te.getStartTime(), te.getEndTime(), te.getBareLaneRegainTime());
         result.setPeriod(period);
         
-        //Speed Setting
-        result.data_origin = selectedStation.getSpeed();
-        result.data_smoothed = selectedStation.getSmoothedSpeed();
-        result.data_quant = selectedStation.getQuantSpeed();
-        
-        //Flow setting
-        result.q_origin = selectedStation.getAverageLaneFlow();
-        result.q_smoothed = selectedStation.getSmoothedAverageLaneFlow();
-        result.q_quant = selectedStation.getQuantAverageLaneFlow();
-        
-        // density setting
-        result.k_origin = selectedStation.getDensity();
-        result.k_smoothed = selectedStation.getSmoothedDensity();
-        result.k_quant = selectedStation.getQuantDensity();
-        
-        //Average u Data
-        result.u_Avg_origin = selectedStation.getAverageSpeed();
-        result.u_Avg_smoothed = selectedStation.getSmoothedAverageSpeed();
-        result.u_Avg_quant = selectedStation.getQuantAverageSpeed();
-        
-        //TT
-        result.tt_origin = selectedStation.getTravelTime();
-        result.tt_smoothed = selectedStation.getSmoothedTravelTime();
-        result.tt_quant = selectedStation.getQuantTravelTime();
-
+        result.setSnowData(selectedStation);
+        result.setNormalData(normalStation);
     }
     /**
      * Main algorithm process
@@ -113,10 +93,12 @@ public class SRTEProcess {
      * @return
      */
     public SRTEResult stateDecision() {
-        if(!selectedStation.hasData())
-            return result;
+//        if(!selectedStation.hasData())
+//            return result;
         
-        
+        System.out.println("set Result");
+        result.getcurrentPoint().srst = 1;
+        result.getcurrentPoint().rst = 15;
         
         return result;
     }

@@ -45,31 +45,31 @@ public class SRTEResult {
     private HashMap<Integer,Double> speedData = new HashMap<Integer,Double>();
 
     private ArrayList<ResultRCRAccPoint> RCRAccPoint = new ArrayList<ResultRCRAccPoint>();
-    public double[] data_origin;   // original 5 min speed data
-    public double[] data_smoothed;   // smoothed 5 min speed data
-    public double[] data_quant;   // 5 min speed data after quantization
     
-    public double[] u_Avg_origin;
-    public double[] u_Avg_smoothed;
-    public double[] u_Avg_quant;
-
-    public double[] k_smoothed;
-    public double[] k_origin;
-    public double[] k_quant;
-    
-    public double[] q_origin;
-    public double[] q_smoothed;
-    public double[] q_quant;
-    
-    public double[] tt_origin;
-    public double[] tt_smoothed;
-    public double[] tt_quant;
+    private SRTEData snowData;
+    private SRTEData normalData;
     
     public int[] phases;
     public List<String> msgs = new ArrayList<String>();
     public double SpeedLimit;
     
     public boolean hasData = true;
+    
+        public void setSnowData(SRTESection selectedStation) {
+               snowData = new SRTEData(selectedStation); 
+        }
+        
+        public SRTEData getSnowData(){
+              return snowData;  
+        }
+
+        void setNormalData(SRTESection normalStation) {
+                normalData = new SRTEData(normalStation);
+        }
+        
+        public SRTEData getNormalData(){
+                return normalData;
+        }
     /**
      * 
      */
@@ -250,38 +250,38 @@ public class SRTEResult {
 //        
 //    }
 
-    void addPoint(ResultPoint rp) {
-        point.add(rp);
-        if(currentPoint.isEmpty()){
-            System.out.println("clst :"+currentPoint.lst+" plst:"+rp.lst+"-Emplty");
-            currentPoint = rp.clone();
-            return;
-        }
-        for(ResultPoint pn : point){
-            System.out.println("clst :"+currentPoint.lst+" plst:"+pn.lst);
-
-            /**
-             * reset LST Location
-             * Most Low Speed during LST's
-             */
-            if(this.data_smoothed[this.currentPoint.lst] >= this.data_smoothed[pn.lst]){
-                currentPoint.setLST(pn.lst);
-                System.out.println("clst :"+currentPoint.lst+" plst:"+pn.lst + "gotit");
-            }
-            
-            /**
-             * reset RST Location
-             * The closest Point that End Time
-             */
-            int dCurrentRST = this.currentPoint.rst - this.getEndTimeStep();
-            int dPnRST = pn.rst - getEndTimeStep();
-            if(dCurrentRST > dPnRST)
-                currentPoint.setRST(currentPoint.rst);
-            else
-                currentPoint.setRST(pn.rst);
-            
-        }
-    }
+//    void addPoint(ResultPoint rp) {
+//        point.add(rp);
+//        if(currentPoint.isEmpty()){
+//            System.out.println("clst :"+currentPoint.lst+" plst:"+rp.lst+"-Emplty");
+//            currentPoint = rp.clone();
+//            return;
+//        }
+//        for(ResultPoint pn : point){
+//            System.out.println("clst :"+currentPoint.lst+" plst:"+pn.lst);
+//
+//            /**
+//             * reset LST Location
+//             * Most Low Speed during LST's
+//             */
+//            if(this.data_smoothed[this.currentPoint.lst] >= this.data_smoothed[pn.lst]){
+//                currentPoint.setLST(pn.lst);
+//                System.out.println("clst :"+currentPoint.lst+" plst:"+pn.lst + "gotit");
+//            }
+//            
+//            /**
+//             * reset RST Location
+//             * The closest Point that End Time
+//             */
+//            int dCurrentRST = this.currentPoint.rst - this.getEndTimeStep();
+//            int dPnRST = pn.rst - getEndTimeStep();
+//            if(dCurrentRST > dPnRST)
+//                currentPoint.setRST(currentPoint.rst);
+//            else
+//                currentPoint.setRST(pn.rst);
+//            
+//        }
+//    }
     
     public Collection<ResultPoint> getPoint(){
         return point;

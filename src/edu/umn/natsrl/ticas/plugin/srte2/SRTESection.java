@@ -359,6 +359,7 @@ public class SRTESection {
 
         private void calcFilter() {
                 if(getSpeed() == null){
+                        System.out.println("speed null!");
                         hasData = false;
                         return;
                 }
