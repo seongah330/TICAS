@@ -604,9 +604,10 @@ public class SRTEChartView extends javax.swing.JFrame {
          */
         HashMap<Integer,Boolean> point = new HashMap<Integer,Boolean>();
         point.put(currentStationResult.getcurrentPoint().srst,true);
-        point.put(currentStationResult.getcurrentPoint().lst,true);
         point.put(currentStationResult.getcurrentPoint().rst,true);
-        point.put(currentStationResult.getcurrentPoint().csrt,true);
+        point.put(currentStationResult.getcurrentPoint().RCR,true);
+        point.put(currentStationResult.getcurrentPoint().TPR,true);
+        point.put(currentStationResult.getcurrentPoint().NPR,true);
         
         /**
          * Each SRT Point
@@ -702,8 +703,8 @@ public class SRTEChartView extends javax.swing.JFrame {
     }
     private void updatePointInformation(ResultPoint currentPoint) {
         String str = null;
-        str = "<html>Point Information<br>   <b>-SRST</b>&nbsp: "+currentPoint.srst+"<br>    <b>-LST</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.lst+"<br>    <b>-RST</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.rst;
-        str += "<br>    <b>-SRT</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.csrt;
+        str = "<html>Point Information<br>   <b>-SRST</b>&nbsp: "+currentPoint.srst+"<br>    <b>-RST</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.rst+"<br>    <b>-TPR</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.TPR;
+        str += "<br>    <b>-NPR</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.NPR;
         str += "<br>    <b>-RCR</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.RCR;
         int cnt = 1;
         for(int srt : currentPoint.srt){

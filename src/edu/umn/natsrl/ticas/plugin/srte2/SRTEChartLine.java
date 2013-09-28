@@ -74,9 +74,9 @@ public class SRTEChartLine extends SRTEChart implements ImplSRTEChart{
         
         //print normal u data
         if(normalu != null)
-                this.AddDataTrace(normalu, "Normal Day Speed");
+                this.AddPointDataTrace(null,normalu, "Normal Day Speed",true,null,Color.BLUE);
         
         if(normalTT != null)
-                this.AddDataTrace(normalTT, "Normal Day TravelTime");
+                this.AddPointDataTrace(null,normalTT, "Normal Day TravelTime",true,null,Color.BLUE);
     }
 }

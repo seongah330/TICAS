@@ -25,8 +25,9 @@ import java.util.ArrayList;
  */
 public class ResultPoint {
     public int srst=-1; // speed decline point for 5 min data
-    public int lst=0; // low speed point for 5 min data
     public int rst=0; // speed recovery point for 5 min data
+    public int TPR=0;
+    public int NPR=0;
     public int csrt=Integer.MAX_VALUE; // SRT
     public int RCR=-1;
     public ArrayList<Integer> srt = new ArrayList<Integer>(); // stable speed point for 5 min data
@@ -35,60 +36,24 @@ public class ResultPoint {
     
     ResultPoint(){;}
     
-    public boolean isEmpty(){
-//        System.out.println(toString());
-        if(srst < 0 ||
-                lst <=0 ||
-                rst <=0)
-            return true;
-        
-        if(srst > lst || lst > rst || srst > rst)
-            return true;
-        
-        return false;
-    }
-    
     public void setSRST(int _srst){
         srst = _srst;
-    }
-    public void setLST(int _lst){
-        lst = _lst;
-    }
-    public void setRST(int _rst){
-        int gap = lst - _rst;
-        if(gap > 0 && gap < 2)
-            rst = lst;
-        else
-            rst = _rst;
     }
     
     @Override
     public ResultPoint clone(){
         ResultPoint temp = new ResultPoint();
         temp.srst = srst;
-        temp.lst = lst;
         temp.rst = rst;
         
         return temp;
     }
     public String toString(){
-        return "srst : "+srst + " lst : "+lst + " rst : "+rst;
-    }
-
-    ResultPoint getMovingPoint(ResultPoint current) {
-        ResultPoint temp = new ResultPoint();
-        temp.srst = current.srst;
-        temp.lst = lst;
-        temp.rst = current.rst;
-        
-        return temp;
+        return "srst : "+srst + " rst : "+rst;
     }
 
     int getSRST() {
         return this.srst;
-    }
-    int getLST(){
-        return this.lst;
     }
     int getRST(){
         return this.rst;

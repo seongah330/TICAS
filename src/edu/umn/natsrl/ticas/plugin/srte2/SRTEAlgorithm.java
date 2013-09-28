@@ -472,7 +472,7 @@ public class SRTEAlgorithm extends Thread{
                 double SL_BARE = error;
                 String direction = "";
                 double SRSTP = result[i].getcurrentPoint().srst;
-                double LSTP = result[i].getcurrentPoint().lst;
+                double LSTP = result[i].getcurrentPoint().TPR;
                 double RSTP = result[i].getcurrentPoint().rst;
                 double SRTP = result[i].getcurrentPoint().csrt;
                 double RCRP = result[i].getcurrentPoint().RCR;
@@ -500,7 +500,7 @@ public class SRTEAlgorithm extends Thread{
 //                System.out.println("ST : "+result[i].station.getStationId() + "Bare : "+BLTS+ " RCR-bare : "+RCRdeference + " RCR-SL : "+ RCR_SL + " SL-BARE : "+SL_BARE);
                 
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().srst))); //srst
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getPoint(result[i].getcurrentPoint().lst)))); //lst
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getPoint(result[i].getcurrentPoint().TPR)))); //TPR
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().rst))); //rst
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().RCR))); //rxr
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().csrt))); //srt1
@@ -571,7 +571,7 @@ public class SRTEAlgorithm extends Thread{
                  */
                 colIdx += 1;
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().srst));
-                sheet.addCell(new Number(colIdx++, idx+rows, getPoint(result[i].getcurrentPoint().lst)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getPoint(result[i].getcurrentPoint().TPR)));
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().rst));
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().RCR));
                 sheet.addCell(new Number(colIdx++, idx+rows, result[i].getcurrentPoint().csrt));
@@ -609,11 +609,11 @@ public class SRTEAlgorithm extends Thread{
                 sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().data_smoothed,result[i].getcurrentPoint().srst)));
                 //lst
                 colIdx += 1;
-                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getPoint(result[i].getcurrentPoint().lst))));
-                sheet.addCell(new Number(colIdx++, idx+rows, getPoint(result[i].getcurrentPoint().lst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().q_smoothed,result[i].getcurrentPoint().lst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().k_smoothed,result[i].getcurrentPoint().lst)));
-                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().data_smoothed,result[i].getcurrentPoint().lst)));
+                sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,getPoint(result[i].getcurrentPoint().TPR))));
+                sheet.addCell(new Number(colIdx++, idx+rows, getPoint(result[i].getcurrentPoint().TPR)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().q_smoothed,result[i].getcurrentPoint().TPR)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().k_smoothed,result[i].getcurrentPoint().TPR)));
+                sheet.addCell(new Number(colIdx++, idx+rows, getValue(result[i].getSnowData().data_smoothed,result[i].getcurrentPoint().TPR)));
                 //rst
                 colIdx += 1;
                 sheet.addCell(new Label(colIdx++, idx+rows, getTime(p,result[i].getcurrentPoint().rst)));
