@@ -34,6 +34,9 @@ public class ResultPoint {
     public ArrayList<Integer> srtc = new ArrayList<Integer>();
     public ArrayList<Integer> srtf = new ArrayList<Integer>();
     
+    public int SRST_TT = 0;
+    public int RST_TT = 0;
+    public int NPR_TT = 0;
     ResultPoint(){;}
     
     public void setSRST(int _srst){

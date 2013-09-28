@@ -608,6 +608,9 @@ public class SRTEChartView extends javax.swing.JFrame {
         point.put(currentStationResult.getcurrentPoint().RCR,true);
         point.put(currentStationResult.getcurrentPoint().TPR,true);
         point.put(currentStationResult.getcurrentPoint().NPR,true);
+        point.put(currentStationResult.getcurrentPoint().SRST_TT,true);
+        point.put(currentStationResult.getcurrentPoint().RST_TT,true);
+        point.put(currentStationResult.getcurrentPoint().NPR_TT,true);
         
         /**
          * Each SRT Point
@@ -706,6 +709,9 @@ public class SRTEChartView extends javax.swing.JFrame {
         str = "<html>Point Information<br>   <b>-SRST</b>&nbsp: "+currentPoint.srst+"<br>    <b>-RST</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.rst+"<br>    <b>-TPR</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.TPR;
         str += "<br>    <b>-NPR</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.NPR;
         str += "<br>    <b>-RCR</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.RCR;
+        str += "<br>    <b>-RCR</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.SRST_TT;
+        str += "<br>    <b>-RCR</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.RST_TT;
+        str += "<br>    <b>-RCR</b>&nbsp&nbsp&nbsp&nbsp: "+currentPoint.NPR_TT;
         int cnt = 1;
         for(int srt : currentPoint.srt){
             switch(cnt){
