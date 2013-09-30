@@ -18,6 +18,7 @@
 package edu.umn.natsrl.ticas.plugin.srte2;
 
 import edu.umn.natsrl.ticas.plugin.srte2.SRTEChartView.DataType;
+import info.monitorenter.gui.chart.traces.painters.TracePainterDisc;
 
 /**
  *
@@ -37,7 +38,8 @@ public class SRTEChartXY extends SRTEChart implements ImplSRTEChart {
     public void setXYGraph(double[] xdata, double[] ydata, DataType datatype){
         setRangeData(xdata,ydata);
         
-        super.addDataTrace(xdata, ydata,datatype);
+        super.addDataTrace(xdata, ydata,datatype,null);
+        super.addDataTrace(xdata, ydata,datatype,new TracePainterDisc(3));
     }
 
     private void setRangeData(double[] xdata, double[] ydata) {

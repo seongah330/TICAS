@@ -23,6 +23,7 @@ import info.monitorenter.gui.chart.axis.scalepolicy.AxisScalePolicyManualTicks;
 import info.monitorenter.gui.chart.pointpainters.PointPainterDisc;
 import info.monitorenter.gui.chart.rangepolicies.RangePolicyFixedViewport;
 import info.monitorenter.gui.chart.traces.Trace2DSimple;
+import info.monitorenter.gui.chart.traces.painters.TracePainterDisc;
 import info.monitorenter.gui.chart.traces.painters.TracePainterVerticalBar;
 import info.monitorenter.util.Range;
 import java.awt.Color;
@@ -161,12 +162,13 @@ public class SRTEChart {
      * @param ydata
      * @param datatype 
      */
-    void addDataTrace(double[] xdata, double[] ydata, DataType datatype) {
+    void addDataTrace(double[] xdata, double[] ydata, DataType datatype,ITracePainter<?> pnt) {
         ITrace2D trace = new Trace2DSimple();
 
         chart.addTrace(trace);
         trace.setName(datatype.name);
-
+        if(pnt != null)
+            trace.setTracePainter(pnt);
         // Feature: turn on highlighting: Two steps enable it on the chart and set a highlighter for the trace: 
         Set<IPointPainter<?>> highlighters = trace.getPointHighlighters();
         highlighters.clear();
